@@ -33,13 +33,7 @@ let project = Project(
             deploymentTargets: .iOS("26.0"),
             infoPlist: .extendingDefault(
                 with: [
-                    "UILaunchScreen": [
-                        "UIColorName": "",
-                        "UIImageName": ""
-                    ],
-                    "UIApplicationSceneManifest": [
-                        "UIApplicationSupportsMultipleScenes": false
-                    ]
+                    "UILaunchScreen": [:]
                 ]
             ),
             sources: ["Sources/Eatadaki/**"],

@@ -20,7 +20,6 @@ public struct InitializationErrorView: View {
                 .multilineTextAlignment(.center)
                 .padding(.horizontal)
         }
-        .frame(maxWidth: .infinity, maxHeight: .infinity)
         .padding()
     }
 }
