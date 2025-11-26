@@ -1,4 +1,4 @@
-// swift-tools-version: 5.9
+// swift-tools-version: 6.2
 import PackageDescription
 
 #if TUIST
@@ -12,9 +12,9 @@ let packageSettings = PackageSettings(
 #endif
 
 let package = Package(
-    name: "Itadaki",
+    name: "Eatadaki",
     platforms: [
-        .iOS(.v17)
+        .iOS(.v26)
     ],
     dependencies: [
         .package(url: "https://github.com/groue/GRDB.swift.git", from: "6.0.0")

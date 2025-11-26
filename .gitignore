@@ -68,3 +68,59 @@ Derived/
 
 ### Tuist managed dependencies ###
 Tuist/.build
+.tuist-bin
+tuistenv
+
+### Swift Package Manager ###
+.swiftpm/
+.build/
+*.xcodeproj
+Package.resolved
+
+### Swift ###
+*.swiftpm
+.swiftpm/configuration/registries.json
+.swiftpm/xcode/package.xcworkspace/contents.xcworkspacedata
+.netrc
+
+### Fastlane ###
+fastlane/report.xml
+fastlane/Preview.html
+fastlane/screenshots/**/*.png
+fastlane/test_output
+
+### Code Injection ###
+iOSInjectionProject/
+
+### App Packaging ###
+*.ipa
+*.dSYM.zip
+*.dSYM
+
+### Playgrounds ###
+timeline.xctimeline
+playground.xcworkspace
+
+### Xcode Cloud ###
+ci_scripts/
+ci_post_clone.sh
+ci_post_xcodebuild.sh
+
+### Environment & Secrets ###
+.env
+.env.local
+*.secrets
+Secrets.swift
+
+### Coverage ###
+*.gcda
+*.gcov
+coverage/
+*.profdata
+
+### IDEs ###
+.idea/
+.vscode/
+*.swp
+*.swo
+*~

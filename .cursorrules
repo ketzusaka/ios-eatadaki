@@ -1,0 +1,41 @@
+# Cursor Rules for Eatadaki iOS
+
+## Architecture Documentation
+
+Please refer to the architecture documentation at `docs/ARCHITECTURE.md` for detailed information about the app's architecture, state machine, and module structure.
+
+## Key Architecture Points
+
+- **State Machine Pattern**: The app uses three primary states: Initializing, Unauthenticated, and Authenticated
+- **User Requirement**: All user data requires authentication - the app must have a logged-in user
+- **Module Structure**: 
+  - `Eatadaki` - App entry point and state machine
+  - `EatadakiUI` - SwiftUI views
+  - `EatadakiData` - Data persistence (GRDB) using Repository pattern
+  - `EatadakiKit` - Shared utilities
+
+## Code Style Guidelines
+
+- Use SwiftUI for all UI
+- Follow the state machine pattern for app flow
+- Keep modules separated with clear dependencies
+- Use GRDB for all database operations through `EatadakiRepository` protocol
+- Implement `RealEatadakiRepository` as an actor for thread-safe database access using `DatabasePool`
+- Use `EatadakiDatabaseMigrator` for all database schema migrations
+- Repository methods use async/throws pattern
+- Data models use UUID for identification (e.g., `Spot`)
+- Ensure all user data operations require authentication
+- **Create new files for new views**: Even if a view is a subview or component, it should have its own file. This improves code organization, reusability, and maintainability.
+- **Database column naming**: Use camelCase for database column names to match Swift property names. Avoid CodingKeys - let GRDB's automatic Codable support handle the mapping directly.
+
+## When Making Changes
+
+- Consider the state machine when adding new features
+- Ensure proper state transitions
+- Maintain separation between UI, Data, and Business Logic layers
+- Update architecture documentation if making significant structural changes
+
+## Development Workflow
+
+- **Tuist Generation**: Always use `tuist generate --no-open` to prevent Xcode from automatically opening after generation. This avoids interrupting the user's workflow.
+

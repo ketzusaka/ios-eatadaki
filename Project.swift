@@ -1,63 +1,153 @@
 import ProjectDescription
 
+// MARK: - Packages
+
+let packages: [Package] = [
+    .package(
+        url: "https://github.com/groue/GRDB.swift.git",
+        .upToNextMajor(from: "6.0.0")
+    )
+]
+
+// MARK: - Project
+
 let project = Project(
-    name: "Itadaki",
+    name: "Eatadaki",
     organizationName: "Aethercode Labs",
+    packages: packages,
+    settings: .settings(
+        configurations: [
+            .debug(name: "Debug"),
+            .release(name: "Release")
+        ]
+    ),
     targets: [
+
+        // MARK: - App
+        
         .target(
-            name: "Itadaki",
-            destinations: .iOS,
+            name: "Eatadaki",
+            destinations: [.iPhone],
             product: .app,
-            bundleId: "com.aethercodelabs.itadaki",
-            deploymentTargets: .iOS("17.0"),
-            infoPlist: .default,
-            sources: ["Sources/Itadaki/**"],
+            bundleId: "com.aethercodelabs.eatadaki",
+            deploymentTargets: .iOS("26.0"),
+            infoPlist: .extendingDefault(
+                with: [
+                    "UILaunchScreen": [
+                        "UIColorName": "",
+                        "UIImageName": ""
+                    ],
+                    "UIApplicationSceneManifest": [
+                        "UIApplicationSupportsMultipleScenes": false
+                    ]
+                ]
+            ),
+            sources: ["Sources/Eatadaki/**"],
             resources: ["Resources/**"],
             dependencies: [
-                .target(name: "ItadakiUI"),
-                .target(name: "ItadakiData"),
-                .target(name: "ItadakiKit")
+                .target(name: "EatadakiUI"),
+                .target(name: "EatadakiData"),
+                .target(name: "EatadakiKit")
             ],
             settings: .settings(
-                base: [
-                    "CODE_SIGN_STYLE": "Automatic",
-                    "DEVELOPMENT_TEAM": "7YF7AKC3MY"
+                configurations: [
+                    .debug(
+                        name: "Debug",
+                        settings: [
+                            "PRODUCT_BUNDLE_IDENTIFIER": "com.aethercodelabs.eatadaki.dev"
+                        ]
+                    ),
+                    .release(name: "Release")
                 ]
             )
         ),
+
+        // MARK: - Frameworks
+        
         .target(
-            name: "ItadakiUI",
-            destinations: .iOS,
+            name: "EatadakiUI",
+            destinations: [.iPhone],
             product: .framework,
-            bundleId: "com.aethercodelabs.itadaki.ui",
-            deploymentTargets: .iOS("17.0"),
+            bundleId: "com.aethercodelabs.eatadaki.ui",
+            deploymentTargets: .iOS("26.0"),
             infoPlist: .default,
-            sources: ["Sources/ItadakiUI/**"],
+            sources: ["Sources/EatadakiUI/**"],
+            dependencies: [.target(name: "EatadakiKit")]
+        ),
+
+        .target(
+            name: "EatadakiData",
+            destinations: [.iPhone],
+            product: .framework,
+            bundleId: "com.aethercodelabs.eatadaki.data",
+            deploymentTargets: .iOS("26.0"),
+            infoPlist: .default,
+            sources: ["Sources/EatadakiData/**"],
             dependencies: [
-                .target(name: "ItadakiKit")
+                .package(product: "GRDB"),
+                .target(name: "EatadakiKit")
             ]
         ),
+
         .target(
-            name: "ItadakiData",
-            destinations: .iOS,
+            name: "EatadakiKit",
+            destinations: [.iPhone],
             product: .framework,
-            bundleId: "com.aethercodelabs.itadaki.data",
-            deploymentTargets: .iOS("17.0"),
+            bundleId: "com.aethercodelabs.eatadaki.kit",
+            deploymentTargets: .iOS("26.0"),
             infoPlist: .default,
-            sources: ["Sources/ItadakiData/**"],
-            dependencies: [
-                .external(name: "GRDB"),
-                .target(name: "ItadakiKit")
-            ]
+            sources: ["Sources/EatadakiKit/**"]
         ),
+
+        // MARK: - Tests
         .target(
-            name: "ItadakiKit",
-            destinations: .iOS,
-            product: .framework,
-            bundleId: "com.aethercodelabs.itadaki.kit",
-            deploymentTargets: .iOS("17.0"),
-            infoPlist: .default,
-            sources: ["Sources/ItadakiKit/**"]
+            name: "EatadakiTests",
+            destinations: [.iPhone],
+            product: .unitTests,
+            bundleId: "com.aethercodelabs.eatadaki.tests",
+            deploymentTargets: .iOS("26.0"),
+            sources: ["Tests/EatadakiAppTests/**"],
+            dependencies: [.target(name: "Eatadaki")]
+        ),
+
+        .target(
+            name: "EatadakiUITests",
+            destinations: [.iPhone],
+            product: .unitTests,
+            bundleId: "com.aethercodelabs.eatadaki.ui.tests",
+            deploymentTargets: .iOS("26.0"),
+            sources: ["Tests/EatadakiUITests/**"],
+            dependencies: [.target(name: "EatadakiUI")]
+        ),
+
+        .target(
+            name: "EatadakiDataTests",
+            destinations: [.iPhone],
+            product: .unitTests,
+            bundleId: "com.aethercodelabs.eatadaki.data.tests",
+            deploymentTargets: .iOS("26.0"),
+            sources: ["Tests/EatadakiDataTests/**"],
+            dependencies: [.target(name: "EatadakiData")]
+        ),
+
+        .target(
+            name: "EatadakiKitTests",
+            destinations: [.iPhone],
+            product: .unitTests,
+            bundleId: "com.aethercodelabs.eatadaki.kit.tests",
+            deploymentTargets: .iOS("26.0"),
+            sources: ["Tests/EatadakiKitTests/**"],
+            dependencies: [.target(name: "EatadakiKit")]
+        ),
+
+        .target(
+            name: "EatadakiAppUITests",
+            destinations: [.iPhone],
+            product: .uiTests,
+            bundleId: "com.aethercodelabs.eatadaki.ui-tests",
+            deploymentTargets: .iOS("26.0"),
+            sources: ["Tests/EatadakiAppUITests/**"],
+            dependencies: [.target(name: "Eatadaki")]
         )
     ]
 )

@@ -1,0 +1,95 @@
+# SwiftLint Configuration for Eatadaki
+# Modern Swift style with implicit returns and contemporary patterns
+
+# Paths
+included:
+  - Sources
+  - Tests
+
+excluded:
+  - Derived
+  - .tuist-bin
+  - Package.swift
+  - Package.resolved
+
+# Disabled rules (from standard set)
+disabled_rules:
+  - todo                    # Allow TODO comments during development
+  - line_length             # No strict line length (let formatter handle)
+  - type_body_length        # No strict type length (context-dependent)
+  - file_length             # No strict file length (context-dependent)
+  - function_body_length    # No strict function length (context-dependent)
+  - cyclomatic_complexity   # No complexity checks (can be too restrictive)
+  - force_cast              # Allow force casts (developer discretion)
+  - force_try               # Allow force try (developer discretion)
+  - explicit_acl            # Allow implicit access control (too opinionated)
+  - explicit_top_level_acl  # Allow implicit top-level access control
+  - first_where             # Not suitable for some async patterns
+  - identifier_name         # Allow any identifier names (too restrictive)
+
+# Opt-in rules for modern Swift style
+opt_in_rules:
+  - implicit_return                    # Enforce implicit returns (closures, functions, getters)
+  - strict_fileprivate                 # Prefer `private` over `fileprivate`
+  - multiline_parameters              # Multi-line function parameters style
+  - sorted_imports                     # Keep imports alphabetically sorted
+  - vertical_whitespace_closing_braces # Spacing before closing braces
+  - vertical_whitespace_opening_braces # Spacing after opening braces
+  - operator_usage_whitespace          # Consistent operator spacing
+  - yoda_condition                     # Prefer non-Yoda conditions
+  - redundant_type_annotation          # Remove unnecessary type annotations
+  - closure_spacing                    # Consistent closure spacing
+  - empty_count                        # Prefer `.isEmpty` over `.count == 0`
+  - first_where                        # Prefer `.first(where:)` over `.filter { }.first`
+  - contains_over_filter_count         # Prefer `contains` over filter count checks
+  - contains_over_filter_is_empty      # Prefer `contains` over filter isEmpty
+  - flatmap_over_map_reduce            # Prefer `flatMap` over `map { }.reduce`
+  - shorthand_optional_binding          # Prefer shorthand optional binding syntax
+
+# Rule configurations
+type_name:
+  min_length: 2
+  max_length: 40
+
+
+# Modern Swift style preferences
+
+strict_fileprivate:
+  severity: warning
+
+multiline_parameters:
+  severity: warning
+
+sorted_imports:
+  severity: warning
+
+vertical_whitespace_closing_braces:
+  severity: warning
+
+vertical_whitespace_opening_braces:
+  severity: warning
+
+operator_usage_whitespace:
+  severity: warning
+
+yoda_condition:
+  severity: warning
+
+redundant_type_annotation:
+  severity: warning
+
+closure_spacing:
+  severity: warning
+
+empty_count:
+  severity: warning
+
+contains_over_filter_count:
+  severity: warning
+
+contains_over_filter_is_empty:
+  severity: warning
+
+flatmap_over_map_reduce:
+  severity: warning
+
