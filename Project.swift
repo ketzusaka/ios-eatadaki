@@ -125,7 +125,10 @@ let project = Project(
             bundleId: "com.aethercodelabs.eatadaki.data.tests",
             deploymentTargets: .iOS("26.0"),
             sources: ["Tests/EatadakiDataTests/**"],
-            dependencies: [.target(name: "EatadakiData")]
+            dependencies: [
+                .target(name: "EatadakiData"),
+                .package(product: "GRDB")
+            ]
         ),
 
         .target(
