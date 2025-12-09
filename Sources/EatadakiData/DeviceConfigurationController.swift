@@ -23,15 +23,19 @@ public actor RealDeviceConfigurationController: DeviceConfigurationController {
     public var optInLocationServices: Bool {
         get async throws {
             try await db.read { db in
-                try Bool(DeviceConfiguration.fetchOne(db, key: "optInLocationServices")?.value ?? "false") ?? false
+                try Bool(DeviceConfiguration.fetchOne(db, key: DeviceConfigurationKey.optInLocationServices.rawValue)?.value ?? "false") ?? false
             }
         }
     }
     
     public func setOptInLocationServices(_ optInLocationServices: Bool) async throws {
         try await db.write { db in
-            let config = DeviceConfiguration(key: "optInLocationServices", value: optInLocationServices ? "1" : "0")
-            try config.save(db)
+            let keyString = DeviceConfigurationKey.optInLocationServices.rawValue
+            // Delete existing config if it exists
+            _ = try DeviceConfiguration.filter(Column("key") == keyString).deleteAll(db)
+            // Insert new config
+            let config = DeviceConfiguration(key: .optInLocationServices, value: optInLocationServices ? "true" : "false")
+            try config.insert(db)
         }
     }
     

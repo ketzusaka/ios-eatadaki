@@ -88,14 +88,14 @@ struct DeviceConfigDatabaseMigratorTests {
         
         try migrator.migrate()
         
-        let testConfig = DeviceConfiguration(key: "testKey", value: "testValue")
+        let testConfig = DeviceConfiguration(key: .optInLocationServices, value: "testValue")
         
         try db.write { database in
             try testConfig.insert(database)
         }
         
         try db.read { database in
-            let fetchedConfig = try #require(try? DeviceConfiguration.fetchOne(database, key: "testKey"))
+            let fetchedConfig = try #require(try? DeviceConfiguration.fetchOne(database, key: DeviceConfigurationKey.optInLocationServices.rawValue))
             #expect(fetchedConfig.key == testConfig.key)
             #expect(fetchedConfig.value == testConfig.value)
         }
