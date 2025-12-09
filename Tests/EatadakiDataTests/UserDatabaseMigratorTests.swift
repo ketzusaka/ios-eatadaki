@@ -78,7 +78,7 @@ struct UserDatabaseMigratorTests {
         let testUser = User(
             id: UUID(),
             email: "test@example.com",
-            createdAt: Date()
+            createdAt: .now
         )
         
         try db.write { database in

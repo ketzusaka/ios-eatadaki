@@ -19,28 +19,47 @@ public actor RealSpotsRepository: SpotsRepository {
     }
 
     public func fetchSpot(withID id: UUID) async throws -> Spot {
-        try await db.read { db in
-            guard let spot = try Spot.fetchOne(db, key: id) else {
-                throw RepositoryError.notFound
+        do {
+            return try await db.read { db in
+                guard let spot = try Spot.fetchOne(db, key: id) else {
+                    throw RepositoryError.notFound
+                }
+                return spot
             }
-            return spot
+        } catch let error as RepositoryError {
+            throw error
+        } catch {
+            throw RepositoryError.unknown(error.localizedDescription)
         }
     }
 
     public func fetchSpots() async throws -> [Spot] {
-        try await db.read { db in
-            try Spot.fetchAll(db)
+        do {
+            return try await db.read { db in
+                try Spot.fetchAll(db)
+            }
+        } catch let error as RepositoryError {
+            throw error
+        } catch {
+            throw RepositoryError.unknown(error.localizedDescription)
         }
     }
 
     public func create(spot: Spot) async throws -> Spot {
-        try await db.write { db in
-            try spot.insert(db)
-            return spot
+        do {
+            return try await db.write { db in
+                try spot.insert(db)
+                return spot
+            }
+        } catch let error as RepositoryError {
+            throw error
+        } catch {
+            throw RepositoryError.unknown(error.localizedDescription)
         }
     }
 }
 
-enum RepositoryError: Error {
+public enum RepositoryError: Error, Equatable {
     case notFound
+    case unknown(String)
 }

@@ -209,7 +209,7 @@ struct ExperiencesDatabaseMigratorTests {
             mapkitId: "test-mapkit-id",
             remoteId: "test-remote-id",
             name: "Test Spot",
-            createdAt: Date()
+            createdAt: .now
         )
         
         try db.write { database in
@@ -236,7 +236,7 @@ struct ExperiencesDatabaseMigratorTests {
             remoteId: "test-remote-id",
             name: "Test Experience",
             description: "Test Description",
-            createdAt: Date()
+            createdAt: .now
         )
         
         try db.write { database in

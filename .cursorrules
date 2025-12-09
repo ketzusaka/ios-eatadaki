@@ -36,6 +36,11 @@ Please refer to the architecture documentation at `docs/ARCHITECTURE.md` for det
 - Maintain separation between UI, Data, and Business Logic layers
 - Update architecture documentation if making significant structural changes
 
+## Testing Guidelines
+
+- **Test Helper Placement**: Place all helper methods (private functions used for test setup) at the end of test structs, after all test methods. Use a `// MARK: - Helpers` comment to separate them.
+- **Date Usage in Tests**: Use `.now` instead of `Date()` for creating current date values in test code (e.g., `createdAt: .now`).
+
 ## Development Workflow
 
 - **Tuist Generation**: Always use `tuist generate --no-open` to prevent Xcode from automatically opening after generation. This avoids interrupting the user's workflow.
