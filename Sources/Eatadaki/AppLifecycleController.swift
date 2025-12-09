@@ -14,26 +14,32 @@ final class AppLifecycleController {
         state = .initializing
 
         do {
-            // Create database connection
-            let dbURL = try getDatabaseURL()
-            let db = try DatabasePool(path: dbURL.path)
+            // Create separate database connections for each domain
+            let userDbURL = try getDatabaseURL(name: "user")
+            let userDb = try DatabasePool(path: userDbURL.path)
+            
+            let deviceConfigDbURL = try getDatabaseURL(name: "device_config")
+            let deviceConfigDb = try DatabasePool(path: deviceConfigDbURL.path)
+            
+            let experiencesDbURL = try getDatabaseURL(name: "experiences")
+            let experiencesDb = try DatabasePool(path: experiencesDbURL.path)
 
             // Run migrations
-            let userMigrator = UserDatabaseMigrator(db: db)
+            let userMigrator = UserDatabaseMigrator(db: userDb)
             try userMigrator.migrate()
             
-            let deviceConfigMigrator = DeviceConfigDatabaseMigrator(db: db)
+            let deviceConfigMigrator = DeviceConfigDatabaseMigrator(db: deviceConfigDb)
             try deviceConfigMigrator.migrate()
             
-            let experiencesMigrator = ExperiencesDatabaseMigrator(db: db)
+            let experiencesMigrator = ExperiencesDatabaseMigrator(db: experiencesDb)
             try experiencesMigrator.migrate()
 
             // Create repositories
-            let userRepository = RealUserRepository(db: db)
-            let spotsRepository = RealSpotsRepository(db: db)
+            let userRepository = RealUserRepository(db: userDb)
+            let spotsRepository = RealSpotsRepository(db: experiencesDb)
             
             // Create device configuration controller
-            let deviceConfigurationController = RealDeviceConfigurationController(db: db)
+            let deviceConfigurationController = RealDeviceConfigurationController(db: deviceConfigDb)
             
             // Create location service
             let locationService = RealLocationService(deviceConfigurationController: deviceConfigurationController)
@@ -69,7 +75,7 @@ final class AppLifecycleController {
         }
     }
 
-    private func getDatabaseURL() throws -> URL {
+    private func getDatabaseURL(name: String) throws -> URL {
         let fileManager = FileManager.default
         let appSupportURL = try fileManager.url(
             for: .applicationSupportDirectory,
@@ -77,6 +83,6 @@ final class AppLifecycleController {
             appropriateFor: nil,
             create: true
         )
-        return appSupportURL.appendingPathComponent("eatadaki.sqlite")
+        return appSupportURL.appendingPathComponent("\(name).sqlite")
     }
 }
