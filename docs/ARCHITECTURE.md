@@ -135,7 +135,9 @@ The app follows a **state machine pattern** with three primary states:
 - **Key Components**:
   - `EatadakiRepository`: Protocol defining data access interface with async/throws methods
   - `RealEatadakiRepository`: Actor-based concrete implementation using `DatabasePool` for thread-safe data access
-  - `EatadakiDatabaseMigrator`: Handles database schema migrations for all repositories
+  - `UserDatabaseMigrator`: Handles user table migrations
+  - `DeviceConfigDatabaseMigrator`: Handles device configuration table migrations
+  - `ExperiencesDatabaseMigrator`: Handles experiences, experience ratings, and spots table migrations
   - `Spot`: Core data model with UUID-based identification
 - **Database Conventions**:
   - Use camelCase for database column names to match Swift property names
@@ -154,7 +156,7 @@ The app follows a **state machine pattern** with three primary states:
 ### Initialization Flow
 1. App launches → `Initializing` state
 2. Initialize database (GRDB `DatabasePool`)
-3. Run database migrations (`EatadakiDatabaseMigrator`)
+3. Run database migrations (`UserDatabaseMigrator`, `DeviceConfigDatabaseMigrator`, `ExperiencesDatabaseMigrator`)
 4. Check for existing user session
 5. Transition to `Unauthenticated` or `Authenticated`
 

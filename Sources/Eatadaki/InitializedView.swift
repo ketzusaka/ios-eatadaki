@@ -17,9 +17,9 @@ struct InitializedView: View {
                 Label("Spots", systemImage: "mappin.circle")
             }
 
-            TastesView()
+            ExperiencesView()
                 .tabItem {
-                    Label("Tastes", systemImage: "fork.knife")
+                    Label("Experiences", systemImage: "fork.knife")
                 }
 
             ProfileView(isAuthenticated: isAuthenticated)

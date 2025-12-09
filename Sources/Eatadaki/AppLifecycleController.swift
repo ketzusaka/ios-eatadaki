@@ -19,8 +19,14 @@ final class AppLifecycleController {
             let db = try DatabasePool(path: dbURL.path)
 
             // Run migrations
-            let migrator = EatadakiDatabaseMigrator(db: db)
-            try migrator.migrate()
+            let userMigrator = UserDatabaseMigrator(db: db)
+            try userMigrator.migrate()
+            
+            let deviceConfigMigrator = DeviceConfigDatabaseMigrator(db: db)
+            try deviceConfigMigrator.migrate()
+            
+            let experiencesMigrator = ExperiencesDatabaseMigrator(db: db)
+            try experiencesMigrator.migrate()
 
             // Create repositories
             let userRepository = RealUserRepository(db: db)

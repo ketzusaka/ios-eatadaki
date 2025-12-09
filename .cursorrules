@@ -21,7 +21,7 @@ Please refer to the architecture documentation at `docs/ARCHITECTURE.md` for det
 - Keep modules separated with clear dependencies
 - Use GRDB for all database operations through `EatadakiRepository` protocol
 - Implement `RealEatadakiRepository` as an actor for thread-safe database access using `DatabasePool`
-- Use `EatadakiDatabaseMigrator` for all database schema migrations
+- Use separate database migrators for each domain: `UserDatabaseMigrator`, `DeviceConfigDatabaseMigrator`, and `ExperiencesDatabaseMigrator`
 - Repository methods use async/throws pattern
 - Data models use UUID for identification (e.g., `Spot`)
 - Ensure all user data operations require authentication
