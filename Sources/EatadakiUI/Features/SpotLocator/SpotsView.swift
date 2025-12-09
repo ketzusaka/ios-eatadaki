@@ -13,7 +13,24 @@ public struct SpotsView: View {
                 Text("Spots")
                     .font(.headline)
             }
-            .navigationTitle("Eatadaki")
+            .toolbar {
+                ToolbarItem(placement: .navigationBarLeading) {
+                    Button(action: {
+                        // TODO: Present Filtering UI
+                    }) {
+                        Image(systemName: "line.3.horizontal.decrease.circle")
+                    }
+                }
+
+                ToolbarItem(placement: .navigationBarTrailing) {
+                    Button(action: {
+                        // TODO: Add spot
+                    }) {
+                        Image(systemName: "plus")
+                    }
+                }
+            }
+            .navigationTitle("Spots")
         }
     }
 }
