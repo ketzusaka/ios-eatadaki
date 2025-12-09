@@ -1,7 +1,7 @@
 import Foundation
 import GRDB
 
-public struct Spot: Codable {
+public struct Spot: Codable, Identifiable {
     public var id: UUID
     public var mapkitId: String?
     public var remoteId: String?

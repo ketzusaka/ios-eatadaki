@@ -1,3 +1,4 @@
+import EatadakiKit
 import EatadakiUI
 import SwiftUI
 
@@ -7,10 +8,14 @@ struct InitializedView: View {
 
     var body: some View {
         TabView {
-            SpotsView()
-                .tabItem {
-                    Label("Spots", systemImage: "mappin.circle")
-                }
+            SpotsView(
+                viewModel: SpotsViewModel(
+                    dependencies: context,
+                )
+            )
+            .tabItem {
+                Label("Spots", systemImage: "mappin.circle")
+            }
 
             TastesView()
                 .tabItem {

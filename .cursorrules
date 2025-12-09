@@ -27,6 +27,7 @@ Please refer to the architecture documentation at `docs/ARCHITECTURE.md` for det
 - Ensure all user data operations require authentication
 - **Create new files for new views**: Even if a view is a subview or component, it should have its own file. This improves code organization, reusability, and maintainability.
 - **Database column naming**: Use camelCase for database column names to match Swift property names. Avoid CodingKeys - let GRDB's automatic Codable support handle the mapping directly.
+- **Implicit shadowing**: When using optional binding with the same variable name, use implicit shadowing syntax: `if let variableName` instead of `if let variableName = variableName`. This reduces repetition and improves readability.
 
 ## When Making Changes
 

@@ -1,7 +1,11 @@
 import SwiftUI
 
 public struct SpotsView: View {
-    public init() {}
+    @Bindable var viewModel: SpotsViewModel
+
+    public init(viewModel: SpotsViewModel) {
+        self.viewModel = viewModel
+    }
 
     public var body: some View {
         NavigationStack {

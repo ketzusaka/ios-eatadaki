@@ -41,7 +41,8 @@ let project = Project(
             dependencies: [
                 .target(name: "EatadakiUI"),
                 .target(name: "EatadakiData"),
-                .target(name: "EatadakiKit")
+                .target(name: "EatadakiKit"),
+                .package(product: "GRDB")
             ],
             settings: .settings(
                 configurations: [
@@ -66,7 +67,10 @@ let project = Project(
             deploymentTargets: .iOS("26.0"),
             infoPlist: .default,
             sources: ["Sources/EatadakiUI/**"],
-            dependencies: [.target(name: "EatadakiKit")]
+            dependencies: [
+                .target(name: "EatadakiKit"),
+                .target(name: "EatadakiData")
+            ]
         ),
 
         .target(

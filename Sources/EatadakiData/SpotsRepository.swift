@@ -7,6 +7,10 @@ public protocol SpotsRepository: AnyObject {
     func create(spot: Spot) async throws -> Spot
 }
 
+public protocol SpotsRepositoryProviding {
+    var spotsRepository: SpotsRepository { get }
+}
+
 public actor RealSpotsRepository: SpotsRepository {
     private let db: DatabaseWriter
 

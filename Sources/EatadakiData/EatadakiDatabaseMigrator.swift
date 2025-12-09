@@ -11,15 +11,15 @@ final public class EatadakiDatabaseMigrator {
     public func migrate() throws {
         var migrator = DatabaseMigrator()
 
-        migrator.registerMigration("createUser") { db in
+        migrator.registerMigration("v1") { db in
+            // Create user table
             try db.create(table: User.databaseTableName, ifNotExists: true) { t in
                 t.column("id", .text).primaryKey()
                 t.column("email", .text).notNull()
                 t.column("createdAt", .datetime).notNull()
             }
-        }
 
-        migrator.registerMigration("createSpots") { db in
+            // Create spots table
             try db.create(table: Spot.databaseTableName, ifNotExists: true) { t in
                 t.column("id", .text).primaryKey()
                 t.column("mapkitId", .text)
@@ -29,9 +29,8 @@ final public class EatadakiDatabaseMigrator {
             }
             try db.execute(sql: "CREATE UNIQUE INDEX IF NOT EXISTS spots_mapkitId_unique ON spots(mapkitId) WHERE mapkitId IS NOT NULL")
             try db.execute(sql: "CREATE INDEX IF NOT EXISTS spots_remoteId ON spots(remoteId) WHERE remoteId IS NOT NULL")
-        }
 
-        migrator.registerMigration("createTastes") { db in
+            // Create tastes table
             try db.create(table: Taste.databaseTableName, ifNotExists: true) { t in
                 t.column("id", .text).primaryKey()
                 t.column("remoteId", .text)
@@ -40,9 +39,8 @@ final public class EatadakiDatabaseMigrator {
                 t.column("createdAt", .datetime).notNull()
             }
             try db.execute(sql: "CREATE INDEX IF NOT EXISTS tastes_remoteId ON tastes(remoteId) WHERE remoteId IS NOT NULL")
-        }
 
-        migrator.registerMigration("createTasteRatings") { db in
+            // Create taste ratings table
             try db.execute(sql: """
                 CREATE TABLE IF NOT EXISTS tastes_ratings (
                     id TEXT PRIMARY KEY,
@@ -53,6 +51,12 @@ final public class EatadakiDatabaseMigrator {
                 )
             """)
             try db.execute(sql: "CREATE INDEX IF NOT EXISTS tastes_ratings_tasteId ON tastes_ratings(tasteId)")
+
+            // Create device configuration table (key-value store)
+            try db.create(table: DeviceConfiguration.databaseTableName, ifNotExists: true) { t in
+                t.column("key", .text).primaryKey()
+                t.column("value", .text).notNull()
+            }
         }
 
         try migrator.migrate(db)

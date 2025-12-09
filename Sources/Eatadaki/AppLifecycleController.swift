@@ -1,4 +1,5 @@
 import EatadakiData
+import EatadakiKit
 import Foundation
 import GRDB
 import Observation
@@ -24,9 +25,18 @@ final class AppLifecycleController {
             // Create repositories
             let userRepository = RealUserRepository(db: db)
             let spotsRepository = RealSpotsRepository(db: db)
+            
+            // Create device configuration controller
+            let deviceConfigurationController = RealDeviceConfigurationController(db: db)
+            
+            // Create location service
+            let locationService = RealLocationService(deviceConfigurationController: deviceConfigurationController)
+            
             let context = InitializedContext(
                 userRepository: userRepository,
                 spotsRepository: spotsRepository,
+                locationService: locationService,
+                deviceConfigurationController: deviceConfigurationController,
             )
 
             // Move to initialized state
