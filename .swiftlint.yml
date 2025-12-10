@@ -9,6 +9,8 @@ included:
   - EatadakiKit
   - EatadakiLocationKit
   - EatadakiSpotsKit
+  - EatadakiExperiencesKit
+  - EatadakiUserKit
   - Pour
 
 excluded:

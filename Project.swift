@@ -43,6 +43,8 @@ let project = Project(
                 .target(name: "EatadakiData"),
                 .target(name: "EatadakiKit"),
                 .target(name: "EatadakiSpotsKit"),
+                .target(name: "EatadakiExperiencesKit"),
+                .target(name: "EatadakiUserKit"),
                 .target(name: "EatadakiLocationKit"),
                 .target(name: "Pour"),
                 .package(product: "GRDB")
@@ -132,6 +134,34 @@ let project = Project(
                 .target(name: "EatadakiData"),
                 .target(name: "EatadakiKit"),
                 .target(name: "EatadakiLocationKit")
+            ]
+        ),
+
+        .target(
+            name: "EatadakiExperiencesKit",
+            destinations: [.iPhone],
+            product: .framework,
+            bundleId: "com.aethercodelabs.eatadaki.experienceskit",
+            deploymentTargets: .iOS("26.0"),
+            infoPlist: .default,
+            sources: ["EatadakiExperiencesKit/Sources/**"],
+            dependencies: [
+                .target(name: "EatadakiData"),
+                .target(name: "EatadakiKit")
+            ]
+        ),
+
+        .target(
+            name: "EatadakiUserKit",
+            destinations: [.iPhone],
+            product: .framework,
+            bundleId: "com.aethercodelabs.eatadaki.userkit",
+            deploymentTargets: .iOS("26.0"),
+            infoPlist: .default,
+            sources: ["EatadakiUserKit/Sources/**"],
+            dependencies: [
+                .target(name: "EatadakiData"),
+                .target(name: "EatadakiKit")
             ]
         ),
 

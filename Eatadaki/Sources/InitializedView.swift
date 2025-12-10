@@ -1,6 +1,8 @@
 import EatadakiKit
 import EatadakiUI
 import EatadakiSpotsKit
+import EatadakiExperiencesKit
+import EatadakiUserKit
 import SwiftUI
 
 struct InitializedView: View {
