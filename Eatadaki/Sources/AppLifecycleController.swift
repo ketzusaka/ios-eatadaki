@@ -7,8 +7,13 @@ import Observation
 @MainActor
 @Observable
 final class AppLifecycleController {
+    private let fileSystemProvider: FileSystemProvider
 
     private(set) var state: AppState = .uninitialized
+    
+    init(fileSystemProvider: FileSystemProvider = FileManager.default) {
+        self.fileSystemProvider = fileSystemProvider
+    }
 
     func beginInitializing() async {
         guard case .uninitialized = state else { return }
@@ -19,9 +24,9 @@ final class AppLifecycleController {
             // TODO: Implement diagnostics
 
             // Phase 2: Initialize databases
-            let deviceConfigDataService = try DeviceConfigDataService()
-            let experiencesDataService = try ExperiencesDataService()
-            let userDataService = try UserDataService()
+            let deviceConfigDataService = try DeviceConfigDataService(fileSystemProvider: fileSystemProvider)
+            let experiencesDataService = try ExperiencesDataService(fileSystemProvider: fileSystemProvider)
+            let userDataService = try UserDataService(fileSystemProvider: fileSystemProvider)
             
             let context = InitializedContext(
                 experiencesDataService: experiencesDataService,

@@ -1,3 +1,4 @@
+import EatadakiKit
 import Foundation
 import GRDB
 
@@ -6,9 +7,9 @@ public class DeviceConfigDataService {
     public let db: DatabaseWriter
     
     public init(
-        fileManager: FileManager = .default,
+        fileSystemProvider: FileSystemProvider = FileManager.default,
     ) throws {
-        let appSupportURL = try fileManager.url(
+        let appSupportURL = try fileSystemProvider.url(
             for: .applicationSupportDirectory,
             in: .userDomainMask,
             appropriateFor: nil,

@@ -41,6 +41,43 @@ Please refer to the architecture documentation at `docs/ARCHITECTURE.md` for det
 - **Test Helper Placement**: Place all helper methods (private functions used for test setup) at the end of test structs, after all test methods. Use a `// MARK: - Helpers` comment to separate them.
 - **Date Usage in Tests**: Use `.now` instead of `Date()` for creating current date values in test code (e.g., `createdAt: .now`).
 
+## Fake Implementation Guidelines
+
+All `Fake[ProtocolName]` implementations (used for testing and previews) should follow this consistent pattern:
+
+1. **Invocation Tracker**: For each protocol method, create a `private(set) var invocations[MethodName]` array that records all calls with their parameters as a tuple. Name the property using the method signature (e.g., `invocationsUrlForInAppropriateForCreate`).
+
+2. **Stub Property**: For each protocol method, create a `var stub[MethodName]` closure property that can be overridden. The stub should have a default implementation that returns a successful result when possible (e.g., a dummy URL, empty array, or default value).
+
+3. **Configure Init**: Use an initializer that takes an optional configure closure: `init(_ configure: (Fake[ProtocolName]) -> Void = { _ in })`. This allows easy configuration during initialization (e.g., `FakeFileSystemProvider { $0.stubUrlForInAppropriateForCreate = { ... } }`).
+
+4. **Implementation**: In each protocol method implementation:
+   - Append the call parameters to the invocation tracker
+   - Call the stub closure and return its result
+
+5. **DEBUG Only**: All Fake implementations must be wrapped in `#if DEBUG` compiler statements.
+
+**Example Pattern:**
+```swift
+#if DEBUG
+public class FakeFileSystemProvider: FileSystemProvider {
+    public init(_ configure: (FakeFileSystemProvider) -> Void = { _ in }) {
+        configure(self)
+    }
+    
+    public private(set) var invocationsUrlForInAppropriateForCreate: [(directory: FileManager.SearchPathDirectory, domain: FileManager.SearchPathDomainMask, appropriateFor: URL?, create: Bool)] = []
+    public var stubUrlForInAppropriateForCreate: ((FileManager.SearchPathDirectory, FileManager.SearchPathDomainMask, URL?, Bool) throws -> URL) = { directory, domain, url, shouldCreate in
+        URL(fileURLWithPath: "/tmp/fake_application_support")
+    }
+    
+    public func url(for directory: FileManager.SearchPathDirectory, in domain: FileManager.SearchPathDomainMask, appropriateFor url: URL?, create shouldCreate: Bool) throws -> URL {
+        invocationsUrlForInAppropriateForCreate.append((directory, domain, url, shouldCreate))
+        return try stubUrlForInAppropriateForCreate(directory, domain, url, shouldCreate)
+    }
+}
+#endif
+```
+
 ## Development Workflow
 
 - **Tuist Generation**: Always use `tuist generate --no-open` to prevent Xcode from automatically opening after generation. This avoids interrupting the user's workflow.

@@ -1,3 +1,4 @@
+import EatadakiKit
 import EatadakiUI
 import SwiftUI
 
@@ -34,3 +35,19 @@ struct RootView: View {
         .environment(themeManager)
     }
 }
+
+#if DEBUG
+#Preview("Initialization Success") {
+    RootView(lifecycleController: AppLifecycleController())
+}
+
+#Preview("Initialization Failure") {
+    let fakeFileSystem = FakeFileSystemProvider {
+        $0.stubUrlForInAppropriateForCreate = { _, _, _, _ in
+            throw NSError(domain: "TestError", code: 1, userInfo: [NSLocalizedDescriptionKey: "Failed to create application support directory"])
+        }
+    }
+    
+    RootView(lifecycleController: AppLifecycleController(fileSystemProvider: fakeFileSystem))
+}
+#endif
