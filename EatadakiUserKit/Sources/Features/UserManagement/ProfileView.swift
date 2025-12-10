@@ -1,4 +1,5 @@
 import SwiftUI
+import EatadakiUI
 
 public struct ProfileView: View {
     let isAuthenticated: Bool
@@ -17,3 +18,15 @@ public struct ProfileView: View {
         }
     }
 }
+
+#if DEBUG
+#Preview("Authenticated") {
+    ProfileView(isAuthenticated: true)
+        .environment(ThemeManager())
+}
+
+#Preview("Unauthenticated") {
+    ProfileView(isAuthenticated: false)
+        .environment(ThemeManager())
+}
+#endif
