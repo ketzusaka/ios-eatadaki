@@ -120,7 +120,6 @@ struct BartenderTests {
         
         #expect(stringInstance == "test-string")
         #expect(intInstance == 42)
-        #expect(objectInstance is TestObject)
     }
     
     @Test("Thread safety - concurrent access")

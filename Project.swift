@@ -36,7 +36,7 @@ let project = Project(
                     "UILaunchScreen": [:]
                 ]
             ),
-            sources: ["Sources/Eatadaki/**"],
+            sources: ["Eatadaki/Sources/**"],
             resources: ["Resources/**"],
             dependencies: [
                 .target(name: "EatadakiUI"),
@@ -69,7 +69,7 @@ let project = Project(
             bundleId: "com.aethercodelabs.eatadaki.ui",
             deploymentTargets: .iOS("26.0"),
             infoPlist: .default,
-            sources: ["Sources/EatadakiUI/**"],
+            sources: ["EatadakiUI/Sources/**"],
             dependencies: [
                 .target(name: "EatadakiKit"),
                 .target(name: "EatadakiData"),
@@ -84,7 +84,7 @@ let project = Project(
             bundleId: "com.aethercodelabs.eatadaki.data",
             deploymentTargets: .iOS("26.0"),
             infoPlist: .default,
-            sources: ["Sources/EatadakiData/**"],
+            sources: ["EatadakiData/Sources/**"],
             dependencies: [
                 .package(product: "GRDB"),
                 .target(name: "EatadakiKit"),
@@ -99,7 +99,7 @@ let project = Project(
             bundleId: "com.aethercodelabs.eatadaki.kit",
             deploymentTargets: .iOS("26.0"),
             infoPlist: .default,
-            sources: ["Sources/EatadakiKit/**"],
+            sources: ["EatadakiKit/Sources/**"],
             dependencies: [
                 .target(name: "Pour")
             ]
@@ -112,7 +112,7 @@ let project = Project(
             bundleId: "com.aethercodelabs.eatadaki.locationkit",
             deploymentTargets: .iOS("26.0"),
             infoPlist: .default,
-            sources: ["Sources/EatadakiLocationKit/**"],
+            sources: ["EatadakiLocationKit/Sources/**"],
             dependencies: [
                 .target(name: "EatadakiData"),
                 .target(name: "EatadakiKit"),
@@ -127,7 +127,7 @@ let project = Project(
             bundleId: "com.aethercodelabs.eatadaki.spotskit",
             deploymentTargets: .iOS("26.0"),
             infoPlist: .default,
-            sources: ["Sources/EatadakiSpotsKit/**"],
+            sources: ["EatadakiSpotsKit/Sources/**"],
             dependencies: [
                 .target(name: "EatadakiData"),
                 .target(name: "EatadakiKit"),
@@ -142,7 +142,7 @@ let project = Project(
             bundleId: "com.aethercodelabs.eatadaki.pour",
             deploymentTargets: .iOS("26.0"),
             infoPlist: .default,
-            sources: ["Sources/Pour/**"]
+            sources: ["Pour/Sources/**"]
         ),
 
         // MARK: - Tests
@@ -152,7 +152,7 @@ let project = Project(
             product: .unitTests,
             bundleId: "com.aethercodelabs.eatadaki.tests",
             deploymentTargets: .iOS("26.0"),
-            sources: ["Tests/EatadakiAppTests/**"],
+            sources: ["Eatadaki/Tests/**"],
             dependencies: [.target(name: "Eatadaki")]
         ),
 
@@ -162,7 +162,7 @@ let project = Project(
             product: .unitTests,
             bundleId: "com.aethercodelabs.eatadaki.ui.tests",
             deploymentTargets: .iOS("26.0"),
-            sources: ["Tests/EatadakiUITests/**"],
+            sources: ["EatadakiUI/Tests/**"],
             dependencies: [.target(name: "EatadakiUI")]
         ),
 
@@ -172,7 +172,7 @@ let project = Project(
             product: .unitTests,
             bundleId: "com.aethercodelabs.eatadaki.data.tests",
             deploymentTargets: .iOS("26.0"),
-            sources: ["Tests/EatadakiDataTests/**"],
+            sources: ["EatadakiData/Tests/**"],
             dependencies: [
                 .target(name: "EatadakiData"),
                 .package(product: "GRDB")
@@ -185,7 +185,7 @@ let project = Project(
             product: .unitTests,
             bundleId: "com.aethercodelabs.eatadaki.kit.tests",
             deploymentTargets: .iOS("26.0"),
-            sources: ["Tests/EatadakiKitTests/**"],
+            sources: ["EatadakiKit/Tests/**"],
             dependencies: [.target(name: "EatadakiKit")]
         ),
 
@@ -195,7 +195,7 @@ let project = Project(
             product: .unitTests,
             bundleId: "com.aethercodelabs.eatadaki.pour.tests",
             deploymentTargets: .iOS("26.0"),
-            sources: ["Tests/PourTests/**"],
+            sources: ["Pour/Tests/**"],
             dependencies: [.target(name: "Pour")]
         ),
 
@@ -205,7 +205,7 @@ let project = Project(
             product: .uiTests,
             bundleId: "com.aethercodelabs.eatadaki.ui-tests",
             deploymentTargets: .iOS("26.0"),
-            sources: ["Tests/EatadakiAppUITests/**"],
+            sources: ["Eatadaki/Tests/UITests/**"],
             dependencies: [.target(name: "Eatadaki")]
         )
     ]

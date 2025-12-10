@@ -3,8 +3,13 @@
 
 # Paths
 included:
-  - Sources
-  - Tests
+  - Eatadaki
+  - EatadakiUI
+  - EatadakiData
+  - EatadakiKit
+  - EatadakiLocationKit
+  - EatadakiSpotsKit
+  - Pour
 
 excluded:
   - Derived
