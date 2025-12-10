@@ -11,7 +11,7 @@ struct InitializedView: View {
         TabView {
             SpotsView(
                 viewModel: SpotsViewModel(
-                    dependencies: context.dependencies,
+                    dependencies: context,
                 )
             )
             .tabItem {

@@ -9,7 +9,7 @@ public protocol UserRepository: AnyObject {
 }
 
 public protocol UserRepositoryDependencies {
-    var userDb: DatabaseWriter { get }
+    var userDataService: UserDataService { get }
 }
 
 public protocol UserRepositoryProviding {
@@ -19,26 +19,27 @@ public protocol UserRepositoryProviding {
 public extension Pouring where Self: UserRepositoryDependencies {
     var userRepository: UserRepository {
         shared {
-            RealUserRepository(db: userDb)
+            RealUserRepository(service: userDataService)
         }
     }
 }
 
 public actor RealUserRepository: UserRepository {
-    private let db: DatabaseWriter
 
-    public init(db: DatabaseWriter) {
-        self.db = db
+    private let service: UserDataService
+
+    public init(service: UserDataService) {
+        self.service = service
     }
 
     public func fetchUser() async throws -> User? {
-        try await db.read { db in
+        try await service.db.read { db in
             try User.fetchOne(db)
         }
     }
 
     public func saveUser(_ user: User) async throws {
-        try await db.write { db in
+        try await service.db.write { db in
             // Delete existing user (should only be one)
             try User.deleteAll(db)
             // Insert new user
@@ -47,8 +48,9 @@ public actor RealUserRepository: UserRepository {
     }
 
     public func clearUser() async throws {
-        _ = try await db.write { db in
+        _ = try await service.db.write { db in
             try User.deleteAll(db)
         }
     }
+
 }

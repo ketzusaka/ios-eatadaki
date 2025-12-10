@@ -9,13 +9,13 @@ public protocol SpotsRepository: AnyObject {
 }
 
 public protocol SpotsRepositoryDependencies {
-    var experiencesDb: DatabaseWriter { get }
+    var experiencesDataService: ExperiencesDataService { get }
 }
 
 public extension Pouring where Self: SpotsRepositoryDependencies {
     var spotsRepository: SpotsRepository {
         shared { 
-            RealSpotsRepository(db: experiencesDb) 
+            RealSpotsRepository(service: experiencesDataService)
         }
     }
 }
@@ -25,15 +25,15 @@ public protocol SpotsRepositoryProviding {
 }
 
 public actor RealSpotsRepository: SpotsRepository {
-    private let db: DatabaseWriter
+    private let service: ExperiencesDataService
 
-    public init(db: DatabaseWriter) {
-        self.db = db
+    public init(service: ExperiencesDataService) {
+        self.service = service
     }
 
     public func fetchSpot(withID id: UUID) async throws -> Spot {
         do {
-            return try await db.read { db in
+            return try await service.db.read { db in
                 guard let spot = try Spot.fetchOne(db, key: id) else {
                     throw RepositoryError.notFound
                 }
@@ -48,7 +48,7 @@ public actor RealSpotsRepository: SpotsRepository {
 
     public func fetchSpots() async throws -> [Spot] {
         do {
-            return try await db.read { db in
+            return try await service.db.read { db in
                 try Spot.fetchAll(db)
             }
         } catch let error as RepositoryError {
@@ -60,7 +60,7 @@ public actor RealSpotsRepository: SpotsRepository {
 
     public func create(spot: Spot) async throws -> Spot {
         do {
-            return try await db.write { db in
+            return try await service.db.write { db in
                 try spot.insert(db)
                 return spot
             }
