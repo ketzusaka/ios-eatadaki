@@ -45,3 +45,9 @@ Please refer to the architecture documentation at `docs/ARCHITECTURE.md` for det
 
 - **Tuist Generation**: Always use `tuist generate --no-open` to prevent Xcode from automatically opening after generation. This avoids interrupting the user's workflow.
 
+## SwiftUI Preview Guidelines
+
+- **Preview Syntax**: Use the latest `#preview` macro syntax for SwiftUI previews
+- **DEBUG Compilation**: All previews must be wrapped in `#if DEBUG` compiler statements. This is required because previews may use types only available in debug builds (e.g., `PreviewProvider` types)
+- **Theming**: Previews should use `ThemeManager.default` via `.environment(ThemeManager.default)` to ensure consistent theming in previews
+

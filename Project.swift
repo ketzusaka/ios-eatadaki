@@ -160,6 +160,7 @@ let project = Project(
             infoPlist: .default,
             sources: ["EatadakiUserKit/Sources/**"],
             dependencies: [
+                .target(name: "EatadakiUI"),
                 .target(name: "EatadakiData"),
                 .target(name: "EatadakiKit")
             ]
