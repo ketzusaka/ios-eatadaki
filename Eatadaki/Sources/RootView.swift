@@ -20,7 +20,11 @@ struct RootView: View {
                         }
                     }
             case .initializationFailure(let error):
-                InitializationErrorView(error: error)
+                SimpleInterstitialView(
+                    title: "Initialization Failed",
+                    description: error,
+                    imageSystemName: "exclamationmark.triangle",
+                )
             case .unauthenticated(let context):
                 InitializedView(context: context, isAuthenticated: false)
             case .authenticated(let context, _):

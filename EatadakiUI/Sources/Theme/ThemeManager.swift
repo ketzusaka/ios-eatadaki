@@ -27,11 +27,21 @@ extension ThemeDefinition {
         name: "Eatadaki",
         lightTokens: ThemeTokens(
             headlineTextFont: .headline,
-            headlineTextColor: .black
+            headlineTextColor: .black,
+            captionTextFont: .caption,
+            captionTextColor: .secondary,
+            primaryButtonTint: .blue,
+            secondaryButtonTint: .gray,
+            destructiveButtonTint: .red
         ),
         darkTokens: ThemeTokens(
             headlineTextFont: .headline,
-            headlineTextColor: .white
+            headlineTextColor: .white,
+            captionTextFont: .caption,
+            captionTextColor: .secondary,
+            primaryButtonTint: .blue,
+            secondaryButtonTint: .gray,
+            destructiveButtonTint: .red
         )
     )
 }
