@@ -1,10 +1,10 @@
 import EatadakiData
-import EatadakiKit
+import EatadakiLocationKit
 import Foundation
 import Observation
 import CoreLocation
 
-public protocol SpotsViewModelDependencies: LocationServiceProviding, DeviceConfigurationControllerProviding, SpotsRepositoryProviding {}
+public typealias SpotsViewModelDependencies = LocationServiceProviding & DeviceConfigurationControllerProviding & SpotsRepositoryProviding
 
 @Observable
 @MainActor
@@ -17,10 +17,10 @@ public final class SpotsViewModel {
     var isOptedIn: Bool = false
     var hasInitialized: Bool = false
 
-    private let dependencies: any SpotsViewModelDependencies
+    private let dependencies: SpotsViewModelDependencies
 
     public init(
-        dependencies: any SpotsViewModelDependencies,
+        dependencies: SpotsViewModelDependencies,
     ) {
         self.dependencies = dependencies
     }
@@ -42,4 +42,3 @@ public final class SpotsViewModel {
     }
 
 }
-

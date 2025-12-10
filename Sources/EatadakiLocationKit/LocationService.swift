@@ -1,7 +1,29 @@
+import EatadakiData
 import Foundation
 import CoreLocation
-import EatadakiData
-import EatadakiKit
+import Pour
+
+public enum LocationServiceError: Error {
+    case unconfigured
+}
+
+public protocol LocationService: AnyObject {
+    func obtain() async throws -> CLLocation
+}
+
+public protocol LocationServiceDependencies: DeviceConfigurationControllerProviding {}
+
+public protocol LocationServiceProviding {
+    var locationService: LocationService { get }
+}
+
+public extension Pouring where Self: LocationServiceDependencies {
+    var locationService: LocationService {
+        shared {
+            RealLocationService(deviceConfigurationController: deviceConfigurationController)
+        }
+    }
+}
 
 public actor RealLocationService: LocationService {
     private let deviceConfigurationController: any DeviceConfigurationController

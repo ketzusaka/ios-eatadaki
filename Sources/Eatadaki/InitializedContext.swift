@@ -1,29 +1,35 @@
 import EatadakiData
 import EatadakiKit
 import EatadakiUI
+import EatadakiLocationKit
+import GRDB
+import Pour
 
 public struct InitializedContext {
-    public let userRepository: any UserRepository
-    public let spotsRepository: any SpotsRepository
-    public let locationService: any LocationService
-    public let deviceConfigurationController: any DeviceConfigurationController
+    // This will have a Bartender for dependencies
+    // and a Services that holds our services.
+    public let dependencies: InitializedDependencies
 
-    public init(
-        userRepository: any UserRepository,
-        spotsRepository: any SpotsRepository,
-        locationService: any LocationService,
-        deviceConfigurationController: any DeviceConfigurationController,
-    ) {
-        self.userRepository = userRepository
-        self.spotsRepository = spotsRepository
-        self.locationService = locationService
-        self.deviceConfigurationController = deviceConfigurationController
+    public init(dependencies: InitializedDependencies) {
+        self.dependencies = dependencies
     }
 }
 
-extension InitializedContext: DeviceConfigurationControllerProviding {}
-extension InitializedContext: LocationServiceProviding {}
-extension InitializedContext: SpotsRepositoryProviding {}
+public class InitializedDependencies: Bartender {
+    public let experiencesDb: DatabaseWriter
+    public let deviceConfigDb: DatabaseWriter
+    public let userDb: DatabaseWriter
 
-// This below isn't great. It's what I want to avoid. Let's find a better solution here.
-extension InitializedContext: SpotsViewModelDependencies {}
+    public init(experiencesDb: DatabaseWriter, deviceConfigDb: DatabaseWriter, userDb: DatabaseWriter) {
+        self.experiencesDb = experiencesDb
+        self.deviceConfigDb = deviceConfigDb
+        self.userDb = userDb
+    }
+}
+
+// Conform to our dependencies so we automatically get the providers we need
+extension InitializedDependencies: DeviceConfigurationControllerDependencies & DeviceConfigurationControllerProviding {}
+extension InitializedDependencies: LocationServiceDependencies & LocationServiceProviding {}
+extension InitializedDependencies: SpotsRepositoryDependencies & SpotsRepositoryProviding {}
+extension InitializedDependencies: UserRepositoryDependencies & UserRepositoryProviding {}
+

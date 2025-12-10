@@ -1,5 +1,6 @@
 import EatadakiKit
 import EatadakiUI
+import EatadakiSpotsKit
 import SwiftUI
 
 struct InitializedView: View {
@@ -10,7 +11,7 @@ struct InitializedView: View {
         TabView {
             SpotsView(
                 viewModel: SpotsViewModel(
-                    dependencies: context,
+                    dependencies: context.dependencies,
                 )
             )
             .tabItem {

@@ -1,10 +1,23 @@
 import Foundation
 import GRDB
+import Pour
 
 public protocol SpotsRepository: AnyObject {
     func fetchSpot(withID id: UUID) async throws -> Spot
     func fetchSpots() async throws -> [Spot]
     func create(spot: Spot) async throws -> Spot
+}
+
+public protocol SpotsRepositoryDependencies {
+    var experiencesDb: DatabaseWriter { get }
+}
+
+public extension Pouring where Self: SpotsRepositoryDependencies {
+    var spotsRepository: SpotsRepository {
+        shared { 
+            RealSpotsRepository(db: experiencesDb) 
+        }
+    }
 }
 
 public protocol SpotsRepositoryProviding {

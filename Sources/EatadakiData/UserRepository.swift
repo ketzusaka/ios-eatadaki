@@ -1,10 +1,27 @@
 import Foundation
 import GRDB
+import Pour
 
 public protocol UserRepository: AnyObject {
     func fetchUser() async throws -> User?
     func saveUser(_ user: User) async throws
     func clearUser() async throws
+}
+
+public protocol UserRepositoryDependencies {
+    var userDb: DatabaseWriter { get }
+}
+
+public protocol UserRepositoryProviding {
+    var userRepository: UserRepository { get }
+}
+
+public extension Pouring where Self: UserRepositoryDependencies {
+    var userRepository: UserRepository {
+        shared {
+            RealUserRepository(db: userDb)
+        }
+    }
 }
 
 public actor RealUserRepository: UserRepository {

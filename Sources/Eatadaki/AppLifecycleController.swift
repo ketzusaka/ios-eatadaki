@@ -14,6 +14,10 @@ final class AppLifecycleController {
         state = .initializing
 
         do {
+            // Phase 1: Initialize diagnostics
+            // TODO: Implement diagnostics
+
+            // Phase 2: Initialize databases
             // Create separate database connections for each domain
             let userDbURL = try getDatabaseURL(name: "user")
             let userDb = try DatabasePool(path: userDbURL.path)
@@ -34,22 +38,13 @@ final class AppLifecycleController {
             let experiencesMigrator = ExperiencesDatabaseMigrator(db: experiencesDb)
             try experiencesMigrator.migrate()
 
-            // Create repositories
-            let userRepository = RealUserRepository(db: userDb)
-            let spotsRepository = RealSpotsRepository(db: experiencesDb)
-            
-            // Create device configuration controller
-            let deviceConfigurationController = RealDeviceConfigurationController(db: deviceConfigDb)
-            
-            // Create location service
-            let locationService = RealLocationService(deviceConfigurationController: deviceConfigurationController)
-            
-            let context = InitializedContext(
-                userRepository: userRepository,
-                spotsRepository: spotsRepository,
-                locationService: locationService,
-                deviceConfigurationController: deviceConfigurationController,
+            let dependencies = InitializedDependencies(
+                experiencesDb: experiencesDb,
+                deviceConfigDb: deviceConfigDb,
+                userDb: userDb,
             )
+
+            let context = InitializedContext(dependencies: dependencies)
 
             // Move to initialized state
             state = .initialized(context)
@@ -64,8 +59,8 @@ final class AppLifecycleController {
 
     private func checkAuthenticationState(context: InitializedContext) async {
         do {
-            if let user = try await context.userRepository.fetchUser() {
-                let userController = UserController(userRepository: context.userRepository, user: user)
+            if let user = try await context.dependencies.userRepository.fetchUser() {
+                let userController = UserController(userRepository: context.dependencies.userRepository, user: user)
                 state = .authenticated(context, userController)
             } else {
                 state = .unauthenticated(context)

@@ -1,5 +1,6 @@
 import Foundation
 import GRDB
+import Pour
 
 public protocol DeviceConfigurationController: AnyObject {
     var optInLocationServices: Bool { get async throws }
@@ -8,8 +9,20 @@ public protocol DeviceConfigurationController: AnyObject {
     func reset() async throws
 }
 
+public protocol DeviceConfigurationControllerDependencies {
+    var deviceConfigDb: DatabaseWriter { get }
+}
+
 public protocol DeviceConfigurationControllerProviding {
     var deviceConfigurationController: DeviceConfigurationController { get }
+}
+
+public extension Pouring where Self: DeviceConfigurationControllerDependencies {
+    var deviceConfigurationController: DeviceConfigurationController {
+        shared {
+            RealDeviceConfigurationController(db: deviceConfigDb)
+        }
+    }
 }
 
 public actor RealDeviceConfigurationController: DeviceConfigurationController {
