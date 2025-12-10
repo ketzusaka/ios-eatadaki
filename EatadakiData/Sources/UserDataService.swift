@@ -2,9 +2,17 @@ import EatadakiKit
 import Foundation
 import GRDB
 
-public class UserDataService {
+public protocol UserDataService {
+    var userRepository: UserRepository { get }
+}
+
+public class RealUserDataService: UserDataService {
     
-    public let db: DatabaseWriter
+    private let db: DatabaseWriter
+    
+    public lazy var userRepository: UserRepository = {
+        RealUserRepository(db: db)
+    }()
     
     public init(
         fileSystemProvider: FileSystemProvider = FileManager.default,
@@ -18,7 +26,7 @@ public class UserDataService {
         
         let userDbURL = appSupportURL.appendingPathComponent("user.sqlite")
         db = try DatabasePool(path: userDbURL.path)
-        let migrator = DeviceConfigDatabaseMigrator(db: db)
+        let migrator = UserDatabaseMigrator(db: db)
         try migrator.migrate()
     }
 

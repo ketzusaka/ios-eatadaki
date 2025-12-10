@@ -24,8 +24,20 @@ public class InitializedContext: Bartender {
 }
 
 // Conform to our dependencies so we automatically get the providers we need
-extension InitializedContext: DeviceConfigurationControllerDependencies & DeviceConfigurationControllerProviding {}
+extension InitializedContext: DeviceConfigurationControllerProviding {
+    public var deviceConfigurationController: DeviceConfigurationController {
+        deviceConfigDataService.deviceConfigurationController
+    }
+}
 extension InitializedContext: LocationServiceDependencies & LocationServiceProviding {}
-extension InitializedContext: SpotsRepositoryDependencies & SpotsRepositoryProviding {}
-extension InitializedContext: UserRepositoryDependencies & UserRepositoryProviding {}
+extension InitializedContext: SpotsRepositoryProviding {
+    public var spotsRepository: SpotsRepository {
+        experiencesDataService.spotsRepository
+    }
+}
+extension InitializedContext: UserRepositoryProviding {
+    public var userRepository: UserRepository {
+        userDataService.userRepository
+    }
+}
 

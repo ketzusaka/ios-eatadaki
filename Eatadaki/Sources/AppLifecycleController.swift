@@ -24,9 +24,9 @@ final class AppLifecycleController {
             // TODO: Implement diagnostics
 
             // Phase 2: Initialize databases
-            let deviceConfigDataService = try DeviceConfigDataService(fileSystemProvider: fileSystemProvider)
-            let experiencesDataService = try ExperiencesDataService(fileSystemProvider: fileSystemProvider)
-            let userDataService = try UserDataService(fileSystemProvider: fileSystemProvider)
+            let deviceConfigDataService = try RealDeviceConfigDataService(fileSystemProvider: fileSystemProvider)
+            let experiencesDataService = try RealExperiencesDataService(fileSystemProvider: fileSystemProvider)
+            let userDataService = try RealUserDataService(fileSystemProvider: fileSystemProvider)
             
             let context = InitializedContext(
                 experiencesDataService: experiencesDataService,

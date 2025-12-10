@@ -2,9 +2,17 @@ import EatadakiKit
 import Foundation
 import GRDB
 
-public class DeviceConfigDataService {
+public protocol DeviceConfigDataService {
+    var deviceConfigurationController: DeviceConfigurationController { get }
+}
+
+public class RealDeviceConfigDataService: DeviceConfigDataService {
     
-    public let db: DatabaseWriter
+    private let db: DatabaseWriter
+    
+    public lazy var deviceConfigurationController: DeviceConfigurationController = {
+        RealDeviceConfigurationController(db: db)
+    }()
     
     public init(
         fileSystemProvider: FileSystemProvider = FileManager.default,

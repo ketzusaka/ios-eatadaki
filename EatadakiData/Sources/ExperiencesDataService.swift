@@ -2,9 +2,17 @@ import EatadakiKit
 import Foundation
 import GRDB
 
-public class ExperiencesDataService {
+public protocol ExperiencesDataService {
+    var spotsRepository: SpotsRepository { get }
+}
+
+public class RealExperiencesDataService: ExperiencesDataService {
     
     public let db: DatabaseWriter
+    
+    public lazy var spotsRepository: any SpotsRepository = {
+        RealSpotsRepository(db: db)
+    }()
     
     public init(
         fileSystemProvider: FileSystemProvider = FileManager.default,
