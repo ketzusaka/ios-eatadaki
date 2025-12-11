@@ -29,8 +29,8 @@ final class AppLifecycleController {
             let userDataService = try RealUserDataService(fileSystemProvider: fileSystemProvider)
 
             let context = InitializedContext(
-                experiencesDataService: experiencesDataService,
                 deviceConfigDataService: deviceConfigDataService,
+                experiencesDataService: experiencesDataService,
                 userDataService: userDataService,
             )
 

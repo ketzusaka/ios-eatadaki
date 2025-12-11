@@ -37,8 +37,8 @@ struct InitializedView: View {
 #if DEBUG
 #Preview("Unauthenticated") {
     let context = InitializedContext(
-        experiencesDataService: FakeExperiencesDataService(),
         deviceConfigDataService: FakeDeviceConfigDataService(),
+        experiencesDataService: FakeExperiencesDataService(),
         userDataService: FakeUserDataService(),
     )
 
@@ -56,8 +56,8 @@ struct InitializedView: View {
     }
 
     let context = InitializedContext(
-        experiencesDataService: FakeExperiencesDataService(),
         deviceConfigDataService: FakeDeviceConfigDataService(),
+        experiencesDataService: FakeExperiencesDataService(),
         userDataService: fakeUserDataService,
     )
 

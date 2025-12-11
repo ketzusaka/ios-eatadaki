@@ -1,6 +1,5 @@
 import Foundation
 import GRDB
-import Pour
 
 public protocol SpotsRepository: AnyObject {
     func fetchSpot(withID id: UUID) async throws -> Spot

@@ -3,20 +3,25 @@ import EatadakiKit
 import EatadakiLocationKit
 import EatadakiUI
 import GRDB
-import Pour
 
-public class InitializedContext: Bartender {
-    public let experiencesDataService: ExperiencesDataService
+public class InitializedContext {
+    /// Initialization dependencies
     public let deviceConfigDataService: DeviceConfigDataService
+    public let experiencesDataService: ExperiencesDataService
     public let userDataService: UserDataService
+    
+    /// On-the-fly dependencies
+    public lazy var locationService: LocationService = {
+        RealLocationService(deviceConfigurationController: deviceConfigurationController)
+    }()
 
     public init(
-        experiencesDataService: ExperiencesDataService,
         deviceConfigDataService: DeviceConfigDataService,
+        experiencesDataService: ExperiencesDataService,
         userDataService: UserDataService,
     ) {
-        self.experiencesDataService = experiencesDataService
         self.deviceConfigDataService = deviceConfigDataService
+        self.experiencesDataService = experiencesDataService
         self.userDataService = userDataService
     }
 }
@@ -27,7 +32,7 @@ extension InitializedContext: DeviceConfigurationControllerProviding {
         deviceConfigDataService.deviceConfigurationController
     }
 }
-extension InitializedContext: LocationServiceDependencies & LocationServiceProviding {}
+extension InitializedContext: LocationServiceProviding {}
 extension InitializedContext: SpotsRepositoryProviding {
     public var spotsRepository: SpotsRepository {
         experiencesDataService.spotsRepository

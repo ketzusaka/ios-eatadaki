@@ -1,6 +1,5 @@
 import Foundation
 import GRDB
-import Pour
 
 public protocol DeviceConfigurationController: AnyObject {
     var optInLocationServices: Bool { get async throws }

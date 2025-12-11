@@ -1,6 +1,5 @@
 import Foundation
 import GRDB
-import Pour
 
 public protocol UserRepository: AnyObject {
     func fetchUser() async throws -> User?

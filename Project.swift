@@ -46,7 +46,6 @@ let project = Project(
                 .target(name: "EatadakiExperiencesKit"),
                 .target(name: "EatadakiUserKit"),
                 .target(name: "EatadakiLocationKit"),
-                .target(name: "Pour"),
                 .package(product: "GRDB")
             ],
             settings: .settings(
@@ -74,8 +73,7 @@ let project = Project(
             sources: ["EatadakiUI/Sources/**"],
             dependencies: [
                 .target(name: "EatadakiKit"),
-                .target(name: "EatadakiData"),
-                .target(name: "Pour")
+                .target(name: "EatadakiData")
             ]
         ),
 
@@ -89,8 +87,7 @@ let project = Project(
             sources: ["EatadakiData/Sources/**"],
             dependencies: [
                 .package(product: "GRDB"),
-                .target(name: "EatadakiKit"),
-                .target(name: "Pour")
+                .target(name: "EatadakiKit")
             ]
         ),
 
@@ -102,9 +99,7 @@ let project = Project(
             deploymentTargets: .iOS("26.0"),
             infoPlist: .default,
             sources: ["EatadakiKit/Sources/**"],
-            dependencies: [
-                .target(name: "Pour")
-            ]
+            dependencies: []
         ),
 
         .target(
@@ -117,8 +112,7 @@ let project = Project(
             sources: ["EatadakiLocationKit/Sources/**"],
             dependencies: [
                 .target(name: "EatadakiData"),
-                .target(name: "EatadakiKit"),
-                .target(name: "Pour")
+                .target(name: "EatadakiKit")
             ]
         ),
 
@@ -166,16 +160,6 @@ let project = Project(
             ]
         ),
 
-        .target(
-            name: "Pour",
-            destinations: [.iPhone],
-            product: .framework,
-            bundleId: "com.aethercodelabs.eatadaki.pour",
-            deploymentTargets: .iOS("26.0"),
-            infoPlist: .default,
-            sources: ["Pour/Sources/**"]
-        ),
-
         // MARK: - Tests
         .target(
             name: "EatadakiTests",
@@ -218,16 +202,6 @@ let project = Project(
             deploymentTargets: .iOS("26.0"),
             sources: ["EatadakiKit/Tests/**"],
             dependencies: [.target(name: "EatadakiKit")]
-        ),
-
-        .target(
-            name: "PourTests",
-            destinations: [.iPhone],
-            product: .unitTests,
-            bundleId: "com.aethercodelabs.eatadaki.pour.tests",
-            deploymentTargets: .iOS("26.0"),
-            sources: ["Pour/Tests/**"],
-            dependencies: [.target(name: "Pour")]
         ),
 
         .target(
