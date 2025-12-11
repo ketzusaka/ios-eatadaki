@@ -1,3 +1,4 @@
+import EatadakiData
 import EatadakiKit
 import EatadakiUI
 import EatadakiSpotsKit
@@ -32,3 +33,35 @@ struct InitializedView: View {
         }
     }
 }
+
+#if DEBUG
+#Preview("Unauthenticated") {
+    let context = InitializedContext(
+        experiencesDataService: FakeExperiencesDataService(),
+        deviceConfigDataService: FakeDeviceConfigDataService(),
+        userDataService: FakeUserDataService(),
+    )
+    
+    InitializedView(context: context, isAuthenticated: false)
+        .environment(ThemeManager())
+}
+
+#Preview("Authenticated") {
+    let fakeUserDataService = FakeUserDataService {
+        $0.stubUserRepository = FakeUserRepository {
+            $0.stubFetchUser = {
+                User(id: UUID(), email: "test@example.com", createdAt: .now)
+            }
+        }
+    }
+    
+    let context = InitializedContext(
+        experiencesDataService: FakeExperiencesDataService(),
+        deviceConfigDataService: FakeDeviceConfigDataService(),
+        userDataService: fakeUserDataService,
+    )
+    
+    InitializedView(context: context, isAuthenticated: true)
+        .environment(ThemeManager())
+}
+#endif
