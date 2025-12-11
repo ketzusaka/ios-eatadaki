@@ -149,6 +149,89 @@ struct UserRepositoryTests {
         #expect(timeDifference < 1.0) // Within 1 second
     }
 
+    @Test("Observe user returns nil when no user exists")
+    func testObserveUserReturnsNilWhenNoUserExists() async throws {
+        let repository = try setupRepository()
+        
+        let observation = await repository.observeUser()
+        var iterator = observation.makeAsyncIterator()
+        
+        // First value should be nil (unwrap outer optional first)
+        let firstValueOptional = try await iterator.next()
+        let firstValue = try #require(firstValueOptional)
+        #expect(firstValue == nil)
+    }
+
+    @Test("Observe user returns user when user exists")
+    func testObserveUserReturnsUserWhenUserExists() async throws {
+        let repository = try setupRepository()
+        let testUser = User(
+            id: UUID(),
+            email: "observe@example.com",
+            createdAt: .now
+        )
+        
+        try await repository.saveUser(testUser)
+        
+        let observation = await repository.observeUser()
+        var iterator = observation.makeAsyncIterator()
+        
+        // Should get the user (iterator.next() returns User?? - unwrap both levels)
+        let observedUserOptional = try await iterator.next()
+        let observedUser = try #require(observedUserOptional)
+        let user: User = try #require(observedUser)
+        #expect(user.id == testUser.id)
+        #expect(user.email == testUser.email)
+    }
+
+    @Test("Observe user emits updates when user is saved")
+    func testObserveUserEmitsUpdatesWhenUserIsSaved() async throws {
+        let repository = try setupRepository()
+        
+        let observation = await repository.observeUser()
+        
+        var iterator = observation.makeAsyncIterator()
+        let initialUser = try await iterator.next()
+        #expect(initialUser == .some(nil))
+        
+        let testUser = User(
+            id: UUID(),
+            email: "update@example.com",
+            createdAt: Date(timeIntervalSince1970: 0)
+        )
+        try await repository.saveUser(testUser)
+        
+        let nextUser = try await iterator.next()
+        let optionalUser = try #require(nextUser)
+        let user: User = try #require(optionalUser)
+        #expect(user == testUser)
+    }
+
+    @Test("Observe user emits nil when user is cleared")
+    func testObserveUserEmitsNilWhenUserIsCleared() async throws {
+        let repository = try setupRepository()
+        let testUser = User(
+            id: UUID(),
+            email: "clear@example.com",
+            createdAt: Date(timeIntervalSince1970: 0),
+        )
+        
+        try await repository.saveUser(testUser)
+        
+        let observation = await repository.observeUser()
+        
+        var iterator = observation.makeAsyncIterator()
+        let initialUser = try await iterator.next()
+        #expect(initialUser == .some(testUser))
+        
+        // Clear the user
+        try await repository.clearUser()
+        
+        let nextUser = try await iterator.next()
+        let optionalUser = try #require(nextUser)
+        #expect(optionalUser == nil)
+    }
+
     // MARK: - Helpers
 
     private func createInMemoryDatabase() throws -> DatabaseQueue {

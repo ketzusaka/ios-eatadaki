@@ -1,7 +1,7 @@
 import Foundation
 import GRDB
 
-public struct User: Codable {
+public struct User: Codable, Equatable {
     public var id: UUID
     public var email: String
     public var createdAt: Date
