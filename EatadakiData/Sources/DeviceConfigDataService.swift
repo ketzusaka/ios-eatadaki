@@ -7,13 +7,12 @@ public protocol DeviceConfigDataService {
 }
 
 public class RealDeviceConfigDataService: DeviceConfigDataService {
-    
     private let db: DatabaseWriter
-    
+
     public lazy var deviceConfigurationController: DeviceConfigurationController = {
         RealDeviceConfigurationController(db: db)
     }()
-    
+
     public init(
         fileSystemProvider: FileSystemProvider = FileManager.default,
     ) throws {
@@ -23,11 +22,10 @@ public class RealDeviceConfigDataService: DeviceConfigDataService {
             appropriateFor: nil,
             create: true
         )
-        
+
         let deviceConfigDbURL = appSupportURL.appendingPathComponent("device_config.sqlite")
         db = try DatabasePool(path: deviceConfigDbURL.path)
         let migrator = DeviceConfigDatabaseMigrator(db: db)
         try migrator.migrate()
     }
-
 }

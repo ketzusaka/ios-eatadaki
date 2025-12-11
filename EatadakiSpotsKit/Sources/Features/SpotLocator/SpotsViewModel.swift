@@ -1,8 +1,8 @@
+import CoreLocation
 import EatadakiData
 import EatadakiLocationKit
 import Foundation
 import Observation
-import CoreLocation
 
 public typealias SpotsViewModelDependencies = LocationServiceProviding & DeviceConfigurationControllerProviding & SpotsRepositoryProviding
 
@@ -37,8 +37,7 @@ public final class SpotsViewModel {
         if isOptedIn {
             // TODO: Fetch Location
         }
-        
+
         hasInitialized = true
     }
-
 }

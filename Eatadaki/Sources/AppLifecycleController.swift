@@ -10,7 +10,7 @@ final class AppLifecycleController {
     private let fileSystemProvider: FileSystemProvider
 
     private(set) var state: AppState = .uninitialized
-    
+
     init(fileSystemProvider: FileSystemProvider = FileManager.default) {
         self.fileSystemProvider = fileSystemProvider
     }
@@ -27,7 +27,7 @@ final class AppLifecycleController {
             let deviceConfigDataService = try RealDeviceConfigDataService(fileSystemProvider: fileSystemProvider)
             let experiencesDataService = try RealExperiencesDataService(fileSystemProvider: fileSystemProvider)
             let userDataService = try RealUserDataService(fileSystemProvider: fileSystemProvider)
-            
+
             let context = InitializedContext(
                 experiencesDataService: experiencesDataService,
                 deviceConfigDataService: deviceConfigDataService,
@@ -57,5 +57,4 @@ final class AppLifecycleController {
             state = .unauthenticated(context)
         }
     }
-
 }

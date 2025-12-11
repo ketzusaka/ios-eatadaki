@@ -1,12 +1,11 @@
 import EatadakiData
 import EatadakiKit
-import EatadakiUI
 import EatadakiLocationKit
+import EatadakiUI
 import GRDB
 import Pour
 
 public class InitializedContext: Bartender {
-
     public let experiencesDataService: ExperiencesDataService
     public let deviceConfigDataService: DeviceConfigDataService
     public let userDataService: UserDataService
@@ -20,7 +19,6 @@ public class InitializedContext: Bartender {
         self.deviceConfigDataService = deviceConfigDataService
         self.userDataService = userDataService
     }
-
 }
 
 // Conform to our dependencies so we automatically get the providers we need
@@ -40,4 +38,3 @@ extension InitializedContext: UserRepositoryProviding {
         userDataService.userRepository
     }
 }
-

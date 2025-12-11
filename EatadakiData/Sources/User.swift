@@ -5,7 +5,7 @@ public struct User: Codable {
     public var id: UUID
     public var email: String
     public var createdAt: Date
-    
+
     public init(id: UUID, email: String, createdAt: Date) {
         self.id = id
         self.email = email

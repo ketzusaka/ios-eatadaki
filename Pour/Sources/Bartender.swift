@@ -14,10 +14,10 @@ public extension Pouring {
 open class Bartender: Pouring {
     private let queue = DispatchQueue(label: "com.aethercodelabs.eatadaki.pour.cache")
     private var storage: [String: Any] = [:]
-    
+
     /// Initializes a new Bartender instance.
     public init() {}
-    
+
     /// Retrieves or creates a cached instance of a type.
     ///
     /// - Parameters:
@@ -32,7 +32,7 @@ open class Bartender: Pouring {
             if let cached = storage[key] as? T {
                 return cached
             }
-            
+
             let instance = factory()
             storage[key] = instance
             return instance

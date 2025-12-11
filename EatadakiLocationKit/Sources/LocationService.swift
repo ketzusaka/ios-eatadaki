@@ -1,6 +1,6 @@
+import CoreLocation
 import EatadakiData
 import Foundation
-import CoreLocation
 import Pour
 
 public enum LocationServiceError: Error {
@@ -35,14 +35,12 @@ public actor RealLocationService: LocationService {
     public func obtain() async throws -> CLLocation {
         // Check if location services are opted in
         let isOptedIn = try await deviceConfigurationController.optInLocationServices
-        
+
         guard isOptedIn else {
             throw LocationServiceError.unconfigured
         }
-        
+
         // TODO: Implement the rest
         throw LocationServiceError.unconfigured
-
     }
-
 }

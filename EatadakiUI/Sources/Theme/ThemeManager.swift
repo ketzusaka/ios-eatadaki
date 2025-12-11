@@ -1,11 +1,10 @@
-import SwiftUI
 import Observation
+import SwiftUI
 
 @Observable
 public class ThemeManager {
-        
     public let themeDefinition: ThemeDefinition
-    
+
     public init(themeDefinition: ThemeDefinition = .eatadaki) {
         self.themeDefinition = themeDefinition
     }
@@ -17,7 +16,6 @@ public class ThemeManager {
     public func tokens(for colorScheme: ColorScheme) -> ThemeTokens {
         tokens(for: colorScheme == .dark ? ThemeVariant.dark : ThemeVariant.light)
     }
-
 }
 
 // MARK: - Default Theme

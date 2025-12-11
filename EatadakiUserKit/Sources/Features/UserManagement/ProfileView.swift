@@ -1,5 +1,5 @@
-import SwiftUI
 import EatadakiUI
+import SwiftUI
 
 public struct ProfileView: View {
     let isAuthenticated: Bool

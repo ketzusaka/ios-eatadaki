@@ -7,13 +7,12 @@ public protocol UserDataService {
 }
 
 public class RealUserDataService: UserDataService {
-    
     private let db: DatabaseWriter
-    
+
     public lazy var userRepository: UserRepository = {
         RealUserRepository(db: db)
     }()
-    
+
     public init(
         fileSystemProvider: FileSystemProvider = FileManager.default,
     ) throws {
@@ -23,11 +22,10 @@ public class RealUserDataService: UserDataService {
             appropriateFor: nil,
             create: true
         )
-        
+
         let userDbURL = appSupportURL.appendingPathComponent("user.sqlite")
         db = try DatabasePool(path: userDbURL.path)
         let migrator = UserDatabaseMigrator(db: db)
         try migrator.migrate()
     }
-
 }

@@ -3,11 +3,11 @@ import GRDB
 
 public enum DeviceConfigurationKey: String, Codable, DatabaseValueConvertible {
     case optInLocationServices
-    
+
     public var databaseValue: DatabaseValue {
         rawValue.databaseValue
     }
-    
+
     public static func fromDatabaseValue(_ dbValue: DatabaseValue) -> DeviceConfigurationKey? {
         guard let string = String.fromDatabaseValue(dbValue) else {
             return nil
@@ -29,4 +29,3 @@ public struct DeviceConfiguration: Codable {
 extension DeviceConfiguration: TableRecord, FetchableRecord, PersistableRecord {
     public static var databaseTableName: String { "deviceConfiguration" }
 }
-

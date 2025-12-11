@@ -47,7 +47,7 @@ struct RootView: View {
             throw NSError(domain: "TestError", code: 1, userInfo: [NSLocalizedDescriptionKey: "Failed to create application support directory"])
         }
     }
-    
+
     RootView(lifecycleController: AppLifecycleController(fileSystemProvider: fakeFileSystem))
 }
 #endif

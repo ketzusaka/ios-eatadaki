@@ -7,7 +7,7 @@ public struct Spot: Codable, Identifiable {
     public var remoteId: String?
     public var name: String
     public var createdAt: Date
-    
+
     public init(id: UUID, mapkitId: String? = nil, remoteId: String? = nil, name: String, createdAt: Date) {
         self.id = id
         self.mapkitId = mapkitId

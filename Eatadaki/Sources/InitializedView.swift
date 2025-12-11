@@ -1,8 +1,8 @@
 import EatadakiData
-import EatadakiKit
-import EatadakiUI
-import EatadakiSpotsKit
 import EatadakiExperiencesKit
+import EatadakiKit
+import EatadakiSpotsKit
+import EatadakiUI
 import EatadakiUserKit
 import SwiftUI
 
@@ -41,7 +41,7 @@ struct InitializedView: View {
         deviceConfigDataService: FakeDeviceConfigDataService(),
         userDataService: FakeUserDataService(),
     )
-    
+
     InitializedView(context: context, isAuthenticated: false)
         .environment(ThemeManager())
 }
@@ -54,13 +54,13 @@ struct InitializedView: View {
             }
         }
     }
-    
+
     let context = InitializedContext(
         experiencesDataService: FakeExperiencesDataService(),
         deviceConfigDataService: FakeDeviceConfigDataService(),
         userDataService: fakeUserDataService,
     )
-    
+
     InitializedView(context: context, isAuthenticated: true)
         .environment(ThemeManager())
 }

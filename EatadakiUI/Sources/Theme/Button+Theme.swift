@@ -6,13 +6,13 @@ extension Button {
             .buttonStyle(.borderedProminent)
             .tint(theme.primaryButtonTint)
     }
-    
+
     public func secondaryButtonStyling(using theme: ThemeTokens) -> some View {
         self
             .buttonStyle(.bordered)
             .tint(theme.secondaryButtonTint)
     }
-    
+
     public func destructiveButtonStyling(using theme: ThemeTokens) -> some View {
         self
             .buttonStyle(.bordered)

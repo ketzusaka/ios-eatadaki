@@ -6,7 +6,7 @@ extension Text {
             .font(theme.headlineTextFont)
             .foregroundColor(theme.headlineTextColor)
     }
-    
+
     public func captionTextStyling(using theme: ThemeTokens) -> some View {
         self
             .font(theme.captionTextFont)

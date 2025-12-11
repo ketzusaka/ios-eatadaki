@@ -5,7 +5,7 @@ import Pour
 public protocol DeviceConfigurationController: AnyObject {
     var optInLocationServices: Bool { get async throws }
     func setOptInLocationServices(_ optInLocationServices: Bool) async throws
-    
+
     func reset() async throws
 }
 
@@ -14,13 +14,12 @@ public protocol DeviceConfigurationControllerProviding {
 }
 
 public actor RealDeviceConfigurationController: DeviceConfigurationController {
-    
     private let db: DatabaseWriter
 
     public init(db: DatabaseWriter) {
         self.db = db
     }
-    
+
     public var optInLocationServices: Bool {
         get async throws {
             try await db.read { db in
@@ -28,7 +27,7 @@ public actor RealDeviceConfigurationController: DeviceConfigurationController {
             }
         }
     }
-    
+
     public func setOptInLocationServices(_ optInLocationServices: Bool) async throws {
         try await db.write { db in
             let keyString = DeviceConfigurationKey.optInLocationServices.rawValue
@@ -39,10 +38,8 @@ public actor RealDeviceConfigurationController: DeviceConfigurationController {
             try config.insert(db)
         }
     }
-    
+
     public func reset() async throws {
         fatalError("TBD")
     }
-
 }
-

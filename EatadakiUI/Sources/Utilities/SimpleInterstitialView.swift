@@ -3,45 +3,45 @@ import SwiftUI
 public struct SimpleInterstitialView: View {
     @Environment(ThemeManager.self) private var themeManager
     @Environment(\.colorScheme) private var colorScheme
-    
+
     public enum Style {
         case notice
         case warning
         case critical
     }
-    
+
     public enum ActionStyle {
         case primary
         case secondary
         case destructive
     }
-    
+
     public struct Action: Hashable {
         public let label: String
         public let style: ActionStyle
         public let handler: () -> Void
-        
+
         public init(label: String, style: ActionStyle, handler: @escaping () -> Void) {
             self.label = label
             self.style = style
             self.handler = handler
         }
-        
+
         public func hash(into hasher: inout Hasher) {
             hasher.combine(label)
         }
-        
+
         public static func == (lhs: Action, rhs: Action) -> Bool {
             lhs.label == rhs.label
         }
     }
-    
+
     let title: String
     let description: String
     let imageSystemName: String
     let style: Style
     let actions: Set<Action>
-    
+
     public init(
         title: String,
         description: String,
@@ -55,10 +55,10 @@ public struct SimpleInterstitialView: View {
         self.style = style
         self.actions = actions
     }
-    
+
     public var body: some View {
         let theme = themeManager.tokens(for: colorScheme)
-        
+
         VStack(spacing: 16) {
             Spacer()
 
@@ -66,10 +66,10 @@ public struct SimpleInterstitialView: View {
                 Image(systemName: imageSystemName)
                     .font(.largeTitle)
                     .foregroundColor(color(for: style))
-                
+
                 Text(title)
                     .headlineTextStyling(using: theme)
-                
+
                 Text(description)
                     .captionTextStyling(using: theme)
                     .multilineTextAlignment(.center)
@@ -77,7 +77,7 @@ public struct SimpleInterstitialView: View {
             }
 
             Spacer()
-            
+
             if !actions.isEmpty {
                 HStack(spacing: 12) {
                     ForEach(sortedActions, id: \.self) { action in
@@ -100,7 +100,7 @@ public struct SimpleInterstitialView: View {
             return lhs.label < rhs.label
         }
     }
-    
+
     private func color(for style: Style) -> Color {
         switch style {
         case .notice: .blue
@@ -108,7 +108,7 @@ public struct SimpleInterstitialView: View {
         case .critical: .red
         }
     }
-    
+
     private func order(for style: ActionStyle) -> Int {
         switch style {
         case .destructive: 0
@@ -116,11 +116,11 @@ public struct SimpleInterstitialView: View {
         case .primary: 2
         }
     }
-    
+
     @ViewBuilder
     private func actionButton(for action: Action) -> some View {
         let theme = themeManager.tokens(for: colorScheme)
-        
+
         switch action.style {
         case .primary:
             Button(action: action.handler) {

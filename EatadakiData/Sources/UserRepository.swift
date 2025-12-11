@@ -13,7 +13,6 @@ public protocol UserRepositoryProviding {
 }
 
 public actor RealUserRepository: UserRepository {
-
     private let db: DatabaseWriter
 
     public init(db: DatabaseWriter) {
@@ -40,5 +39,4 @@ public actor RealUserRepository: UserRepository {
             try User.deleteAll(db)
         }
     }
-
 }

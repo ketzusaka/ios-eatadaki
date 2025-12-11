@@ -6,12 +6,12 @@ public struct ThemeTokens {
     public let headlineTextColor: Color
     public let captionTextFont: Font
     public let captionTextColor: Color
-    
+
     // MARK: - Button Styles
     public let primaryButtonTint: Color
     public let secondaryButtonTint: Color
     public let destructiveButtonTint: Color
-    
+
     public init(
         headlineTextFont: Font,
         headlineTextColor: Color,
