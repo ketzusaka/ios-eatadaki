@@ -7,12 +7,12 @@ public class FakeDeviceConfigurationController: DeviceConfigurationController {
     }
 
     public private(set) var invokedCountOptInLocationServices: Int = 0
-    public var stubOptInLocationServices: Bool = false
+    public var stubOptInLocationServices: () async throws -> Bool = { true }
 
     public var optInLocationServices: Bool {
         get async throws {
             invokedCountOptInLocationServices += 1
-            return stubOptInLocationServices
+            return try await stubOptInLocationServices()
         }
     }
 

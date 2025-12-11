@@ -2,12 +2,14 @@ import CoreLocation
 import EatadakiData
 import Foundation
 
-public enum LocationServiceError: Error {
-    case unconfigured
+public enum LocationServiceError: Error, Equatable {
+    case optedOutOfLocationServices
+    case failedToReadOptedIntoLocationServices
+    case unknown(String)
 }
 
-public protocol LocationService: AnyObject {
-    func obtain() async throws -> CLLocation
+public protocol LocationService {
+    func obtain() async throws(LocationServiceError) -> CLLocation
 }
 
 public protocol LocationServiceProviding {
@@ -16,20 +18,33 @@ public protocol LocationServiceProviding {
 
 public actor RealLocationService: LocationService {
     private let deviceConfigurationController: any DeviceConfigurationController
+    private var hasOptedIn = false
 
     public init(deviceConfigurationController: any DeviceConfigurationController) {
         self.deviceConfigurationController = deviceConfigurationController
     }
 
-    public func obtain() async throws -> CLLocation {
-        // Check if location services are opted in
-        let isOptedIn = try await deviceConfigurationController.optInLocationServices
+    public func obtain() async throws(LocationServiceError) -> CLLocation {
+        let isOptedIn: Bool
+
+        if !hasOptedIn {
+            do {
+                isOptedIn = try await deviceConfigurationController.optInLocationServices
+                if isOptedIn {
+                    hasOptedIn = true
+                }
+            } catch {
+                throw LocationServiceError.failedToReadOptedIntoLocationServices
+            }
+        } else {
+            isOptedIn = true
+        }
 
         guard isOptedIn else {
-            throw LocationServiceError.unconfigured
+            throw LocationServiceError.optedOutOfLocationServices
         }
 
         // TODO: Implement the rest
-        throw LocationServiceError.unconfigured
+        throw LocationServiceError.unknown("Not implemented")
     }
 }
