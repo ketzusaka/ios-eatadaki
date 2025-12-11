@@ -45,7 +45,7 @@ struct SpotsRepositoryTests {
         let repository = try setupRepository()
         let nonExistentID = UUID()
 
-        await #expect(throws: RepositoryError.notFound) {
+        await #expect(throws: SpotsRepositoryError.spotNotFound) {
             try await repository.fetchSpot(withID: nonExistentID)
         }
     }

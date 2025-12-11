@@ -22,8 +22,8 @@ struct RealLocationServiceTests {
     @Test("obtain throws failedToReadOptedIntoLocationServices when controller throws")
     func testObtainThrowsFailedToReadWhenControllerThrows() async throws {
         let fakeController = FakeDeviceConfigurationController {
-            $0.stubOptInLocationServices = {
-                throw NSError(domain: "TestError", code: 1)
+            $0.stubOptInLocationServices = { () async throws(DeviceConfigurationControllerError) -> Bool in
+                throw DeviceConfigurationControllerError.databaseError("Testing")
             }
         }
         let service = RealLocationService(deviceConfigurationController: fakeController)
