@@ -2,12 +2,14 @@ import EatadakiData
 import EatadakiKit
 import EatadakiLocationKit
 import EatadakiUI
+import EatadakiUserKit
 import GRDB
 
 public class InitializedContext {
     /// Initialization dependencies
     public let deviceConfigDataService: DeviceConfigDataService
     public let experiencesDataService: ExperiencesDataService
+    public let userController: UserController
     public let userDataService: UserDataService
 
     /// On-the-fly dependencies
@@ -18,10 +20,12 @@ public class InitializedContext {
     public init(
         deviceConfigDataService: DeviceConfigDataService,
         experiencesDataService: ExperiencesDataService,
+        userController: UserController,
         userDataService: UserDataService,
     ) {
         self.deviceConfigDataService = deviceConfigDataService
         self.experiencesDataService = experiencesDataService
+        self.userController = userController
         self.userDataService = userDataService
     }
 }

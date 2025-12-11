@@ -14,7 +14,7 @@ public struct SpotsView: View {
 
     public var body: some View {
         let theme = themeManager.tokens(for: colorScheme)
-        
+
         NavigationStack {
             List {
                 Text("Spots")

@@ -5,6 +5,4 @@ enum AppState {
     case initializing
     case initializationFailure(String)
     case initialized(InitializedContext)
-    case unauthenticated(InitializedContext)
-    case authenticated(InitializedContext, UserController)
 }

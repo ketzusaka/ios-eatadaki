@@ -32,7 +32,6 @@ public final class SpotsViewModel {
         if isOptedIn {
             // TODO: Fetch Location
         }
-
     }
 }
 

@@ -1,5 +1,6 @@
 import EatadakiData
 import EatadakiKit
+import EatadakiUserKit
 import Foundation
 import GRDB
 import Observation
@@ -27,34 +28,20 @@ final class AppLifecycleController {
             let deviceConfigDataService = try RealDeviceConfigDataService(fileSystemProvider: fileSystemProvider)
             let experiencesDataService = try RealExperiencesDataService(fileSystemProvider: fileSystemProvider)
             let userDataService = try RealUserDataService(fileSystemProvider: fileSystemProvider)
+            let userController = try await UserController(userRepository: userDataService.userRepository)
 
             let context = InitializedContext(
                 deviceConfigDataService: deviceConfigDataService,
                 experiencesDataService: experiencesDataService,
+                userController: userController,
                 userDataService: userDataService,
             )
 
             // Move to initialized state
             state = .initialized(context)
-
-            // Check authentication state
-            await checkAuthenticationState(context: context)
         } catch {
             // Handle initialization error
             state = .initializationFailure(error.localizedDescription)
-        }
-    }
-
-    private func checkAuthenticationState(context: InitializedContext) async {
-        do {
-            if let user = try await context.userRepository.fetchUser() {
-                let userController = UserController(userRepository: context.userRepository, user: user)
-                state = .authenticated(context, userController)
-            } else {
-                state = .unauthenticated(context)
-            }
-        } catch {
-            state = .unauthenticated(context)
         }
     }
 }

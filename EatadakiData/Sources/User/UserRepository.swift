@@ -1,10 +1,14 @@
 import Foundation
 import GRDB
 
+public enum UserRepositoryError: Error {
+    case databaseError(String)
+}
+
 public protocol UserRepository: AnyObject {
-    func fetchUser() async throws -> User?
-    func saveUser(_ user: User) async throws
-    func clearUser() async throws
+    func fetchUser() async throws(UserRepositoryError) -> User?
+    func saveUser(_ user: User) async throws(UserRepositoryError)
+    func clearUser() async throws(UserRepositoryError)
 }
 
 public protocol UserRepositoryProviding {
@@ -18,24 +22,42 @@ public actor RealUserRepository: UserRepository {
         self.db = db
     }
 
-    public func fetchUser() async throws -> User? {
-        try await db.read { db in
-            try User.fetchOne(db)
+    public func fetchUser() async throws(UserRepositoryError) -> User? {
+        do {
+            return try await db.read { db in
+                try User.fetchOne(db)
+            }
+        } catch let error as UserRepositoryError {
+            throw error
+        } catch {
+            throw UserRepositoryError.databaseError(error.localizedDescription)
         }
     }
 
-    public func saveUser(_ user: User) async throws {
-        try await db.write { db in
-            // Delete existing user (should only be one)
-            try User.deleteAll(db)
-            // Insert new user
-            try user.insert(db)
+    public func saveUser(_ user: User) async throws(UserRepositoryError) {
+        do {
+            return try await db.write { db in
+                // Delete existing user (should only be one)
+                try User.deleteAll(db)
+                // Insert new user
+                try user.insert(db)
+            }
+        } catch let error as UserRepositoryError {
+            throw error
+        } catch {
+            throw UserRepositoryError.databaseError(error.localizedDescription)
         }
     }
 
-    public func clearUser() async throws {
-        _ = try await db.write { db in
-            try User.deleteAll(db)
+    public func clearUser() async throws(UserRepositoryError) {
+        do {
+            _ = try await db.write { db in
+                try User.deleteAll(db)
+            }
+        } catch let error as UserRepositoryError {
+            throw error
+        } catch {
+            throw UserRepositoryError.databaseError(error.localizedDescription)
         }
     }
 }

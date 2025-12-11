@@ -13,7 +13,7 @@ struct RootView: View {
     var body: some View {
         Group {
             switch lifecycleController.state {
-            case .uninitialized, .initializing, .initialized:
+            case .uninitialized, .initializing:
                 LoadingView()
                     .task {
                         if case .uninitialized = lifecycleController.state {
@@ -26,10 +26,8 @@ struct RootView: View {
                     description: error,
                     imageSystemName: "exclamationmark.triangle",
                 )
-            case .unauthenticated(let context):
-                InitializedView(context: context, isAuthenticated: false)
-            case .authenticated(let context, _):
-                InitializedView(context: context, isAuthenticated: true)
+            case .initialized(let context):
+                InitializedView(context: context)
             }
         }
         .environment(themeManager)

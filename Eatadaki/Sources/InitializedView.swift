@@ -8,7 +8,6 @@ import SwiftUI
 
 struct InitializedView: View {
     let context: InitializedContext
-    let isAuthenticated: Bool
 
     var body: some View {
         TabView {
@@ -26,7 +25,7 @@ struct InitializedView: View {
                     Label("Experiences", systemImage: "fork.knife")
                 }
 
-            ProfileView(isAuthenticated: isAuthenticated)
+            ProfileView(isAuthenticated: false)
                 .tabItem {
                     Label("Profile", systemImage: "person.circle")
                 }
@@ -36,32 +35,34 @@ struct InitializedView: View {
 
 #if DEBUG
 #Preview("Unauthenticated") {
+    let userDataService = FakeUserDataService()
     let context = InitializedContext(
         deviceConfigDataService: FakeDeviceConfigDataService(),
         experiencesDataService: FakeExperiencesDataService(),
-        userDataService: FakeUserDataService(),
+        userController: UserController(userRepository: userDataService.userRepository, user: nil),
+        userDataService: userDataService,
     )
 
-    InitializedView(context: context, isAuthenticated: false)
+    InitializedView(context: context)
         .environment(ThemeManager())
 }
 
 #Preview("Authenticated") {
+    let fakeUser = User(id: UUID(), email: "test@example.com", createdAt: .now)
     let fakeUserDataService = FakeUserDataService {
         $0.stubUserRepository = FakeUserRepository {
-            $0.stubFetchUser = {
-                User(id: UUID(), email: "test@example.com", createdAt: .now)
-            }
+            $0.stubFetchUser = { fakeUser }
         }
     }
 
     let context = InitializedContext(
         deviceConfigDataService: FakeDeviceConfigDataService(),
         experiencesDataService: FakeExperiencesDataService(),
+        userController: UserController(userRepository: fakeUserDataService.userRepository, user: fakeUser),
         userDataService: fakeUserDataService,
     )
 
-    InitializedView(context: context, isAuthenticated: true)
+    InitializedView(context: context)
         .environment(ThemeManager())
 }
 #endif
