@@ -9,7 +9,7 @@ public class InitializedContext {
     public let deviceConfigDataService: DeviceConfigDataService
     public let experiencesDataService: ExperiencesDataService
     public let userDataService: UserDataService
-    
+
     /// On-the-fly dependencies
     public lazy var locationService: LocationService = {
         RealLocationService(deviceConfigurationController: deviceConfigurationController)
