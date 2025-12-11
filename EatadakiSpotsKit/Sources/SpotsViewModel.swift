@@ -9,13 +9,8 @@ public typealias SpotsViewModelDependencies = LocationServiceProviding & DeviceC
 @Observable
 @MainActor
 public final class SpotsViewModel {
-    var location: CLLocation?
-    var spots: [Spot] = []
-    var searchQuery: String = ""
-    var isLoadingLocation: Bool = false
-    var locationError: Error?
-    var isOptedIn: Bool = false
-    var hasInitialized: Bool = false
+    public var spots: [SpotInfoListing] = []
+    public var isOptedIn: Bool = false
 
     private let dependencies: SpotsViewModelDependencies
 
@@ -38,6 +33,13 @@ public final class SpotsViewModel {
             // TODO: Fetch Location
         }
 
-        hasInitialized = true
     }
 }
+
+#if DEBUG
+public struct FakeSpotsViewModelDependencies: LocationServiceProviding, DeviceConfigurationControllerProviding, SpotsRepositoryProviding {
+    public var locationService: LocationService = FakeLocationService()
+    public var deviceConfigurationController: DeviceConfigurationController = FakeDeviceConfigurationController()
+    public var spotsRepository: SpotsRepository = FakeSpotsRepository()
+}
+#endif

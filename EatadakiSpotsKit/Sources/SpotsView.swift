@@ -1,6 +1,11 @@
+import EatadakiData
+import EatadakiLocationKit
+import EatadakiUI
 import SwiftUI
 
 public struct SpotsView: View {
+    @Environment(ThemeManager.self) var themeManager
+    @Environment(\.colorScheme) var colorScheme
     @Bindable var viewModel: SpotsViewModel
 
     public init(viewModel: SpotsViewModel) {
@@ -8,10 +13,12 @@ public struct SpotsView: View {
     }
 
     public var body: some View {
+        let theme = themeManager.tokens(for: colorScheme)
+        
         NavigationStack {
             List {
                 Text("Spots")
-                    .font(.headline)
+                    .headlineTextStyling(using: theme)
             }
             .toolbar {
                 ToolbarItem(placement: .navigationBarLeading) {
@@ -34,3 +41,15 @@ public struct SpotsView: View {
         }
     }
 }
+
+#if DEBUG
+#Preview {
+    let dependencies = FakeSpotsViewModelDependencies()
+    let viewModel = SpotsViewModel(dependencies: dependencies)
+
+    NavigationStack {
+        SpotsView(viewModel: viewModel)
+            .environment(ThemeManager())
+    }
+}
+#endif
