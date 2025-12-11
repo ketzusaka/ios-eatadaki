@@ -33,6 +33,8 @@ disabled_rules:
   - explicit_top_level_acl  # Allow implicit top-level access control
   - first_where             # Not suitable for some async patterns
   - identifier_name         # Allow any identifier names (too restrictive)
+  - large_tuple             # Allow large tuples (useful for fake invocation tracking)
+  - trailing_comma          # Allow trailing commas in collection literals
 
 # Opt-in rules for modern Swift style
 opt_in_rules:
