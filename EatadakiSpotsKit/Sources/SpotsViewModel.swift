@@ -37,8 +37,15 @@ public final class SpotsViewModel {
 
 #if DEBUG
 public struct FakeSpotsViewModelDependencies: LocationServiceProviding, DeviceConfigurationControllerProviding, SpotsRepositoryProviding {
-    public var locationService: LocationService = FakeLocationService()
-    public var deviceConfigurationController: DeviceConfigurationController = FakeDeviceConfigurationController()
-    public var spotsRepository: SpotsRepository = FakeSpotsRepository()
+    public var fakeLocationService = FakeLocationService()
+    public var locationService: LocationService { fakeLocationService }
+    
+    public var fakeDeviceConfigurationController = FakeDeviceConfigurationController()
+    public var deviceConfigurationController: DeviceConfigurationController { fakeDeviceConfigurationController }
+    
+    public var fakeSpotsRepository = FakeSpotsRepository()
+    public var spotsRepository: SpotsRepository { fakeSpotsRepository }
+    
+    public init() {}
 }
 #endif

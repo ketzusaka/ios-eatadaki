@@ -218,6 +218,20 @@ let project = Project(
         ),
 
         .target(
+            name: "EatadakiSpotsKitTests",
+            destinations: [.iPhone],
+            product: .unitTests,
+            bundleId: "com.aethercodelabs.eatadaki.spotskit.tests",
+            deploymentTargets: .iOS("26.0"),
+            sources: ["EatadakiSpotsKit/Tests/**"],
+            dependencies: [
+                .target(name: "EatadakiSpotsKit"),
+                .target(name: "EatadakiData"),
+                .target(name: "EatadakiLocationKit")
+            ]
+        ),
+
+        .target(
             name: "EatadakiAppUITests",
             destinations: [.iPhone],
             product: .uiTests,
