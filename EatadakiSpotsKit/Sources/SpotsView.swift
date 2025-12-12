@@ -43,18 +43,23 @@ public struct SpotsView: View {
     
     @ViewBuilder
     private var contentView: some View {
-        if !viewModel.hasInitialized {
+        switch viewModel.stage {
+        case .uninitialized, .initializing:
             LoadingView()
-        } else if !viewModel.isOptedIn {
+        case .requiresOptIn:
             locationOptInInterstitial
-        } else if viewModel.hasReceivedContent {
-            spotsList
-        } else if viewModel.isFetchingContent {
-            LoadingView(text: "Finding spots")
-        } else if viewModel.isFetchingLocation {
-            LoadingView(text: "Locating")
-        } else {
-            errorInterstitial
+        case .locating:
+            if viewModel.hasReceivedContent {
+                spotsList
+            } else {
+                LoadingView(text: "Locating")
+            }
+        case .located, .fetching, .fetched:
+            if viewModel.hasReceivedContent {
+                spotsList
+            } else {
+                LoadingView(text: "Finding spots")
+            }
         }
     }
     
@@ -71,23 +76,6 @@ public struct SpotsView: View {
                 ) {
                     await viewModel.optIntoLocationServices()
                 }
-            ]
-        )
-    }
-    
-    private var errorInterstitial: some View {
-        SimpleInterstitialView(
-            title: "Something Went Wrong",
-            description: "We encountered an issue while loading spots. Please try again.",
-            imageSystemName: "exclamationmark.triangle",
-            style: .critical,
-            actions: [
-                SimpleInterstitialView.Action(
-                    label: "Retry",
-                    style: .primary,
-                ) {
-                    await viewModel.refreshSpots()
-                },
             ]
         )
     }

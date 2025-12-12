@@ -10,13 +10,20 @@ public typealias SpotsViewModelDependencies = LocationServiceProviding & DeviceC
 @Observable
 @MainActor
 public final class SpotsViewModel {
+    public enum Stage {
+        case uninitialized // App hasn't called `initialized()`
+        case initializing // Determines opt-in state
+        case requiresOptIn // Skipped once the user opts in
+        case locating // Locating the user
+        case located // User has been located
+        case fetching // Fetching content
+        case fetched // Fetching finished
+    }
+
+    public var stage: Stage = .uninitialized
     public var currentLocation: CLLocation?
     public var spots: [SpotInfoListing] = []
-    public var isOptedIn = false
-    public var hasInitialized = false
-    public var isFetchingLocation = false
     public var hasReceivedContent = false
-    public var isFetchingContent = false
 
     private let dependencies: SpotsViewModelDependencies
 
@@ -28,26 +35,25 @@ public final class SpotsViewModel {
 
     public func initialize() async {
         // Check opt-in status
+        let isOptedIn: Bool
         do {
             isOptedIn = try await dependencies.deviceConfigurationController.optInLocationServices
         } catch {
             isOptedIn = false
         }
         
-        // Once we know if we can request a location we're considered initialized
-        hasInitialized = true
-
-        // If opted in, fetch location
         if isOptedIn {
+            stage = .locating
             await refreshCurrentLocation()
             await refreshSpots()
+        } else {
+            stage = .requiresOptIn
         }
     }
     
     public func optIntoLocationServices() async {
         do {
             try await dependencies.deviceConfigurationController.setOptInLocationServices(true)
-            isOptedIn = true
             await refreshCurrentLocation()
             await refreshSpots()
         } catch {
@@ -56,22 +62,21 @@ public final class SpotsViewModel {
     }
     
     public func refreshCurrentLocation() async {
-        isFetchingLocation = true
-        defer { isFetchingLocation = false }
-
         do {
+            stage = .locating
             currentLocation = try await dependencies.locationService.obtain()
+            stage = .located
         } catch {
             // TODO: Handle failed location fetch
         }
     }
     
     public func refreshSpots() async {
-        isFetchingContent = true
+        stage = .fetching
         // TODO: Fetch content!
         try? await Task.sleep(seconds: 3)
         hasReceivedContent = true
-        isFetchingContent = false
+        stage = .fetched
     }
 }
 
