@@ -6,6 +6,7 @@ public enum LocationServiceError: Error, Equatable {
     case optedOutOfLocationServices
     case failedToReadOptedIntoLocationServices
     case unknown(String)
+    case updateError(LocationManagerProviderError)
 }
 
 public protocol LocationService {
@@ -18,13 +19,25 @@ public protocol LocationServiceProviding {
 
 public actor RealLocationService: LocationService {
     private let deviceConfigurationController: any DeviceConfigurationController
+    private let locationManager: any LocationManagerProvider
+
     private var hasOptedIn = false
 
-    public init(deviceConfigurationController: any DeviceConfigurationController) {
+    public init(
+        deviceConfigurationController: any DeviceConfigurationController,
+        locationManager: any LocationManagerProvider = CLLocationManager(),
+    ) {
         self.deviceConfigurationController = deviceConfigurationController
+        self.locationManager = locationManager
     }
 
     public func obtain() async throws(LocationServiceError) -> CLLocation {
+        /// If we're already authorized by the system we don't need to worry about our own opt-in value.
+        if locationManager.authorizationStatus == .authorizedWhenInUse {
+            return try await currentLocation()
+        }
+        
+        /// Now lets check if they are opted in
         let isOptedIn: Bool
 
         if !hasOptedIn {
@@ -43,8 +56,17 @@ public actor RealLocationService: LocationService {
         guard isOptedIn else {
             throw LocationServiceError.optedOutOfLocationServices
         }
+        
+        /// We've determined they are opted in now. We don't need to ask for permission; our fetch will do that on our behalf.
 
-        // TODO: Implement the rest
-        throw LocationServiceError.unknown("Not implemented")
+        return try await currentLocation()
+    }
+    
+    private func currentLocation() async throws(LocationServiceError) -> CLLocation {
+        do {
+            return try await locationManager.requestLocation()
+        } catch {
+            throw LocationServiceError.updateError(error)
+        }
     }
 }

@@ -33,7 +33,8 @@ let project = Project(
             deploymentTargets: .iOS("26.0"),
             infoPlist: .extendingDefault(
                 with: [
-                    "UILaunchScreen": [:]
+                    "UILaunchScreen": [:],
+                    "NSLocationWhenInUseUsageDescription": "Eatadaki uses your location to help you discover nearby restaurants and dining spots."
                 ]
             ),
             sources: ["Eatadaki/Sources/**"],
@@ -127,7 +128,8 @@ let project = Project(
             dependencies: [
                 .target(name: "EatadakiData"),
                 .target(name: "EatadakiKit"),
-                .target(name: "EatadakiLocationKit")
+                .target(name: "EatadakiLocationKit"),
+                .target(name: "EatadakiUI")
             ]
         ),
 
@@ -141,7 +143,8 @@ let project = Project(
             sources: ["EatadakiExperiencesKit/Sources/**"],
             dependencies: [
                 .target(name: "EatadakiData"),
-                .target(name: "EatadakiKit")
+                .target(name: "EatadakiKit"),
+                .target(name: "EatadakiUI")
             ]
         ),
 

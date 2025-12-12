@@ -19,9 +19,9 @@ public struct SimpleInterstitialView: View {
     public struct Action: Hashable {
         public let label: String
         public let style: ActionStyle
-        public let handler: () -> Void
+        public let handler: () async -> Void
 
-        public init(label: String, style: ActionStyle, handler: @escaping () -> Void) {
+        public init(label: String, style: ActionStyle, handler: @escaping () async -> Void) {
             self.label = label
             self.style = style
             self.handler = handler
@@ -123,19 +123,31 @@ public struct SimpleInterstitialView: View {
 
         switch action.style {
         case .primary:
-            Button(action: action.handler) {
+            Button(action: {
+                Task {
+                    await action.handler()
+                }
+            }) {
                 Text(action.label)
                     .frame(maxWidth: .infinity)
             }
             .primaryButtonStyling(using: theme)
         case .secondary:
-            Button(action: action.handler) {
+            Button(action: {
+                Task {
+                    await action.handler()
+                }
+            }) {
                 Text(action.label)
                     .frame(maxWidth: .infinity)
             }
             .secondaryButtonStyling(using: theme)
         case .destructive:
-            Button(action: action.handler) {
+            Button(action: {
+                Task {
+                    await action.handler()
+                }
+            }) {
                 Text(action.label)
                     .frame(maxWidth: .infinity)
             }
