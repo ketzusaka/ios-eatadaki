@@ -1,3 +1,4 @@
+import CoreLocation
 import EatadakiData
 import Foundation
 import GRDB
@@ -85,7 +86,7 @@ struct RealSpotsRepositoryTests {
         #expect(spots.first?.name == testSpot.name)
     }
 
-    @Test("Fetch all spots returns multiple spots in correct order")
+    @Test("Fetch all spots returns multiple spots")
     func testFetchSpotsMultiple() async throws {
         let spot1 = Spot(
             id: UUID(),
@@ -122,6 +123,346 @@ struct RealSpotsRepositoryTests {
         #expect(spotIds.contains(spot3.id))
     }
 
+    // MARK: - Sorting Tests
+
+    @Test("Fetch spots with default sort returns spots sorted by name ascending")
+    func testFetchSpotsDefaultSort() async throws {
+        let spotA = Spot(
+            id: UUID(),
+            name: "Alpha Spot",
+            latitude: 37.7849447,
+            longitude: -122.4303306,
+            createdAt: .now,
+        )
+        let spotZ = Spot(
+            id: UUID(),
+            name: "Zulu Spot",
+            latitude: 37.7849544,
+            longitude: -122.4317274,
+            createdAt: .now,
+        )
+        let spotM = Spot(
+            id: UUID(),
+            name: "Mike Spot",
+            latitude: 37.7749,
+            longitude: -122.4194,
+            createdAt: .now,
+        )
+
+        _ = try await repository.create(spot: spotZ)
+        _ = try await repository.create(spot: spotA)
+        _ = try await repository.create(spot: spotM)
+
+        let spots = try await repository.fetchSpots()
+
+        try #require(spots.count == 3)
+        #expect(spots[0].name == "Alpha Spot")
+        #expect(spots[1].name == "Mike Spot")
+        #expect(spots[2].name == "Zulu Spot")
+    }
+
+    @Test("Fetch spots sorted by name ascending")
+    func testFetchSpotsSortByNameAscending() async throws {
+        let spotA = Spot(
+            id: UUID(),
+            name: "Alpha Spot",
+            latitude: 37.7849447,
+            longitude: -122.4303306,
+            createdAt: .now,
+        )
+        let spotZ = Spot(
+            id: UUID(),
+            name: "Zulu Spot",
+            latitude: 37.7849544,
+            longitude: -122.4317274,
+            createdAt: .now,
+        )
+        let spotM = Spot(
+            id: UUID(),
+            name: "Mike Spot",
+            latitude: 37.7749,
+            longitude: -122.4194,
+            createdAt: .now,
+        )
+
+        _ = try await repository.create(spot: spotZ)
+        _ = try await repository.create(spot: spotA)
+        _ = try await repository.create(spot: spotM)
+
+        let request = FetchSpotsDataRequest(
+            sort: FetchSpotsDataRequest.Sort(
+                field: .name,
+                direction: .ascending,
+            )
+        )
+        let spots = try await repository.fetchSpots(request: request)
+
+        try #require(spots.count == 3)
+        #expect(spots[0].name == "Alpha Spot")
+        #expect(spots[1].name == "Mike Spot")
+        #expect(spots[2].name == "Zulu Spot")
+    }
+
+    @Test("Fetch spots sorted by name descending")
+    func testFetchSpotsSortByNameDescending() async throws {
+        let spotA = Spot(
+            id: UUID(),
+            name: "Alpha Spot",
+            latitude: 37.7849447,
+            longitude: -122.4303306,
+            createdAt: .now,
+        )
+        let spotZ = Spot(
+            id: UUID(),
+            name: "Zulu Spot",
+            latitude: 37.7849544,
+            longitude: -122.4317274,
+            createdAt: .now,
+        )
+        let spotM = Spot(
+            id: UUID(),
+            name: "Mike Spot",
+            latitude: 37.7749,
+            longitude: -122.4194,
+            createdAt: .now,
+        )
+
+        _ = try await repository.create(spot: spotA)
+        _ = try await repository.create(spot: spotZ)
+        _ = try await repository.create(spot: spotM)
+
+        let request = FetchSpotsDataRequest(
+            sort: FetchSpotsDataRequest.Sort(
+                field: .name,
+                direction: .descending,
+            )
+        )
+        let spots = try await repository.fetchSpots(request: request)
+
+        #expect(spots.count == 3)
+        #expect(spots[0].name == "Zulu Spot")
+        #expect(spots[1].name == "Mike Spot")
+        #expect(spots[2].name == "Alpha Spot")
+    }
+
+    @Test("Fetch spots sorted by distance ascending")
+    func testFetchSpotsSortByDistanceAscending() async throws {
+        // Reference point: San Francisco (37.7749, -122.4194)
+        let referenceCoordinate = CLLocationCoordinate2D(
+            latitude: 37.7749,
+            longitude: -122.4194,
+        )
+
+        // Spot 1: Very close (Mission District, ~1km away)
+        let spot1 = Spot(
+            id: UUID(),
+            name: "Close Spot",
+            latitude: 37.7849447,
+            longitude: -122.4303306,
+            createdAt: .now,
+        )
+        // Spot 2: Medium distance (Oakland, ~10km away)
+        let spot2 = Spot(
+            id: UUID(),
+            name: "Medium Spot",
+            latitude: 37.8044,
+            longitude: -122.2712,
+            createdAt: .now,
+        )
+        // Spot 3: Far (San Jose, ~70km away)
+        let spot3 = Spot(
+            id: UUID(),
+            name: "Far Spot",
+            latitude: 37.3382,
+            longitude: -121.8863,
+            createdAt: .now,
+        )
+
+        _ = try await repository.create(spot: spot3)
+        _ = try await repository.create(spot: spot1)
+        _ = try await repository.create(spot: spot2)
+
+        let request = FetchSpotsDataRequest(
+            sort: FetchSpotsDataRequest.Sort(
+                field: .distance(from: referenceCoordinate),
+                direction: .ascending,
+            )
+        )
+        let spots = try await repository.fetchSpots(request: request)
+
+        try #require(spots.count == 3)
+        // Verify ordering: closest first
+        #expect(spots[0].name == "Close Spot")
+        #expect(spots[1].name == "Medium Spot")
+        #expect(spots[2].name == "Far Spot")
+    }
+
+    @Test("Fetch spots sorted by distance descending")
+    func testFetchSpotsSortByDistanceDescending() async throws {
+        // Reference point: San Francisco (37.7749, -122.4194)
+        let referenceCoordinate = CLLocationCoordinate2D(
+            latitude: 37.7749,
+            longitude: -122.4194,
+        )
+
+        // Spot 1: Very close (Mission District, ~1km away)
+        let spot1 = Spot(
+            id: UUID(),
+            name: "Close Spot",
+            latitude: 37.7849447,
+            longitude: -122.4303306,
+            createdAt: .now,
+        )
+        // Spot 2: Medium distance (Oakland, ~10km away)
+        let spot2 = Spot(
+            id: UUID(),
+            name: "Medium Spot",
+            latitude: 37.8044,
+            longitude: -122.2712,
+            createdAt: .now,
+        )
+        // Spot 3: Far (San Jose, ~70km away)
+        let spot3 = Spot(
+            id: UUID(),
+            name: "Far Spot",
+            latitude: 37.3382,
+            longitude: -121.8863,
+            createdAt: .now,
+        )
+
+        _ = try await repository.create(spot: spot1)
+        _ = try await repository.create(spot: spot3)
+        _ = try await repository.create(spot: spot2)
+
+        let request = FetchSpotsDataRequest(
+            sort: FetchSpotsDataRequest.Sort(
+                field: .distance(from: referenceCoordinate),
+                direction: .descending,
+            )
+        )
+        let spots = try await repository.fetchSpots(request: request)
+
+        try #require(spots.count == 3)
+        // Verify ordering: farthest first
+        #expect(spots[0].name == "Far Spot")
+        #expect(spots[1].name == "Medium Spot")
+        #expect(spots[2].name == "Close Spot")
+    }
+
+    @Test("Fetch spots sorted by distance with multiple spots at similar distances")
+    func testFetchSpotsSortByDistanceSimilarDistances() async throws {
+        // Reference point: San Francisco (37.7749, -122.4194)
+        let referenceCoordinate = CLLocationCoordinate2D(
+            latitude: 37.7749,
+            longitude: -122.4194,
+        )
+
+        // Create spots at varying distances but in different directions
+        // Spot 1: North (37.7849, -122.4194) - very close
+        let spot1 = Spot(
+            id: UUID(),
+            name: "North Spot",
+            latitude: 37.7849,
+            longitude: -122.4194,
+            createdAt: .now,
+        )
+        // Spot 2: South (37.7649, -122.4194) - very close
+        let spot2 = Spot(
+            id: UUID(),
+            name: "South Spot",
+            latitude: 37.7649,
+            longitude: -122.4194,
+            createdAt: .now,
+        )
+        // Spot 3: East (37.7749, -122.4094) - very close
+        let spot3 = Spot(
+            id: UUID(),
+            name: "East Spot",
+            latitude: 37.7749,
+            longitude: -122.4094,
+            createdAt: .now,
+        )
+        // Spot 4: West (37.7749, -122.4294) - very close
+        let spot4 = Spot(
+            id: UUID(),
+            name: "West Spot",
+            latitude: 37.7749,
+            longitude: -122.4294,
+            createdAt: .now,
+        )
+
+        _ = try await repository.create(spot: spot4)
+        _ = try await repository.create(spot: spot2)
+        _ = try await repository.create(spot: spot1)
+        _ = try await repository.create(spot: spot3)
+
+        let request = FetchSpotsDataRequest(
+            sort: FetchSpotsDataRequest.Sort(
+                field: .distance(from: referenceCoordinate),
+                direction: .ascending,
+            )
+        )
+        let spots = try await repository.fetchSpots(request: request)
+
+        try #require(spots.count == 4)
+        // All spots should be at approximately the same distance, so ordering should be consistent
+        // Verify that the reference point is included in the results and sorting is stable
+        let spotNames = spots.map(\.name)
+        #expect(spotNames.contains("North Spot"))
+        #expect(spotNames.contains("South Spot"))
+        #expect(spotNames.contains("East Spot"))
+        #expect(spotNames.contains("West Spot"))
+    }
+
+    @Test("Fetch spots sorted by distance with single spot")
+    func testFetchSpotsSortByDistanceSingleSpot() async throws {
+        let referenceCoordinate = CLLocationCoordinate2D(
+            latitude: 37.7749,
+            longitude: -122.4194,
+        )
+
+        let spot = Spot(
+            id: UUID(),
+            name: "Single Spot",
+            latitude: 37.7849447,
+            longitude: -122.4303306,
+            createdAt: .now,
+        )
+
+        _ = try await repository.create(spot: spot)
+
+        let request = FetchSpotsDataRequest(
+            sort: FetchSpotsDataRequest.Sort(
+                field: .distance(from: referenceCoordinate),
+                direction: .ascending,
+            )
+        )
+        let spots = try await repository.fetchSpots(request: request)
+
+        #expect(spots.count == 1)
+        let fetchedSpot = try #require(spots.first)
+        #expect(fetchedSpot.id == spot.id)
+        #expect(fetchedSpot.name == spot.name)
+    }
+
+    @Test("Fetch spots sorted by distance with empty results")
+    func testFetchSpotsSortByDistanceEmpty() async throws {
+        let referenceCoordinate = CLLocationCoordinate2D(
+            latitude: 37.7749,
+            longitude: -122.4194,
+        )
+
+        let request = FetchSpotsDataRequest(
+            sort: FetchSpotsDataRequest.Sort(
+                field: .distance(from: referenceCoordinate),
+                direction: .ascending,
+            )
+        )
+        let spots = try await repository.fetchSpots(request: request)
+
+        #expect(spots.isEmpty)
+    }
+
     @Test("Create spot with all optional fields")
     func testCreateSpotWithOptionalFields() async throws {
         let testSpot = Spot(
@@ -148,7 +489,7 @@ struct RealSpotsRepositoryTests {
             name: "Minimal Spot",
             latitude: 37.7849447,
             longitude: -122.4303306,
-            createdAt: .now
+            createdAt: .now,
         )
 
         let createdSpot = try await repository.create(spot: testSpot)

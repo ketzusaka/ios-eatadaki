@@ -85,7 +85,7 @@ public class FakeFileSystemProvider: FileSystemProvider {
 ## Development Workflow
 
 - **Tuist Generation**: Always use `tuist generate --no-open` to prevent Xcode from automatically opening after generation. This avoids interrupting the user's workflow.
-- **Command Output**: Do not use `tail` or `head` with commands. These commands prevent seeing the full command output as it's emitted. Always run commands directly without piping to `tail` or `head`.
+- **Command Output**: Do not use `tail`, `head`, `grep`, or similar tools with commands. These commands prevent seeing the full command output as it's emitted. Always run commands directly without piping to `tail` or `head`.
 
 ## SwiftUI Preview Guidelines
 

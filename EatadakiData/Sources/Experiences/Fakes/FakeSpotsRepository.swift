@@ -40,14 +40,14 @@ public class FakeSpotsRepository: SpotsRepository {
         return try await stubFetchSpotWithIDs(ids)
     }
 
-    public private(set) var invokedCountFetchSpots: Int = 0
-    public var stubFetchSpots: () async throws(SpotsRepositoryError) -> [Spot] = {
+    public private(set) var invocationsFetchSpots: [FetchSpotsDataRequest] = []
+    public var stubFetchSpots: (FetchSpotsDataRequest) async throws(SpotsRepositoryError) -> [Spot] = { _ in
         []
     }
 
-    public func fetchSpots() async throws(SpotsRepositoryError) -> [Spot] {
-        invokedCountFetchSpots += 1
-        return try await stubFetchSpots()
+    public func fetchSpots(request: FetchSpotsDataRequest = .default) async throws(SpotsRepositoryError) -> [Spot] {
+        invocationsFetchSpots.append(request)
+        return try await stubFetchSpots(request)
     }
 
     public private(set) var invocationsCreate: [Spot] = []

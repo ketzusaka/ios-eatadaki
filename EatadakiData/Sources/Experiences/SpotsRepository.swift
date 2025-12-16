@@ -1,3 +1,4 @@
+import CoreLocation
 import Foundation
 import GRDB
 
@@ -26,7 +27,7 @@ public struct SpotIDs: Equatable {
 public protocol SpotsRepository: AnyObject {
     func fetchSpot(withID id: UUID) async throws(SpotsRepositoryError) -> Spot
     func fetchSpot(withIDs ids: SpotIDs) async throws(SpotsRepositoryError) -> Spot
-    func fetchSpots() async throws(SpotsRepositoryError) -> [Spot]
+    func fetchSpots(request: FetchSpotsDataRequest) async throws(SpotsRepositoryError) -> [Spot]
 
     @discardableResult
     func create(spot: Spot) async throws(SpotsRepositoryError) -> Spot
@@ -104,10 +105,37 @@ public actor RealSpotsRepository: SpotsRepository {
         }
     }
 
-    public func fetchSpots() async throws(SpotsRepositoryError) -> [Spot] {
+    public func fetchSpots(request: FetchSpotsDataRequest = .default) async throws(SpotsRepositoryError) -> [Spot] {
         do {
             return try await db.read { db in
-                try Spot.fetchAll(db)
+                switch request.sort.field {
+                case .name:
+                    let ordering = request.sort.direction == .ascending
+                        ? Column("name").asc
+                        : Column("name").desc
+                    let query = Spot.all().order(ordering)
+                    return try query.fetchAll(db)
+
+                case .distance(let coordinate):
+                    let orderDirection = request.sort.direction == .ascending ? "ASC" : "DESC"
+                    let sql = """
+                        SELECT * FROM spots
+                        ORDER BY (
+                            (latitude - ?) * (latitude - ?) +
+                            (longitude - ?) * (longitude - ?)
+                        ) \(orderDirection)
+                    """
+                    return try Spot.fetchAll(
+                        db,
+                        sql: sql,
+                        arguments: [
+                            coordinate.latitude,
+                            coordinate.latitude,
+                            coordinate.longitude,
+                            coordinate.longitude,
+                        ]
+                    )
+                }
             }
         } catch let error as SpotsRepositoryError {
             throw error
