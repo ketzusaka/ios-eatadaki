@@ -18,7 +18,10 @@ final public class ExperiencesDatabaseMigrator {
                 t.column("mapkitId", .text)
                 t.column("remoteId", .text)
                 t.column("name", .text).notNull()
+                t.column("latitude", .real).notNull()
+                t.column("longitude", .real).notNull()
                 t.column("createdAt", .datetime).notNull()
+                t.column("reason", .text).notNull()
             }
             try db.execute(sql: "CREATE UNIQUE INDEX IF NOT EXISTS spots_mapkitId_unique ON spots(mapkitId) WHERE mapkitId IS NOT NULL")
             try db.execute(sql: "CREATE INDEX IF NOT EXISTS spots_remoteId ON spots(remoteId) WHERE remoteId IS NOT NULL")
@@ -44,13 +47,6 @@ final public class ExperiencesDatabaseMigrator {
                 )
             """)
             try db.execute(sql: "CREATE INDEX IF NOT EXISTS experiences_ratings_experienceId ON experiences_ratings(experienceId)")
-        }
-
-        migrator.registerMigration("v2") { db in
-            // Add latitude and longitude columns to spots table
-            // SQLite requires a default value when adding NOT NULL columns to existing tables
-            try db.execute(sql: "ALTER TABLE spots ADD COLUMN latitude REAL NOT NULL DEFAULT 0.0")
-            try db.execute(sql: "ALTER TABLE spots ADD COLUMN longitude REAL NOT NULL DEFAULT 0.0")
         }
 
         try migrator.migrate(db)

@@ -36,6 +36,7 @@ public extension Spot {
             latitude: foundSpot.latitude,
             longitude: foundSpot.longitude,
             createdAt: .now,
+            reason: .findResult,
         )
     }
 }

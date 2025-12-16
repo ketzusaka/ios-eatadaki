@@ -1,6 +1,12 @@
 import Foundation
 import GRDB
 
+public enum SpotReason: String, Codable {
+    case createdByUser = "createdByUser"
+    case findResult = "findResult"
+    case foundAndViewed = "foundAndViewed"
+}
+
 public struct Spot: Codable, Identifiable {
     public var id: UUID
     public var mapkitId: String?
@@ -9,6 +15,7 @@ public struct Spot: Codable, Identifiable {
     public var latitude: Double
     public var longitude: Double
     public var createdAt: Date
+    public var reason: SpotReason
 
     public init(
         id: UUID,
@@ -18,6 +25,7 @@ public struct Spot: Codable, Identifiable {
         latitude: Double,
         longitude: Double,
         createdAt: Date,
+        reason: SpotReason = .findResult,
     ) {
         self.id = id
         self.mapkitId = mapkitId
@@ -26,6 +34,7 @@ public struct Spot: Codable, Identifiable {
         self.latitude = latitude
         self.longitude = longitude
         self.createdAt = createdAt
+        self.reason = reason
     }
 }
 

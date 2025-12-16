@@ -59,7 +59,10 @@ struct ExperiencesDatabaseMigratorTests {
             #expect(columnNames.contains("mapkitId"))
             #expect(columnNames.contains("remoteId"))
             #expect(columnNames.contains("name"))
+            #expect(columnNames.contains("latitude"))
+            #expect(columnNames.contains("longitude"))
             #expect(columnNames.contains("createdAt"))
+            #expect(columnNames.contains("reason"))
 
             // Check id is primary key
             let idRow = try #require(tableInfo.first { $0["name"] as String == "id" })
@@ -71,10 +74,25 @@ struct ExperiencesDatabaseMigratorTests {
             let nameNotNull = nameRow["notnull"] as? Int64 ?? 0
             #expect(nameNotNull == 1)
 
+            // Check latitude is not null
+            let latitudeRow = try #require(tableInfo.first { $0["name"] as String == "latitude" })
+            let latitudeNotNull = latitudeRow["notnull"] as? Int64 ?? 0
+            #expect(latitudeNotNull == 1)
+
+            // Check longitude is not null
+            let longitudeRow = try #require(tableInfo.first { $0["name"] as String == "longitude" })
+            let longitudeNotNull = longitudeRow["notnull"] as? Int64 ?? 0
+            #expect(longitudeNotNull == 1)
+
             // Check createdAt is not null
             let createdAtRow = try #require(tableInfo.first { $0["name"] as String == "createdAt" })
             let createdAtNotNull = createdAtRow["notnull"] as? Int64 ?? 0
             #expect(createdAtNotNull == 1)
+
+            // Check reason is not null
+            let reasonRow = try #require(tableInfo.first { $0["name"] as String == "reason" })
+            let reasonNotNull = reasonRow["notnull"] as? Int64 ?? 0
+            #expect(reasonNotNull == 1)
         }
     }
 
@@ -210,7 +228,8 @@ struct ExperiencesDatabaseMigratorTests {
             name: "Peace Plaza",
             latitude: 37.7849447,
             longitude: -122.4303306,
-            createdAt: .now
+            createdAt: .now,
+            reason: .findResult,
         )
 
         try db.write { database in
@@ -224,6 +243,7 @@ struct ExperiencesDatabaseMigratorTests {
             #expect(fetchedSpot.mapkitId == testSpot.mapkitId)
             #expect(fetchedSpot.latitude == testSpot.latitude)
             #expect(fetchedSpot.longitude == testSpot.longitude)
+            #expect(fetchedSpot.reason == testSpot.reason)
         }
     }
 
@@ -239,7 +259,7 @@ struct ExperiencesDatabaseMigratorTests {
             remoteId: "test-remote-id",
             name: "Test Experience",
             description: "Test Description",
-            createdAt: .now
+            createdAt: .now,
         )
 
         try db.write { database in
