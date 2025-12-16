@@ -47,6 +47,20 @@ final public class ExperiencesDatabaseMigrator {
                 )
             """)
             try db.execute(sql: "CREATE INDEX IF NOT EXISTS experiences_ratings_experienceId ON experiences_ratings(experienceId)")
+
+            // Create R-tree virtual table for geospatial spot searches
+            // id: integer primary key (auto-generated)
+            // minX, maxX: longitude bounds (same value for points)
+            // minY, maxY: latitude bounds (same value for points)
+            // +spotId: auxiliary column to store the spot UUID (prefix with + to indicate auxiliary)
+            try db.execute(sql: """
+                CREATE VIRTUAL TABLE IF NOT EXISTS spots_geospatial_index USING rtree(
+                    id,
+                    minX, maxX,
+                    minY, maxY,
+                    +spotId TEXT
+                )
+            """)
         }
 
         try migrator.migrate(db)

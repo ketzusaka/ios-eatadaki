@@ -172,6 +172,32 @@ The app follows a **state machine pattern** with three primary states:
 3. `RealEatadakiRepository` performs async database operations using `DatabasePool`
 4. Updates propagate back to UI
 
+## Testing Guidelines
+
+### Database Testing
+
+When writing tests that interact with the database, **never perform assertions inside database read/write blocks**. Instead, fetch data from the database and perform assertions outside the block.
+
+**❌ Incorrect:**
+```swift
+try db.read { database in
+    let entry = try Row.fetchOne(database, sql: "SELECT ...")
+    #expect(entry != nil)  // This will crash the test runner!
+    #expect(entry?["value"] as? String == "expected")
+}
+```
+
+**✅ Correct:**
+```swift
+let fetchedEntry = try await db.read { database in
+    try Row.fetchOne(database, sql: "SELECT ...")
+}
+let entry = try #require(fetchedEntry)
+#expect(entry["value"] as? String == "expected")
+```
+
+**Why:** Running test macros (like `#expect` or `#require`) inside database read/write blocks causes the test runner to crash instead of properly reporting test failures. Always return data from the database block and perform assertions outside.
+
 ## Key Design Principles
 
 1. **State-Driven UI**: UI reflects current app state

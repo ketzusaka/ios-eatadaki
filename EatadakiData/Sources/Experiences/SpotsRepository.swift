@@ -119,8 +119,9 @@ public actor RealSpotsRepository: SpotsRepository {
     @discardableResult
     public func create(spot: Spot) async throws(SpotsRepositoryError) -> Spot {
         do {
-            return try await db.write { db in
+            return try await db.write { [weak self] db in
                 try spot.insert(db)
+                try self?.updateGeospatialIndex(for: spot, in: db)
                 return spot
             }
         } catch let error as SpotsRepositoryError {
@@ -143,8 +144,9 @@ public actor RealSpotsRepository: SpotsRepository {
             var existingSpot = try await fetchSpot(withIDs: spotIDs)
             existingSpot.update(with: spot)
 
-            return try await db.write { [existingSpot] db in
+            return try await db.write { [existingSpot, weak self] db in
                 try existingSpot.update(db)
+                try self?.updateGeospatialIndex(for: existingSpot, in: db)
                 return existingSpot
             }
         } catch SpotsRepositoryError.spotNotFound {
@@ -155,5 +157,47 @@ public actor RealSpotsRepository: SpotsRepository {
         } catch {
             throw SpotsRepositoryError.databaseError(error.localizedDescription)
         }
+    }
+
+    nonisolated private func updateGeospatialIndex(for spot: Spot, in db: Database) throws {
+        let spotIdString = spot.id.uuidString
+        let longitude = spot.longitude
+        let latitude = spot.latitude
+
+        // Check if entry already exists
+        let existingEntry = try Row.fetchOne(
+            db,
+            sql: "SELECT id FROM spots_geospatial_index WHERE spotId = ?",
+            arguments: [spotIdString]
+        )
+
+        if existingEntry != nil {
+            // Update existing entry
+            try db.execute(
+                sql: """
+                    UPDATE spots_geospatial_index
+                    SET minX = ?, maxX = ?, minY = ?, maxY = ?
+                    WHERE spotId = ?
+                """,
+                arguments: [longitude, longitude, latitude, latitude, spotIdString]
+            )
+        } else {
+            // Insert new entry (id is NULL to auto-generate)
+            try db.execute(
+                sql: """
+                    INSERT INTO spots_geospatial_index (id, minX, maxX, minY, maxY, spotId)
+                    VALUES (NULL, ?, ?, ?, ?, ?)
+                """,
+                arguments: [longitude, longitude, latitude, latitude, spotIdString]
+            )
+        }
+    }
+
+    nonisolated private func deleteFromGeospatialIndex(spotId: UUID, in db: Database) throws {
+        let spotIdString = spotId.uuidString
+        try db.execute(
+            sql: "DELETE FROM spots_geospatial_index WHERE spotId = ?",
+            arguments: [spotIdString]
+        )
     }
 }

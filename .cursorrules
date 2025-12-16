@@ -41,6 +41,9 @@ Please refer to the architecture documentation at `docs/ARCHITECTURE.md` for det
 
 - **Test Helper Placement**: Place all helper methods (private functions used for test setup) at the end of test structs, after all test methods. Use a `// MARK: - Helpers` comment to separate them.
 - **Date Usage in Tests**: Use `.now` instead of `Date()` for creating current date values in test code (e.g., `createdAt: .now`).
+- **Database Testing**: **Never perform assertions inside database read/write blocks**. Fetch data from the database and perform assertions outside the block. Running test macros (like `#expect` or `#require`) inside database blocks causes the test runner to crash instead of properly reporting failures.
+  - ❌ **Incorrect**: `try db.read { database in let entry = try Row.fetchOne(...); #expect(entry != nil) }`
+  - ✅ **Correct**: `let entry = try await db.read { database in try Row.fetchOne(...) }; #expect(entry != nil)`
 
 ## Fake Implementation Guidelines
 
@@ -82,6 +85,7 @@ public class FakeFileSystemProvider: FileSystemProvider {
 ## Development Workflow
 
 - **Tuist Generation**: Always use `tuist generate --no-open` to prevent Xcode from automatically opening after generation. This avoids interrupting the user's workflow.
+- **Command Output**: Do not use `tail` or `head` with commands. These commands prevent seeing the full command output as it's emitted. Always run commands directly without piping to `tail` or `head`.
 
 ## SwiftUI Preview Guidelines
 

@@ -551,4 +551,137 @@ struct RealSpotsRepositoryTests {
         let allSpots = try await repository.fetchSpots()
         #expect(allSpots.count == 2)
     }
+
+    @Test("Creating spot updates R-tree index")
+    func testCreatingSpotUpdatesRTreeIndex() async throws {
+        let db = try DatabaseQueue()
+        let migrator = ExperiencesDatabaseMigrator(db: db)
+        try migrator.migrate()
+
+        let repository = RealSpotsRepository(db: db)
+
+        let testSpot = Spot(
+            id: UUID(),
+            name: "Test Spot",
+            latitude: 37.7849447,
+            longitude: -122.4303306,
+            createdAt: .now,
+            reason: .findResult,
+        )
+
+        _ = try await repository.create(spot: testSpot)
+
+        // Verify the entry exists in the R-tree
+        let fetchedEntry = try await db.read { database in
+            try Row.fetchOne(
+                database,
+                sql: """
+                    SELECT spotId, minX, maxX, minY, maxY
+                    FROM spots_geospatial_index
+                    WHERE spotId = ?
+                """,
+                arguments: [testSpot.id.uuidString]
+            )
+        }
+        let entry = try #require(fetchedEntry)
+        let spotId = try #require(entry["spotId"] as? String)
+        #expect(spotId == testSpot.id.uuidString)
+        let minX = try #require(entry["minX"] as? Double)
+        let maxX = try #require(entry["maxX"] as? Double)
+        let minY = try #require(entry["minY"] as? Double)
+        let maxY = try #require(entry["maxY"] as? Double)
+        // R-tree stores coordinates as 32-bit floats, so we need approximate equality
+        let epsilon = 0.0001
+        #expect(abs(minX - testSpot.longitude) < epsilon)
+        #expect(abs(maxX - testSpot.longitude) < epsilon)
+        #expect(abs(minY - testSpot.latitude) < epsilon)
+        #expect(abs(maxY - testSpot.latitude) < epsilon)
+    }
+
+    @Test("Saving spot updates R-tree index")
+    func testSavingSpotUpdatesRTreeIndex() async throws {
+        let db = try DatabaseQueue()
+        let migrator = ExperiencesDatabaseMigrator(db: db)
+        try migrator.migrate()
+
+        let repository = RealSpotsRepository(db: db)
+
+        let originalSpot = Spot(
+            id: UUID(),
+            name: "Original Spot",
+            latitude: 37.7849447,
+            longitude: -122.4303306,
+            createdAt: .now,
+            reason: .findResult,
+        )
+
+        _ = try await repository.create(spot: originalSpot)
+
+        // Update the spot's location
+        var updatedSpot = originalSpot
+        updatedSpot.latitude = 37.7950
+        updatedSpot.longitude = -122.4000
+
+        _ = try await repository.save(spot: updatedSpot)
+
+        // Verify the R-tree entry was updated
+        let fetchedEntry = try await db.read { database in
+            try Row.fetchOne(
+                database,
+                sql: """
+                    SELECT spotId, minX, maxX, minY, maxY
+                    FROM spots_geospatial_index
+                    WHERE spotId = ?
+                """,
+                arguments: [originalSpot.id.uuidString]
+            )
+        }
+        let entry = try #require(fetchedEntry)
+        let minX = try #require(entry["minX"] as? Double)
+        let maxX = try #require(entry["maxX"] as? Double)
+        let minY = try #require(entry["minY"] as? Double)
+        let maxY = try #require(entry["maxY"] as? Double)
+        // R-tree stores coordinates as 32-bit floats, so we need approximate equality
+        let epsilon = 0.0001
+        #expect(abs(minX - updatedSpot.longitude) < epsilon)
+        #expect(abs(maxX - updatedSpot.longitude) < epsilon)
+        #expect(abs(minY - updatedSpot.latitude) < epsilon)
+        #expect(abs(maxY - updatedSpot.latitude) < epsilon)
+    }
+
+    @Test("Saving new spot creates R-tree index entry")
+    func testSavingNewSpotCreatesRTreeIndexEntry() async throws {
+        let db = try DatabaseQueue()
+        let migrator = ExperiencesDatabaseMigrator(db: db)
+        try migrator.migrate()
+
+        let repository = RealSpotsRepository(db: db)
+
+        let newSpot = Spot(
+            id: UUID(),
+            name: "New Spot",
+            latitude: 37.7849447,
+            longitude: -122.4303306,
+            createdAt: .now,
+            reason: .findResult,
+        )
+
+        _ = try await repository.save(spot: newSpot)
+
+        // Verify the entry exists in the R-tree
+        let fetchedEntry = try await db.read { database in
+            try Row.fetchOne(
+                database,
+                sql: """
+                    SELECT spotId, minX, maxX, minY, maxY
+                    FROM spots_geospatial_index
+                    WHERE spotId = ?
+                """,
+                arguments: [newSpot.id.uuidString]
+            )
+        }
+        let entry = try #require(fetchedEntry)
+        let spotId = try #require(entry["spotId"] as? String)
+        #expect(spotId == newSpot.id.uuidString)
+    }
 }
