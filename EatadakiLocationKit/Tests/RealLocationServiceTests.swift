@@ -100,7 +100,7 @@ struct RealLocationServiceTests {
     @Test("obtain skips opt-in check when already authorized")
     func testObtainSkipsOptInWhenAuthorized() async throws {
         let fakeController = FakeDeviceConfigurationController()
-        let expectedLocation = CLLocation(latitude: 37.7749, longitude: -122.4194)
+        let expectedLocation = CLLocation(latitude: 37.7850, longitude: -122.4294)
         let fakeLocationManager = FakeLocationManagerProvider {
             $0.stubAuthorizationStatus = .authorizedWhenInUse
             $0.stubRequestLocation = { expectedLocation }

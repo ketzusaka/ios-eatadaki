@@ -21,7 +21,7 @@ extension CLLocationManager: LocationManagerProvider {
                     return location
                 }
             }
-            
+
             throw LocationManagerProviderError.locationNotDetermined
         } catch let error as LocationManagerProviderError {
             throw error

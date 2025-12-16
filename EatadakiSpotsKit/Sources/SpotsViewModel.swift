@@ -5,7 +5,7 @@ import EatadakiLocationKit
 import Foundation
 import Observation
 
-public typealias SpotsViewModelDependencies = LocationServiceProviding & DeviceConfigurationControllerProviding & SpotsRepositoryProviding
+public typealias SpotsViewModelDependencies = LocationServiceProviding & DeviceConfigurationControllerProviding & SpotsRepositoryProviding & SpotsSearcherProviding
 
 @Observable
 @MainActor
@@ -41,7 +41,7 @@ public final class SpotsViewModel {
         } catch {
             isOptedIn = false
         }
-        
+
         if isOptedIn {
             stage = .locating
             await refreshCurrentLocation()
@@ -50,7 +50,7 @@ public final class SpotsViewModel {
             stage = .requiresOptIn
         }
     }
-    
+
     public func optIntoLocationServices() async {
         do {
             try await dependencies.deviceConfigurationController.setOptInLocationServices(true)
@@ -60,7 +60,7 @@ public final class SpotsViewModel {
             // TODO: Handle failure
         }
     }
-    
+
     public func refreshCurrentLocation() async {
         do {
             stage = .locating
@@ -70,27 +70,32 @@ public final class SpotsViewModel {
             // TODO: Handle failed location fetch
         }
     }
-    
+
     public func refreshSpots() async {
         stage = .fetching
-        // TODO: Fetch content!
-        try? await Task.sleep(seconds: 3)
+        var request = FindSpotsRequest()
+        request.location = currentLocation
+        // TODO: Include query text when wired up.
+        _ = try? await dependencies.spotsSearcher.findAndCacheSpots(request: request)
         hasReceivedContent = true
         stage = .fetched
     }
 }
 
 #if DEBUG
-public struct FakeSpotsViewModelDependencies: LocationServiceProviding, DeviceConfigurationControllerProviding, SpotsRepositoryProviding {
+public struct FakeSpotsViewModelDependencies: LocationServiceProviding, DeviceConfigurationControllerProviding, SpotsRepositoryProviding, SpotsSearcherProviding {
     public var fakeLocationService = FakeLocationService()
     public var locationService: LocationService { fakeLocationService }
-    
+
     public var fakeDeviceConfigurationController = FakeDeviceConfigurationController()
     public var deviceConfigurationController: DeviceConfigurationController { fakeDeviceConfigurationController }
-    
+
     public var fakeSpotsRepository = FakeSpotsRepository()
     public var spotsRepository: SpotsRepository { fakeSpotsRepository }
-    
+
+    public var fakeSpotsSearcher = FakeSpotsSearcher()
+    public var spotsSearcher: SpotsSearcher { fakeSpotsSearcher }
+
     public init(_ configure: ((Self) -> Void)? = nil) {
         configure?(self)
     }

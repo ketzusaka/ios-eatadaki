@@ -9,7 +9,7 @@ public class FakeLocationService: LocationService {
 
     public private(set) var invokedCountObtain: Int = 0
     public var stubObtain: () async throws(LocationServiceError) -> CLLocation = {
-        CLLocation(latitude: 37.7749, longitude: -122.4194)
+        CLLocation(latitude: 37.7850, longitude: -122.4294)
     }
 
     public func obtain() async throws(LocationServiceError) -> CLLocation {

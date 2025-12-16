@@ -46,6 +46,13 @@ final public class ExperiencesDatabaseMigrator {
             try db.execute(sql: "CREATE INDEX IF NOT EXISTS experiences_ratings_experienceId ON experiences_ratings(experienceId)")
         }
 
+        migrator.registerMigration("v2") { db in
+            // Add latitude and longitude columns to spots table
+            // SQLite requires a default value when adding NOT NULL columns to existing tables
+            try db.execute(sql: "ALTER TABLE spots ADD COLUMN latitude REAL NOT NULL DEFAULT 0.0")
+            try db.execute(sql: "ALTER TABLE spots ADD COLUMN longitude REAL NOT NULL DEFAULT 0.0")
+        }
+
         try migrator.migrate(db)
     }
 }

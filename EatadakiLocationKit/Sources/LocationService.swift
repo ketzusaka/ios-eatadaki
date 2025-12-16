@@ -36,7 +36,7 @@ public actor RealLocationService: LocationService {
         if locationManager.authorizationStatus == .authorizedWhenInUse {
             return try await currentLocation()
         }
-        
+
         /// Now lets check if they are opted in
         let isOptedIn: Bool
 
@@ -56,12 +56,12 @@ public actor RealLocationService: LocationService {
         guard isOptedIn else {
             throw LocationServiceError.optedOutOfLocationServices
         }
-        
+
         /// We've determined they are opted in now. We don't need to ask for permission; our fetch will do that on our behalf.
 
         return try await currentLocation()
     }
-    
+
     private func currentLocation() async throws(LocationServiceError) -> CLLocation {
         do {
             return try await locationManager.requestLocation()

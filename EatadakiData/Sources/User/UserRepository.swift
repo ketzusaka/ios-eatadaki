@@ -33,7 +33,7 @@ public actor RealUserRepository: UserRepository {
             throw UserRepositoryError.databaseError(error.localizedDescription)
         }
     }
-    
+
     public func observeUser() -> any AsyncSequence<User?, Error> {
         ValueObservation.tracking { db in
             try User.fetchOne(db)

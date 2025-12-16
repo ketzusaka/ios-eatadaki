@@ -21,7 +21,7 @@ public class FakeLocationManagerProvider: LocationManagerProvider {
     }
 
     public var invokedCountRequestLocation: Int = 0
-    public var stubRequestLocation: () async throws(LocationManagerProviderError) -> CLLocation = { CLLocation(latitude: -122.4194, longitude: 37.7749) }
+    public var stubRequestLocation: () async throws(LocationManagerProviderError) -> CLLocation = { CLLocation(latitude: 37.7850, longitude: -122.4294) }
 
     public func requestLocation() async throws(LocationManagerProviderError) -> CLLocation {
         invokedCountRequestLocation += 1

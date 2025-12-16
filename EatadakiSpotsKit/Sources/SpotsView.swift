@@ -40,7 +40,7 @@ public struct SpotsView: View {
             await viewModel.initialize()
         }
     }
-    
+
     @ViewBuilder
     private var contentView: some View {
         switch viewModel.stage {
@@ -62,7 +62,7 @@ public struct SpotsView: View {
             }
         }
     }
-    
+
     private var locationOptInInterstitial: some View {
         SimpleInterstitialView(
             title: "Location Services Required",
@@ -79,11 +79,11 @@ public struct SpotsView: View {
             ]
         )
     }
-    
+
     @ViewBuilder
     private var spotsList: some View {
         let theme = themeManager.tokens(for: colorScheme)
-        
+
         List {
             Text("Spots")
                 .headlineTextStyling(using: theme)
@@ -135,7 +135,7 @@ public struct SpotsView: View {
     let dependencies = FakeSpotsViewModelDependencies {
         $0.fakeLocationService.stubObtain = { () async throws(LocationServiceError) -> CLLocation in
             try? await Task.sleep(nanoseconds: .max)
-            return CLLocation(latitude: 37.7749, longitude: -122.4194)
+            return CLLocation(latitude: 37.7850, longitude: -122.4294)
         }
     }
     let viewModel = SpotsViewModel(dependencies: dependencies)

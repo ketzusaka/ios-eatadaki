@@ -207,7 +207,9 @@ struct ExperiencesDatabaseMigratorTests {
             id: UUID(),
             mapkitId: "test-mapkit-id",
             remoteId: "test-remote-id",
-            name: "Test Spot",
+            name: "Peace Plaza",
+            latitude: 37.7849447,
+            longitude: -122.4303306,
             createdAt: .now
         )
 
@@ -220,6 +222,8 @@ struct ExperiencesDatabaseMigratorTests {
             #expect(fetchedSpot.id == testSpot.id)
             #expect(fetchedSpot.name == testSpot.name)
             #expect(fetchedSpot.mapkitId == testSpot.mapkitId)
+            #expect(fetchedSpot.latitude == testSpot.latitude)
+            #expect(fetchedSpot.longitude == testSpot.longitude)
         }
     }
 

@@ -1,13 +1,13 @@
 import SwiftUI
 
 public extension View {
-    func onFirstAppear(perform action: @escaping () async -> ()) -> some View {
+    func onFirstAppear(perform action: @escaping () async -> Void) -> some View {
         modifier(FirstAppear(action: action))
     }
 }
 
 private struct FirstAppear: ViewModifier {
-    let action: () async -> ()
+    let action: () async -> Void
     @State private var hasAppeared = false
 
     func body(content: Content) -> some View {
@@ -18,4 +18,3 @@ private struct FirstAppear: ViewModifier {
         }
     }
 }
-

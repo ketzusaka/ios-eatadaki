@@ -28,6 +28,7 @@ Please refer to the architecture documentation at `docs/ARCHITECTURE.md` for det
 - **Create new files for new views**: Even if a view is a subview or component, it should have its own file. This improves code organization, reusability, and maintainability.
 - **Database column naming**: Use camelCase for database column names to match Swift property names. Avoid CodingKeys - let GRDB's automatic Codable support handle the mapping directly.
 - **Implicit shadowing**: When using optional binding with the same variable name, use implicit shadowing syntax: `if let variableName` instead of `if let variableName = variableName`. This reduces repetition and improves readability.
+- **Trailing commas**: Always include trailing commas in multiline initializers, function calls, and collections (arrays, dictionaries, etc.). This makes diffs cleaner when adding new items - you only need to add a line instead of modifying an existing line. Example: `init(param1: value1, param2: value2,)` or `[item1, item2,]`.
 
 ## When Making Changes
 

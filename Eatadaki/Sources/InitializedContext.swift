@@ -1,6 +1,7 @@
 import EatadakiData
 import EatadakiKit
 import EatadakiLocationKit
+import EatadakiSpotsKit
 import EatadakiUI
 import EatadakiUserKit
 import GRDB
@@ -15,6 +16,20 @@ public class InitializedContext {
     /// On-the-fly dependencies
     public lazy var locationService: LocationService = {
         RealLocationService(deviceConfigurationController: deviceConfigurationController)
+    }()
+
+    public lazy var mapKitSpotsProvider: SpotsProvider = {
+        MapKitSpotsProvider(
+            requestProvider: MapKitLocalSearchRequestProvider(),
+            regionProvider: MapKitLocalSearchRegionProvider(),
+        )
+    }()
+
+    public lazy var spotsSearcher: SpotsSearcher = {
+        RealSpotSearcher(
+            spotsRepository: spotsRepository,
+            spotsProvider: mapKitSpotsProvider,
+        )
     }()
 
     public init(
@@ -37,6 +52,7 @@ extension InitializedContext: DeviceConfigurationControllerProviding {
     }
 }
 extension InitializedContext: LocationServiceProviding {}
+extension InitializedContext: SpotsSearcherProviding {}
 extension InitializedContext: SpotsRepositoryProviding {
     public var spotsRepository: SpotsRepository {
         experiencesDataService.spotsRepository
