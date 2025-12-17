@@ -109,33 +109,51 @@ public actor RealSpotsRepository: SpotsRepository {
     public func fetchSpots(request: FetchSpotsDataRequest = .default) async throws(SpotsRepositoryError) -> [Spot] {
         do {
             return try await db.read { db in
+                var baseQuery: QueryInterfaceRequest<Spot>
+                
+                if let query = request.query, !query.isEmpty {
+                    baseQuery = Spot.filter(Column("name").like("%\(query)%", escape: "\\"))
+                } else {
+                    baseQuery = Spot.all()
+                }
+                
                 switch request.sort.field {
                 case .name:
                     let ordering = request.sort.direction == .ascending
                         ? Column("name").asc
                         : Column("name").desc
-                    let query = Spot.all().order(ordering)
-                    return try query.fetchAll(db)
+                    return try baseQuery.order(ordering).fetchAll(db)
 
                 case .distance(let coordinate):
                     let orderDirection = request.sort.direction == .ascending ? "ASC" : "DESC"
-                    let sql = """
-                        SELECT * FROM spots
-                        ORDER BY (
-                            (latitude - ?) * (latitude - ?) +
-                            (longitude - ?) * (longitude - ?)
-                        ) \(orderDirection)
-                    """
-                    return try Spot.fetchAll(
-                        db,
-                        sql: sql,
-                        arguments: [
-                            coordinate.latitude,
-                            coordinate.latitude,
-                            coordinate.longitude,
-                            coordinate.longitude,
-                        ]
-                    )
+                    let sql: String
+                    var arguments: [DatabaseValueConvertible] = []
+                    if let query = request.query, !query.isEmpty {
+                        sql = """
+                            SELECT * FROM spots
+                            WHERE name LIKE ?
+                            ORDER BY (
+                                (latitude - ?) * (latitude - ?) +
+                                (longitude - ?) * (longitude - ?)
+                            ) \(orderDirection)
+                        """
+                        arguments.append("%\(query)%")
+                    } else {
+                        sql = """
+                            SELECT * FROM spots
+                            ORDER BY (
+                                (latitude - ?) * (latitude - ?) +
+                                (longitude - ?) * (longitude - ?)
+                            ) \(orderDirection)
+                        """
+                    }
+                    arguments.append(contentsOf: [
+                        coordinate.latitude,
+                        coordinate.latitude,
+                        coordinate.longitude,
+                        coordinate.longitude,
+                    ])
+                    return try Spot.fetchAll(db, sql: sql, arguments: StatementArguments(arguments))
                 }
             }
         } catch let error as SpotsRepositoryError {
@@ -152,29 +170,47 @@ public actor RealSpotsRepository: SpotsRepository {
             let ordering = request.sort.direction == .ascending
                 ? Column("name").asc
                 : Column("name").desc
-            let query = Spot.all().order(ordering)
+            var query = Spot.all()
+            if let searchQuery = request.query, !searchQuery.isEmpty {
+                query = query.filter(Column("name").like("%\(searchQuery)%", escape: "\\"))
+            }
+            let orderedQuery = query.order(ordering)
             let observation = ValueObservation.tracking { db in
-                try query.fetchAll(db)
+                try orderedQuery.fetchAll(db)
             }
 
             baseStream = observation.values(in: db)
         case .distance(let coordinate):
             let orderDirection = request.sort.direction == .ascending ? "ASC" : "DESC"
-            let sql = """
-                SELECT * FROM spots
-                ORDER BY (
-                    (latitude - ?) * (latitude - ?) +
-                    (longitude - ?) * (longitude - ?)
-                ) \(orderDirection)
-            """
-            let arguments = StatementArguments([
+            let sql: String
+            var arguments: [DatabaseValueConvertible] = []
+            if let searchQuery = request.query, !searchQuery.isEmpty {
+                sql = """
+                    SELECT * FROM spots
+                    WHERE name LIKE ?
+                    ORDER BY (
+                        (latitude - ?) * (latitude - ?) +
+                        (longitude - ?) * (longitude - ?)
+                    ) \(orderDirection)
+                """
+                arguments.append("%\(searchQuery)%")
+            } else {
+                sql = """
+                    SELECT * FROM spots
+                    ORDER BY (
+                        (latitude - ?) * (latitude - ?) +
+                        (longitude - ?) * (longitude - ?)
+                    ) \(orderDirection)
+                """
+            }
+            arguments.append(contentsOf: [
                 coordinate.latitude,
                 coordinate.latitude,
                 coordinate.longitude,
                 coordinate.longitude,
             ])
             let observation = ValueObservation.tracking { db in
-                try Spot.fetchAll(db, sql: sql, arguments: arguments)
+                try Spot.fetchAll(db, sql: sql, arguments: StatementArguments(arguments))
             }
 
             baseStream = observation.values(in: db)

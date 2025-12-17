@@ -18,6 +18,7 @@ public struct SpotsView: View {
         NavigationStack {
             contentView
                 .navigationTitle("Spots")
+                .searchable(text: $viewModel.searchQuery, prompt: "Search spots")
                 .toolbar {
                     ToolbarItem(placement: .navigationBarLeading) {
                         Button(action: {

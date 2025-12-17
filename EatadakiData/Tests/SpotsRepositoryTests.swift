@@ -463,6 +463,327 @@ struct RealSpotsRepositoryTests {
         #expect(spots.isEmpty)
     }
 
+    // MARK: - Search/Query Tests
+
+    @Test("Fetch spots with query filter returns matching spots")
+    func testFetchSpotsWithQuery() async throws {
+        let spot1 = Spot(
+            id: UUID(),
+            name: "Coffee Shop",
+            latitude: 37.7849447,
+            longitude: -122.4303306,
+            createdAt: .now,
+        )
+        let spot2 = Spot(
+            id: UUID(),
+            name: "Pizza Place",
+            latitude: 37.7849544,
+            longitude: -122.4317274,
+            createdAt: .now,
+        )
+        let spot3 = Spot(
+            id: UUID(),
+            name: "Coffee Bar",
+            latitude: 37.7749,
+            longitude: -122.4194,
+            createdAt: .now,
+        )
+
+        _ = try await repository.create(spot: spot1)
+        _ = try await repository.create(spot: spot2)
+        _ = try await repository.create(spot: spot3)
+
+        let request = FetchSpotsDataRequest(
+            sort: FetchSpotsDataRequest.Sort(
+                field: .name,
+                direction: .ascending,
+            ),
+            query: "Coffee",
+        )
+        let spots = try await repository.fetchSpots(request: request)
+
+        try #require(spots.count == 2)
+        let spotNames = spots.map(\.name)
+        #expect(spotNames.contains("Coffee Bar"))
+        #expect(spotNames.contains("Coffee Shop"))
+        #expect(!spotNames.contains("Pizza Place"))
+    }
+
+    @Test("Fetch spots with query filter sorted by name")
+    func testFetchSpotsWithQuerySortByName() async throws {
+        let spot1 = Spot(
+            id: UUID(),
+            name: "Coffee Shop",
+            latitude: 37.7849447,
+            longitude: -122.4303306,
+            createdAt: .now,
+        )
+        let spot2 = Spot(
+            id: UUID(),
+            name: "Coffee Bar",
+            latitude: 37.7749,
+            longitude: -122.4194,
+            createdAt: .now,
+        )
+        let spot3 = Spot(
+            id: UUID(),
+            name: "Coffee House",
+            latitude: 37.7849544,
+            longitude: -122.4317274,
+            createdAt: .now,
+        )
+
+        _ = try await repository.create(spot: spot1)
+        _ = try await repository.create(spot: spot2)
+        _ = try await repository.create(spot: spot3)
+
+        let request = FetchSpotsDataRequest(
+            sort: FetchSpotsDataRequest.Sort(
+                field: .name,
+                direction: .ascending,
+            ),
+            query: "Coffee",
+        )
+        let spots = try await repository.fetchSpots(request: request)
+
+        try #require(spots.count == 3)
+        #expect(spots[0].name == "Coffee Bar")
+        #expect(spots[1].name == "Coffee House")
+        #expect(spots[2].name == "Coffee Shop")
+    }
+
+    @Test("Fetch spots with query filter sorted by distance")
+    func testFetchSpotsWithQuerySortByDistance() async throws {
+        let referenceCoordinate = CLLocationCoordinate2D(
+            latitude: 37.7749,
+            longitude: -122.4194,
+        )
+
+        // Close spot matching query
+        let spot1 = Spot(
+            id: UUID(),
+            name: "Coffee Shop",
+            latitude: 37.7849447,
+            longitude: -122.4303306,
+            createdAt: .now,
+        )
+        // Far spot matching query
+        let spot2 = Spot(
+            id: UUID(),
+            name: "Coffee Bar",
+            latitude: 37.3382,
+            longitude: -121.8863,
+            createdAt: .now,
+        )
+        // Close spot not matching query
+        let spot3 = Spot(
+            id: UUID(),
+            name: "Pizza Place",
+            latitude: 37.7849544,
+            longitude: -122.4317274,
+            createdAt: .now,
+        )
+
+        _ = try await repository.create(spot: spot1)
+        _ = try await repository.create(spot: spot2)
+        _ = try await repository.create(spot: spot3)
+
+        let request = FetchSpotsDataRequest(
+            sort: FetchSpotsDataRequest.Sort(
+                field: .distance(from: referenceCoordinate),
+                direction: .ascending,
+            ),
+            query: "Coffee",
+        )
+        let spots = try await repository.fetchSpots(request: request)
+
+        try #require(spots.count == 2)
+        // Should be sorted by distance: closer first
+        #expect(spots[0].name == "Coffee Shop")
+        #expect(spots[1].name == "Coffee Bar")
+    }
+
+    @Test("Fetch spots with empty query returns all spots")
+    func testFetchSpotsWithEmptyQuery() async throws {
+        let spot1 = Spot(
+            id: UUID(),
+            name: "Coffee Shop",
+            latitude: 37.7849447,
+            longitude: -122.4303306,
+            createdAt: .now,
+        )
+        let spot2 = Spot(
+            id: UUID(),
+            name: "Pizza Place",
+            latitude: 37.7849544,
+            longitude: -122.4317274,
+            createdAt: .now,
+        )
+
+        _ = try await repository.create(spot: spot1)
+        _ = try await repository.create(spot: spot2)
+
+        let request = FetchSpotsDataRequest(
+            sort: FetchSpotsDataRequest.Sort(
+                field: .name,
+                direction: .ascending,
+            ),
+            query: "",
+        )
+        let spots = try await repository.fetchSpots(request: request)
+
+        try #require(spots.count == 2)
+        #expect(spots.map(\.name).sorted() == ["Coffee Shop", "Pizza Place"])
+    }
+
+    @Test("Fetch spots with nil query returns all spots")
+    func testFetchSpotsWithNilQuery() async throws {
+        let spot1 = Spot(
+            id: UUID(),
+            name: "Coffee Shop",
+            latitude: 37.7849447,
+            longitude: -122.4303306,
+            createdAt: .now,
+        )
+        let spot2 = Spot(
+            id: UUID(),
+            name: "Pizza Place",
+            latitude: 37.7849544,
+            longitude: -122.4317274,
+            createdAt: .now,
+        )
+
+        _ = try await repository.create(spot: spot1)
+        _ = try await repository.create(spot: spot2)
+
+        let request = FetchSpotsDataRequest(
+            sort: FetchSpotsDataRequest.Sort(
+                field: .name,
+                direction: .ascending,
+            ),
+            query: nil,
+        )
+        let spots = try await repository.fetchSpots(request: request)
+
+        try #require(spots.count == 2)
+        #expect(spots.map(\.name).sorted() == ["Coffee Shop", "Pizza Place"])
+    }
+
+    @Test("Fetch spots with query that matches no spots returns empty array")
+    func testFetchSpotsWithNoMatches() async throws {
+        let spot1 = Spot(
+            id: UUID(),
+            name: "Coffee Shop",
+            latitude: 37.7849447,
+            longitude: -122.4303306,
+            createdAt: .now,
+        )
+        let spot2 = Spot(
+            id: UUID(),
+            name: "Pizza Place",
+            latitude: 37.7849544,
+            longitude: -122.4317274,
+            createdAt: .now,
+        )
+
+        _ = try await repository.create(spot: spot1)
+        _ = try await repository.create(spot: spot2)
+
+        let request = FetchSpotsDataRequest(
+            sort: FetchSpotsDataRequest.Sort(
+                field: .name,
+                direction: .ascending,
+            ),
+            query: "Burger",
+        )
+        let spots = try await repository.fetchSpots(request: request)
+
+        #expect(spots.isEmpty)
+    }
+
+    @Test("Fetch spots with partial query match")
+    func testFetchSpotsWithPartialMatch() async throws {
+        let spot1 = Spot(
+            id: UUID(),
+            name: "Great Coffee Shop",
+            latitude: 37.7849447,
+            longitude: -122.4303306,
+            createdAt: .now,
+        )
+        let spot2 = Spot(
+            id: UUID(),
+            name: "Pizza Place",
+            latitude: 37.7849544,
+            longitude: -122.4317274,
+            createdAt: .now,
+        )
+        let spot3 = Spot(
+            id: UUID(),
+            name: "Best Coffee House",
+            latitude: 37.7749,
+            longitude: -122.4194,
+            createdAt: .now,
+        )
+
+        _ = try await repository.create(spot: spot1)
+        _ = try await repository.create(spot: spot2)
+        _ = try await repository.create(spot: spot3)
+
+        let request = FetchSpotsDataRequest(
+            sort: FetchSpotsDataRequest.Sort(
+                field: .name,
+                direction: .ascending,
+            ),
+            query: "Coffee",
+        )
+        let spots = try await repository.fetchSpots(request: request)
+
+        try #require(spots.count == 2)
+        let spotNames = spots.map(\.name).sorted()
+        #expect(spotNames.contains("Best Coffee House"))
+        #expect(spotNames.contains("Great Coffee Shop"))
+        #expect(!spotNames.contains("Pizza Place"))
+    }
+
+    @Test("Observe spots with query filter emits filtered results")
+    func testObserveSpotsWithQuery() async throws {
+        let request = FetchSpotsDataRequest(
+            sort: FetchSpotsDataRequest.Sort(
+                field: .name,
+                direction: .ascending,
+            ),
+            query: "Coffee",
+        )
+        let observation = await repository.observeSpots(request: request)
+        var iterator = observation.makeAsyncIterator()
+
+        // Initial state should be empty
+        let initialSpots = try await iterator.next()
+        #expect(initialSpots?.isEmpty == true)
+
+        let spot1 = Spot(
+            id: UUID(),
+            name: "Coffee Shop",
+            latitude: 37.7849447,
+            longitude: -122.4303306,
+            createdAt: .now,
+        )
+        let spot2 = Spot(
+            id: UUID(),
+            name: "Pizza Place",
+            latitude: 37.7849544,
+            longitude: -122.4317274,
+            createdAt: .now,
+        )
+        _ = try await repository.create(spot: spot1)
+        _ = try await repository.create(spot: spot2)
+
+        // Should only emit spots matching the query
+        let filteredSpots = try await iterator.next()
+        try #require(filteredSpots?.count == 1)
+        #expect(filteredSpots?.first?.name == "Coffee Shop")
+    }
+
     // MARK: - observeSpots Tests
 
     @Test("Observe spots with default sort emits initial empty array")

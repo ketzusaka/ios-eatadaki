@@ -24,6 +24,11 @@ public final class SpotsViewModel {
     public var currentLocation: CLLocation?
     public var spots: [SpotInfoListing] = []
     public var hasReceivedContent = false
+    public var searchQuery: String = "" {
+        didSet {
+            observeSpots()
+        }
+    }
 
     private let dependencies: SpotsViewModelDependencies
     private var observationTask: Task<Void, any Error>? {
@@ -83,8 +88,8 @@ public final class SpotsViewModel {
         stage = .fetching
         var request = FindSpotsRequest()
         request.location = currentLocation
-        // TODO: Include query text when wired up.
-        _ = try? await dependencies.spotsSearcher.findAndCacheSpots(request: request)
+        request.query = searchQuery.isEmpty ? nil : searchQuery
+        try? await dependencies.spotsSearcher.findAndCacheSpots(request: request)
         hasReceivedContent = true
         stage = .fetched
     }
@@ -110,19 +115,22 @@ public final class SpotsViewModel {
     }
     
     private var spotsDataRequest: FetchSpotsDataRequest {
+        let query = searchQuery.isEmpty ? nil : searchQuery
         if let currentLocation {
-            FetchSpotsDataRequest(
+            return FetchSpotsDataRequest(
                 sort: FetchSpotsDataRequest.Sort(
                     field: .distance(from: currentLocation.coordinate),
                     direction: .ascending,
-                )
+                ),
+                query: query,
             )
         } else {
-            FetchSpotsDataRequest(
+            return FetchSpotsDataRequest(
                 sort: FetchSpotsDataRequest.Sort(
                     field: .name,
                     direction: .ascending,
-                )
+                ),
+                query: query,
             )
         }
     }

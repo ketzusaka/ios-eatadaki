@@ -3,9 +3,11 @@ import Foundation
 
 public struct FetchSpotsDataRequest {
     public var sort: Sort
+    public var query: String?
 
-    public init(sort: Sort = .default) {
+    public init(sort: Sort = .default, query: String? = nil) {
         self.sort = sort
+        self.query = query
     }
 
     public static var `default`: FetchSpotsDataRequest {
