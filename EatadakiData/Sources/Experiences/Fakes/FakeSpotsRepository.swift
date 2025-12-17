@@ -50,6 +50,31 @@ public class FakeSpotsRepository: SpotsRepository {
         return try await stubFetchSpots(request)
     }
 
+    public private(set) var invocationsObserveSpots: [FetchSpotsDataRequest] = []
+    public var stubObserveSpots: (FetchSpotsDataRequest) -> any AsyncSequence<[Spot], SpotsRepositoryError> = { _ in
+        struct EmptySpotsSequence: AsyncSequence {
+            typealias Element = [Spot]
+            typealias Failure = SpotsRepositoryError
+            typealias AsyncIterator = Iterator
+
+            struct Iterator: AsyncIteratorProtocol {
+                mutating func next() async throws(SpotsRepositoryError) -> [Spot]? {
+                    nil
+                }
+            }
+
+            func makeAsyncIterator() -> Iterator {
+                Iterator()
+            }
+        }
+        return EmptySpotsSequence()
+    }
+
+    public func observeSpots(request: FetchSpotsDataRequest = .default) async throws(SpotsRepositoryError) -> any AsyncSequence<[Spot], SpotsRepositoryError> {
+        invocationsObserveSpots.append(request)
+        return stubObserveSpots(request)
+    }
+
     public private(set) var invocationsCreate: [Spot] = []
     public var stubCreate: (Spot) async throws(SpotsRepositoryError) -> Spot = { spot in
         spot

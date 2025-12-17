@@ -28,6 +28,7 @@ public protocol SpotsRepository: AnyObject {
     func fetchSpot(withID id: UUID) async throws(SpotsRepositoryError) -> Spot
     func fetchSpot(withIDs ids: SpotIDs) async throws(SpotsRepositoryError) -> Spot
     func fetchSpots(request: FetchSpotsDataRequest) async throws(SpotsRepositoryError) -> [Spot]
+    func observeSpots(request: FetchSpotsDataRequest) async throws(SpotsRepositoryError) -> any AsyncSequence<[Spot], SpotsRepositoryError>
 
     @discardableResult
     func create(spot: Spot) async throws(SpotsRepositoryError) -> Spot
@@ -142,6 +143,53 @@ public actor RealSpotsRepository: SpotsRepository {
         } catch {
             throw SpotsRepositoryError.databaseError(error.localizedDescription)
         }
+    }
+
+    public func observeSpots(request: FetchSpotsDataRequest = .default) async throws(SpotsRepositoryError) -> any AsyncSequence<[Spot], SpotsRepositoryError> {
+        let baseStream: any AsyncSequence<[Spot], Error>
+        switch request.sort.field {
+        case .name:
+            let ordering = request.sort.direction == .ascending
+                ? Column("name").asc
+                : Column("name").desc
+            let query = Spot.all().order(ordering)
+            let observation = ValueObservation.tracking { db in
+                try query.fetchAll(db)
+            }
+
+            baseStream = observation.values(in: db)
+        case .distance(let coordinate):
+            let orderDirection = request.sort.direction == .ascending ? "ASC" : "DESC"
+            let sql = """
+                SELECT * FROM spots
+                ORDER BY (
+                    (latitude - ?) * (latitude - ?) +
+                    (longitude - ?) * (longitude - ?)
+                ) \(orderDirection)
+            """
+            let arguments = StatementArguments([
+                coordinate.latitude,
+                coordinate.latitude,
+                coordinate.longitude,
+                coordinate.longitude,
+            ])
+            let observation = ValueObservation.tracking { db in
+                try Spot.fetchAll(db, sql: sql, arguments: arguments)
+            }
+
+            baseStream = observation.values(in: db)
+        }
+
+        return ErrorTransformingSequence<[Spot], SpotsRepositoryError>(
+            baseStream: baseStream,
+            transformError: { error in
+                if let spotsError = error as? SpotsRepositoryError {
+                    spotsError
+                } else {
+                    SpotsRepositoryError.databaseError(error.localizedDescription)
+                }
+            }
+        )
     }
 
     @discardableResult

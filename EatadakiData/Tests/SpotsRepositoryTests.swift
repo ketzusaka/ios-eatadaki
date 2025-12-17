@@ -463,6 +463,171 @@ struct RealSpotsRepositoryTests {
         #expect(spots.isEmpty)
     }
 
+    // MARK: - observeSpots Tests
+
+    @Test("Observe spots with default sort emits initial empty array")
+    func testObserveSpotsDefaultSortEmpty() async throws {
+        let observation = try await repository.observeSpots()
+        var iterator = observation.makeAsyncIterator()
+
+        let initialSpots = try await iterator.next()
+        #expect(initialSpots?.isEmpty == true)
+    }
+
+    @Test("Observe spots emits when spots are created")
+    func testObserveSpotsEmitsOnCreate() async throws {
+        let observation = try await repository.observeSpots()
+        var iterator = observation.makeAsyncIterator()
+
+        // Initial state should be empty
+        let initialSpots = try await iterator.next()
+        #expect(initialSpots?.isEmpty == true)
+
+        let testSpot = Spot(
+            id: UUID(),
+            name: "Test Spot",
+            latitude: 37.7849447,
+            longitude: -122.4303306,
+            createdAt: .now,
+        )
+        _ = try await repository.create(spot: testSpot)
+
+        let spotsAfterCreate = try await iterator.next()
+        try #require(spotsAfterCreate?.count == 1)
+        #expect(spotsAfterCreate?.first?.id == testSpot.id)
+        #expect(spotsAfterCreate?.first?.name == "Test Spot")
+    }
+
+    @Test("Observe spots with name sort emits sorted results")
+    func testObserveSpotsNameSort() async throws {
+        let spotA = Spot(
+            id: UUID(),
+            name: "Alpha Spot",
+            latitude: 37.7849447,
+            longitude: -122.4303306,
+            createdAt: .now,
+        )
+        let spotZ = Spot(
+            id: UUID(),
+            name: "Zulu Spot",
+            latitude: 37.7849544,
+            longitude: -122.4317274,
+            createdAt: .now,
+        )
+        let spotM = Spot(
+            id: UUID(),
+            name: "Mike Spot",
+            latitude: 37.7749,
+            longitude: -122.4194,
+            createdAt: .now,
+        )
+
+        _ = try await repository.create(spot: spotZ)
+        _ = try await repository.create(spot: spotA)
+        _ = try await repository.create(spot: spotM)
+
+        let request = FetchSpotsDataRequest(
+            sort: FetchSpotsDataRequest.Sort(
+                field: .name,
+                direction: .ascending,
+            )
+        )
+        let observation = try await repository.observeSpots(request: request)
+        var iterator = observation.makeAsyncIterator()
+
+        let spotsOptional = try await iterator.next()
+        let spots = try #require(spotsOptional)
+        try #require(spots.count == 3)
+        #expect(spots[0].name == "Alpha Spot")
+        #expect(spots[1].name == "Mike Spot")
+        #expect(spots[2].name == "Zulu Spot")
+    }
+
+    @Test("Observe spots with distance sort emits sorted results")
+    func testObserveSpotsDistanceSort() async throws {
+        let referenceCoordinate = CLLocationCoordinate2D(
+            latitude: 37.7749,
+            longitude: -122.4194,
+        )
+
+        // Spot 1: Very close (Mission District, ~1km away)
+        let spot1 = Spot(
+            id: UUID(),
+            name: "Close Spot",
+            latitude: 37.7849447,
+            longitude: -122.4303306,
+            createdAt: .now,
+        )
+        // Spot 2: Medium distance (Oakland, ~10km away)
+        let spot2 = Spot(
+            id: UUID(),
+            name: "Medium Spot",
+            latitude: 37.8044,
+            longitude: -122.2712,
+            createdAt: .now,
+        )
+        // Spot 3: Far (San Jose, ~70km away)
+        let spot3 = Spot(
+            id: UUID(),
+            name: "Far Spot",
+            latitude: 37.3382,
+            longitude: -121.8863,
+            createdAt: .now,
+        )
+
+        _ = try await repository.create(spot: spot3)
+        _ = try await repository.create(spot: spot1)
+        _ = try await repository.create(spot: spot2)
+
+        let request = FetchSpotsDataRequest(
+            sort: FetchSpotsDataRequest.Sort(
+                field: .distance(from: referenceCoordinate),
+                direction: .ascending,
+            )
+        )
+        let observation = try await repository.observeSpots(request: request)
+        var iterator = observation.makeAsyncIterator()
+
+        let spotsOptional = try await iterator.next()
+        let spots = try #require(spotsOptional)
+        try #require(spots.count == 3)
+        // Verify ordering: closest first
+        #expect(spots[0].name == "Close Spot")
+        #expect(spots[1].name == "Medium Spot")
+        #expect(spots[2].name == "Far Spot")
+    }
+
+    @Test("Observe spots emits updates when spot is saved")
+    func testObserveSpotsEmitsOnSave() async throws {
+        let observation = try await repository.observeSpots()
+        var iterator = observation.makeAsyncIterator()
+
+        // Initial state should be empty
+        let initialSpots = try await iterator.next()
+        #expect(initialSpots?.isEmpty == true)
+
+        let testSpot = Spot(
+            id: UUID(),
+            name: "Original Name",
+            latitude: 37.7849447,
+            longitude: -122.4303306,
+            createdAt: .now,
+        )
+        _ = try await repository.create(spot: testSpot)
+
+        let spotsAfterCreate = try await iterator.next()
+        try #require(spotsAfterCreate?.count == 1)
+        #expect(spotsAfterCreate?.first?.name == "Original Name")
+
+        var updatedSpot = testSpot
+        updatedSpot.name = "Updated Name"
+        _ = try await repository.save(spot: updatedSpot)
+
+        let spotsAfterSave = try await iterator.next()
+        try #require(spotsAfterSave?.count == 1)
+        #expect(spotsAfterSave?.first?.name == "Updated Name")
+    }
+
     @Test("Create spot with all optional fields")
     func testCreateSpotWithOptionalFields() async throws {
         let testSpot = Spot(
