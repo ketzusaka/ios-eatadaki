@@ -70,7 +70,7 @@ public class FakeSpotsRepository: SpotsRepository {
         return EmptySpotsSequence()
     }
 
-    public func observeSpots(request: FetchSpotsDataRequest = .default) async throws(SpotsRepositoryError) -> any AsyncSequence<[Spot], SpotsRepositoryError> {
+    public func observeSpots(request: FetchSpotsDataRequest = .default) async -> any AsyncSequence<[Spot], SpotsRepositoryError> {
         invocationsObserveSpots.append(request)
         return stubObserveSpots(request)
     }

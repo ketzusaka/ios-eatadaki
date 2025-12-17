@@ -6,6 +6,8 @@ public struct ThemeTokens {
     public let headlineTextColor: Color
     public let captionTextFont: Font
     public let captionTextColor: Color
+    public let listMainTextFont: Font
+    public let listMainTextColor: Color
 
     // MARK: - Button Styles
     public let primaryButtonTint: Color
@@ -17,6 +19,8 @@ public struct ThemeTokens {
         headlineTextColor: Color,
         captionTextFont: Font,
         captionTextColor: Color,
+        listMainTextFont: Font,
+        listMainTextColor: Color,
         primaryButtonTint: Color,
         secondaryButtonTint: Color,
         destructiveButtonTint: Color,
@@ -25,6 +29,8 @@ public struct ThemeTokens {
         self.headlineTextColor = headlineTextColor
         self.captionTextFont = captionTextFont
         self.captionTextColor = captionTextColor
+        self.listMainTextFont = listMainTextFont
+        self.listMainTextColor = listMainTextColor
         self.primaryButtonTint = primaryButtonTint
         self.secondaryButtonTint = secondaryButtonTint
         self.destructiveButtonTint = destructiveButtonTint

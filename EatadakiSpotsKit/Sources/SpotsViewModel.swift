@@ -26,6 +26,11 @@ public final class SpotsViewModel {
     public var hasReceivedContent = false
 
     private let dependencies: SpotsViewModelDependencies
+    private var observationTask: Task<Void, any Error>? {
+        didSet {
+            oldValue?.cancel()
+        }
+    }
 
     public init(
         dependencies: SpotsViewModelDependencies,
@@ -41,6 +46,8 @@ public final class SpotsViewModel {
         } catch {
             isOptedIn = false
         }
+        
+        observeSpots()
 
         if isOptedIn {
             stage = .locating
@@ -66,6 +73,7 @@ public final class SpotsViewModel {
             stage = .locating
             currentLocation = try await dependencies.locationService.obtain()
             stage = .located
+            observeSpots()
         } catch {
             // TODO: Handle failed location fetch
         }
@@ -79,6 +87,44 @@ public final class SpotsViewModel {
         _ = try? await dependencies.spotsSearcher.findAndCacheSpots(request: request)
         hasReceivedContent = true
         stage = .fetched
+    }
+    
+    // Refreshes our data observer. Should be called on init, location change, or filtering change
+    private func observeSpots() {
+        let request = spotsDataRequest
+        observationTask = Task { [weak self] in
+            guard let observation = await self?.dependencies.spotsRepository.observeSpots(request: request) else {
+                return
+            }
+            for try await spots in observation {
+                guard !Task.isCancelled else { return }
+                guard let self else { return }
+                let listableSpots = spots.map(SpotInfoListing.init(from:))
+                await self.updateSpots(with: listableSpots)
+            }
+        }
+    }
+    
+    private func updateSpots(with spots: [SpotInfoListing]) async {
+        self.spots = spots
+    }
+    
+    private var spotsDataRequest: FetchSpotsDataRequest {
+        if let currentLocation {
+            FetchSpotsDataRequest(
+                sort: FetchSpotsDataRequest.Sort(
+                    field: .distance(from: currentLocation.coordinate),
+                    direction: .ascending,
+                )
+            )
+        } else {
+            FetchSpotsDataRequest(
+                sort: FetchSpotsDataRequest.Sort(
+                    field: .name,
+                    direction: .ascending,
+                )
+            )
+        }
     }
 }
 

@@ -85,8 +85,10 @@ public struct SpotsView: View {
         let theme = themeManager.tokens(for: colorScheme)
 
         List {
-            Text("Spots")
-                .headlineTextStyling(using: theme)
+            ForEach(viewModel.spots) { spot in
+                Text(spot.name)
+                    .listMainTextStyling(using: theme)
+            }
         }
     }
 }

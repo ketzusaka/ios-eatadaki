@@ -467,7 +467,7 @@ struct RealSpotsRepositoryTests {
 
     @Test("Observe spots with default sort emits initial empty array")
     func testObserveSpotsDefaultSortEmpty() async throws {
-        let observation = try await repository.observeSpots()
+        let observation = await repository.observeSpots()
         var iterator = observation.makeAsyncIterator()
 
         let initialSpots = try await iterator.next()
@@ -476,7 +476,7 @@ struct RealSpotsRepositoryTests {
 
     @Test("Observe spots emits when spots are created")
     func testObserveSpotsEmitsOnCreate() async throws {
-        let observation = try await repository.observeSpots()
+        let observation = await repository.observeSpots()
         var iterator = observation.makeAsyncIterator()
 
         // Initial state should be empty
@@ -532,7 +532,7 @@ struct RealSpotsRepositoryTests {
                 direction: .ascending,
             )
         )
-        let observation = try await repository.observeSpots(request: request)
+        let observation = await repository.observeSpots(request: request)
         var iterator = observation.makeAsyncIterator()
 
         let spotsOptional = try await iterator.next()
@@ -585,7 +585,7 @@ struct RealSpotsRepositoryTests {
                 direction: .ascending,
             )
         )
-        let observation = try await repository.observeSpots(request: request)
+        let observation = await repository.observeSpots(request: request)
         var iterator = observation.makeAsyncIterator()
 
         let spotsOptional = try await iterator.next()
@@ -599,7 +599,7 @@ struct RealSpotsRepositoryTests {
 
     @Test("Observe spots emits updates when spot is saved")
     func testObserveSpotsEmitsOnSave() async throws {
-        let observation = try await repository.observeSpots()
+        let observation = await repository.observeSpots()
         var iterator = observation.makeAsyncIterator()
 
         // Initial state should be empty

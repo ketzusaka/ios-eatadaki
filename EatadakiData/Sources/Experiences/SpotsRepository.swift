@@ -28,7 +28,7 @@ public protocol SpotsRepository: AnyObject {
     func fetchSpot(withID id: UUID) async throws(SpotsRepositoryError) -> Spot
     func fetchSpot(withIDs ids: SpotIDs) async throws(SpotsRepositoryError) -> Spot
     func fetchSpots(request: FetchSpotsDataRequest) async throws(SpotsRepositoryError) -> [Spot]
-    func observeSpots(request: FetchSpotsDataRequest) async throws(SpotsRepositoryError) -> any AsyncSequence<[Spot], SpotsRepositoryError>
+    func observeSpots(request: FetchSpotsDataRequest) async -> any AsyncSequence<[Spot], SpotsRepositoryError>
 
     @discardableResult
     func create(spot: Spot) async throws(SpotsRepositoryError) -> Spot
@@ -145,7 +145,7 @@ public actor RealSpotsRepository: SpotsRepository {
         }
     }
 
-    public func observeSpots(request: FetchSpotsDataRequest = .default) async throws(SpotsRepositoryError) -> any AsyncSequence<[Spot], SpotsRepositoryError> {
+    public func observeSpots(request: FetchSpotsDataRequest = .default) async -> any AsyncSequence<[Spot], SpotsRepositoryError> {
         let baseStream: any AsyncSequence<[Spot], Error>
         switch request.sort.field {
         case .name:

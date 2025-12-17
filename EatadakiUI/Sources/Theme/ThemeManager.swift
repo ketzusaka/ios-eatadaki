@@ -28,15 +28,19 @@ extension ThemeDefinition {
             headlineTextColor: .black,
             captionTextFont: .caption,
             captionTextColor: .secondary,
+            listMainTextFont: .body,
+            listMainTextColor: .black,
             primaryButtonTint: .blue,
             secondaryButtonTint: .gray,
-            destructiveButtonTint: .red
+            destructiveButtonTint: .red,
         ),
         darkTokens: ThemeTokens(
             headlineTextFont: .headline,
             headlineTextColor: .white,
             captionTextFont: .caption,
             captionTextColor: .secondary,
+            listMainTextFont: .body,
+            listMainTextColor: .white,
             primaryButtonTint: .blue,
             secondaryButtonTint: .gray,
             destructiveButtonTint: .red
