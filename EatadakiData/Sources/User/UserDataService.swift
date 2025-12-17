@@ -1,6 +1,7 @@
 import EatadakiKit
 import Foundation
 import GRDB
+import os
 
 public protocol UserDataService {
     var userRepository: UserRepository { get }
@@ -24,6 +25,7 @@ public class RealUserDataService: UserDataService {
         )
 
         let userDbURL = appSupportURL.appendingPathComponent("user.sqlite")
+        Logger.persistence.debug("User Data Service using database at \(userDbURL.path)")
         db = try DatabasePool(path: userDbURL.path)
         let migrator = UserDatabaseMigrator(db: db)
         try migrator.migrate()

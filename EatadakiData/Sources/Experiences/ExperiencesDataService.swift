@@ -1,6 +1,7 @@
 import EatadakiKit
 import Foundation
 import GRDB
+import os
 
 public protocol ExperiencesDataService {
     var spotsRepository: SpotsRepository { get }
@@ -24,6 +25,7 @@ public class RealExperiencesDataService: ExperiencesDataService {
         )
 
         let experiencesDbURL = appSupportURL.appendingPathComponent("experiences.sqlite")
+        Logger.persistence.debug("Experiences Data Service using database at \(experiencesDbURL.path)")
         db = try DatabasePool(path: experiencesDbURL.path)
         let migrator = ExperiencesDatabaseMigrator(db: db)
         try migrator.migrate()

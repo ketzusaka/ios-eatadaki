@@ -12,9 +12,7 @@ struct InitializedView: View {
     var body: some View {
         TabView {
             SpotsView(
-                viewModel: SpotsViewModel(
-                    dependencies: context,
-                )
+                dependencies: context,
             )
             .tabItem {
                 Label("Spots", systemImage: "mappin.circle")

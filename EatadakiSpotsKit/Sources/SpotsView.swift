@@ -8,10 +8,10 @@ import SwiftUI
 public struct SpotsView: View {
     @Environment(ThemeManager.self) var themeManager
     @Environment(\.colorScheme) var colorScheme
-    @Bindable var viewModel: SpotsViewModel
+    @State var viewModel: SpotsViewModel
 
-    public init(viewModel: SpotsViewModel) {
-        self.viewModel = viewModel
+    public init(dependencies: SpotsViewModelDependencies) {
+        self.viewModel = SpotsViewModel(dependencies: dependencies)
     }
 
     public var body: some View {
@@ -97,10 +97,9 @@ public struct SpotsView: View {
 #if DEBUG
 #Preview("Success") {
     let dependencies = FakeSpotsViewModelDependencies()
-    let viewModel = SpotsViewModel(dependencies: dependencies)
 
     NavigationStack {
-        SpotsView(viewModel: viewModel)
+        SpotsView(dependencies: dependencies)
             .environment(ThemeManager())
     }
 }
@@ -112,10 +111,9 @@ public struct SpotsView: View {
             return true
         }
     }
-    let viewModel = SpotsViewModel(dependencies: dependencies)
 
     NavigationStack {
-        SpotsView(viewModel: viewModel)
+        SpotsView(dependencies: dependencies)
             .environment(ThemeManager())
     }
 }
@@ -126,10 +124,9 @@ public struct SpotsView: View {
             false
         }
     }
-    let viewModel = SpotsViewModel(dependencies: dependencies)
 
     NavigationStack {
-        SpotsView(viewModel: viewModel)
+        SpotsView(dependencies: dependencies)
             .environment(ThemeManager())
     }
 }
@@ -141,10 +138,9 @@ public struct SpotsView: View {
             return CLLocation(latitude: 37.7850, longitude: -122.4294)
         }
     }
-    let viewModel = SpotsViewModel(dependencies: dependencies)
 
     NavigationStack {
-        SpotsView(viewModel: viewModel)
+        SpotsView(dependencies: dependencies)
             .environment(ThemeManager())
     }
 }

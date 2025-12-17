@@ -1,6 +1,7 @@
 import EatadakiKit
 import Foundation
 import GRDB
+import os
 
 public protocol DeviceConfigDataService {
     var deviceConfigurationController: DeviceConfigurationController { get }
@@ -24,6 +25,7 @@ public class RealDeviceConfigDataService: DeviceConfigDataService {
         )
 
         let deviceConfigDbURL = appSupportURL.appendingPathComponent("device_config.sqlite")
+        Logger.persistence.debug("Device Config Data Service using database at \(deviceConfigDbURL.path)")
         db = try DatabasePool(path: deviceConfigDbURL.path)
         let migrator = DeviceConfigDatabaseMigrator(db: db)
         try migrator.migrate()
