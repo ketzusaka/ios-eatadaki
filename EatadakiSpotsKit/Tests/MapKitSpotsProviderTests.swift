@@ -1,4 +1,5 @@
 import CoreLocation
+import EatadakiData
 import EatadakiSpotsKit
 import Foundation
 import MapKit
@@ -106,14 +107,14 @@ struct MapKitSpotsProviderTests {
         let result = try await provider.findSpots(request: testRequest)
 
         try #require(result.spots.count == 2)
-        #expect(result.spots[0].name == peacePlaza.name)
-        #expect(result.spots[0].mapkitId == peacePlaza.identifier?.rawValue)
-        #expect(result.spots[0].latitude == peacePlaza.location.coordinate.latitude)
-        #expect(result.spots[0].longitude == peacePlaza.location.coordinate.longitude)
-        #expect(result.spots[1].name == kinokuniya.name)
-        #expect(result.spots[1].mapkitId == kinokuniya.identifier?.rawValue)
-        #expect(result.spots[1].latitude == kinokuniya.location.coordinate.latitude)
-        #expect(result.spots[1].longitude == kinokuniya.location.coordinate.longitude)
+        #expect(result.spots[0].name == Spot.peacePagoda.name)
+        #expect(result.spots[0].mapkitId == Spot.peacePagoda.mapkitId)
+        #expect(result.spots[0].latitude == Spot.peacePagoda.latitude)
+        #expect(result.spots[0].longitude == Spot.peacePagoda.longitude)
+        #expect(result.spots[1].name == Spot.kinokuniya.name)
+        #expect(result.spots[1].mapkitId == Spot.kinokuniya.mapkitId)
+        #expect(result.spots[1].latitude == Spot.kinokuniya.latitude)
+        #expect(result.spots[1].longitude == Spot.kinokuniya.longitude)
     }
 
     @Test("findSpots filters out mapItems without identifier")
@@ -139,7 +140,7 @@ struct MapKitSpotsProviderTests {
 
         #expect(result.spots.count == 1)
         let spot = try #require(result.spots.first)
-        #expect(spot.name == "Peace Padoga")
+        #expect(spot.name == Spot.peacePagoda.name)
     }
 
     @Test("findSpots filters out mapItems without name")
@@ -164,12 +165,12 @@ struct MapKitSpotsProviderTests {
         let result = try await provider.findSpots(request: testRequest)
 
         try #require(result.spots.count == 2)
-        #expect(result.spots[0].name == "Peace Padoga")
-        #expect(result.spots[0].mapkitId == "I6FD7682FD36BB3BE")
-        #expect(result.spots[0].latitude == 37.7849447)
-        #expect(result.spots[0].longitude == -122.4303306)
+        #expect(result.spots[0].name == Spot.peacePagoda.name)
+        #expect(result.spots[0].mapkitId == Spot.peacePagoda.mapkitId)
+        #expect(result.spots[0].latitude == Spot.peacePagoda.latitude)
+        #expect(result.spots[0].longitude == Spot.peacePagoda.longitude)
         #expect(result.spots[1].name == "Unknown Location")
-        #expect(result.spots[1].mapkitId == "IBB934C01F6A585EA")
+        #expect(result.spots[1].mapkitId == Spot.kinokuniya.mapkitId)
     }
 
     @Test("findSpots wraps search errors in providerError")
@@ -228,10 +229,10 @@ struct MapKitSpotsProviderTests {
         includeName: Bool = true,
     ) -> TestableMapItem {
         createMockMapItem(
-            identifier: includeIdentifier ? "I6FD7682FD36BB3BE" : nil,
-            name: includeName ? "Peace Padoga" : nil,
-            latitude: 37.7849447,
-            longitude: -122.4303306,
+            identifier: includeIdentifier ? Spot.peacePagoda.mapkitId : nil,
+            name: includeName ? Spot.peacePagoda.name : nil,
+            latitude: Spot.peacePagoda.latitude,
+            longitude: Spot.peacePagoda.longitude,
         )
     }
 
@@ -240,10 +241,10 @@ struct MapKitSpotsProviderTests {
         includeName: Bool = true,
     ) -> TestableMapItem {
         createMockMapItem(
-            identifier: includeIdentifier ? "IBB934C01F6A585EA" : nil,
-            name: includeName ? "Kinokuniya" : nil,
-            latitude: 37.7849544,
-            longitude: -122.4317274,
+            identifier: includeIdentifier ? Spot.kinokuniya.mapkitId : nil,
+            name: includeName ? Spot.kinokuniya.name : nil,
+            latitude: Spot.kinokuniya.latitude,
+            longitude: Spot.kinokuniya.longitude,
         )
     }
 

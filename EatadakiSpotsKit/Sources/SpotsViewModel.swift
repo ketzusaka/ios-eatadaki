@@ -51,7 +51,7 @@ public final class SpotsViewModel {
         } catch {
             isOptedIn = false
         }
-        
+
         observeSpots()
 
         if isOptedIn {
@@ -93,7 +93,7 @@ public final class SpotsViewModel {
         hasReceivedContent = true
         stage = .fetched
     }
-    
+
     // Refreshes our data observer. Should be called on init, location change, or filtering change
     private func observeSpots() {
         let request = spotsDataRequest
@@ -109,11 +109,11 @@ public final class SpotsViewModel {
             }
         }
     }
-    
+
     private func updateSpots(with spots: [SpotInfoListing]) async {
         self.spots = spots
     }
-    
+
     private var spotsDataRequest: FetchSpotsDataRequest {
         let query = searchQuery.isEmpty ? nil : searchQuery
         if let currentLocation {

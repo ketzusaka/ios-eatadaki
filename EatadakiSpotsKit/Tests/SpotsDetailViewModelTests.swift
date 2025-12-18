@@ -11,14 +11,7 @@ struct SpotsDetailViewModelTests {
     @Test("initial state with spotInfoListing has uninitialized stage and preview")
     func testInitialStateWithSpotInfoListing() async throws {
         let dependencies = FakeSpotsDetailViewModelDependencies()
-        let spot = Spot(
-            id: UUID(),
-            mapkitId: "I6FD7682FD36BB3BE",
-            name: "Peace Pagoda",
-            latitude: 37.7849447,
-            longitude: -122.4303306,
-            createdAt: .now,
-        )
+        let spot = Spot.peacePagoda
         let spotInfoListing = SpotInfoListing(from: spot)
         let viewModel = SpotsDetailViewModel(
             dependencies: dependencies,
@@ -37,7 +30,7 @@ struct SpotsDetailViewModelTests {
     @Test("initial state with spotIds has uninitialized stage and no preview")
     func testInitialStateWithSpotIds() async {
         let dependencies = FakeSpotsDetailViewModelDependencies()
-        let spotIds = SpotIDs(mapkitId: "I6FD7682FD36BB3BE")
+        let spotIds = SpotIDs(mapkitId: Spot.peacePagoda.mapkitId)
         let viewModel = SpotsDetailViewModel(
             dependencies: dependencies,
             spotIds: spotIds,
@@ -61,7 +54,7 @@ struct SpotsDetailViewModelTests {
             createdAt: .now,
         )
         dependencies.fakeSpotsRepository.stubFetchSpotWithIDs = { _ in spot }
-        let spotIds = SpotIDs(mapkitId: "I6FD7682FD36BB3BE")
+        let spotIds = SpotIDs(mapkitId: Spot.peacePagoda.mapkitId)
         let viewModel = SpotsDetailViewModel(
             dependencies: dependencies,
             spotIds: spotIds,
@@ -104,7 +97,7 @@ struct SpotsDetailViewModelTests {
             createdAt: .now,
         )
         dependencies.fakeSpotsRepository.stubFetchSpotWithIDs = { _ in spot }
-        let spotIds = SpotIDs(mapkitId: "I6FD7682FD36BB3BE")
+        let spotIds = SpotIDs(mapkitId: Spot.peacePagoda.mapkitId)
         let viewModel = SpotsDetailViewModel(
             dependencies: dependencies,
             spotIds: spotIds,
@@ -127,7 +120,7 @@ struct SpotsDetailViewModelTests {
         dependencies.fakeSpotsRepository.stubFetchSpotWithIDs = { (_) async throws(SpotsRepositoryError) -> Spot in
             throw SpotsRepositoryError.spotNotFound
         }
-        let spotIds = SpotIDs(mapkitId: "I6FD7682FD36BB3BE")
+        let spotIds = SpotIDs(mapkitId: Spot.peacePagoda.mapkitId)
         let viewModel = SpotsDetailViewModel(
             dependencies: dependencies,
             spotIds: spotIds,
@@ -152,7 +145,7 @@ struct SpotsDetailViewModelTests {
             createdAt: .now,
         )
         dependencies.fakeSpotsRepository.stubFetchSpotWithIDs = { _ in spot }
-        let spotIds = SpotIDs(mapkitId: "I6FD7682FD36BB3BE")
+        let spotIds = SpotIDs(mapkitId: Spot.peacePagoda.mapkitId)
         let viewModel = SpotsDetailViewModel(
             dependencies: dependencies,
             spotIds: spotIds,
@@ -167,7 +160,7 @@ struct SpotsDetailViewModelTests {
     @Test("spotDetail returns nil when not loaded")
     func testSpotDetailReturnsNilWhenNotLoaded() async {
         let dependencies = FakeSpotsDetailViewModelDependencies()
-        let spotIds = SpotIDs(mapkitId: "I6FD7682FD36BB3BE")
+        let spotIds = SpotIDs(mapkitId: Spot.peacePagoda.mapkitId)
         let viewModel = SpotsDetailViewModel(
             dependencies: dependencies,
             spotIds: spotIds,
@@ -188,7 +181,7 @@ struct SpotsDetailViewModelTests {
             createdAt: .now,
         )
         dependencies.fakeSpotsRepository.stubFetchSpotWithIDs = { _ in spot }
-        let spotIds = SpotIDs(mapkitId: "I6FD7682FD36BB3BE")
+        let spotIds = SpotIDs(mapkitId: Spot.peacePagoda.mapkitId)
         let viewModel = SpotsDetailViewModel(
             dependencies: dependencies,
             spotIds: spotIds,

@@ -110,13 +110,13 @@ public actor RealSpotsRepository: SpotsRepository {
         do {
             return try await db.read { db in
                 var baseQuery: QueryInterfaceRequest<Spot>
-                
+
                 if let query = request.query, !query.isEmpty {
                     baseQuery = Spot.filter(Column("name").like("%\(query)%", escape: "\\"))
                 } else {
                     baseQuery = Spot.all()
                 }
-                
+
                 switch request.sort.field {
                 case .name:
                     let ordering = request.sort.direction == .ascending

@@ -11,24 +11,23 @@ public enum SpotsDetailViewModelError: Error, Equatable {
 @Observable
 @MainActor
 public final class SpotsDetailViewModel {
-    
     public struct Preview {
         public var name: String
         public var coordinates: Coordinates
     }
-    
+
     public enum Stage: Equatable, Sendable {
         case uninitialized // App hasn't called `initialized()`
         case initializing // Reading detail data
         case loaded(SpotInfoDetail) // Fetching finished successfully
         case loadingFailed(SpotsDetailViewModelError) // Fetching finished unsuccessfully
     }
-    
+
     private let dependencies: SpotsDetailViewModelDependencies
     private let spotIds: SpotIDs
-    
+
     public var stage: Stage = .uninitialized
-    
+
     public var preview: Preview?
     public var spotDetail: SpotInfoDetail? {
         switch stage {
@@ -38,11 +37,11 @@ public final class SpotsDetailViewModel {
             nil
         }
     }
-    
+
     public var navigationTitle: String {
         spotDetail?.name ?? preview?.name ?? ""
     }
-    
+
     public init(
         dependencies: SpotsDetailViewModelDependencies,
         spotInfoListing: SpotInfoListing,
@@ -54,7 +53,7 @@ public final class SpotsDetailViewModel {
             coordinates: spotInfoListing.coordinates,
         )
     }
-    
+
     public init(
         dependencies: SpotsDetailViewModelDependencies,
         spotIds: SpotIDs,
@@ -62,7 +61,7 @@ public final class SpotsDetailViewModel {
         self.dependencies = dependencies
         self.spotIds = spotIds
     }
-    
+
     public func initialize() async {
         guard case .uninitialized = stage else { return }
         stage = .initializing

@@ -25,14 +25,7 @@ struct SpotInfoListingTests {
 
     @Test("init from spot sets correct name")
     func testInitFromSpotSetsCorrectName() {
-        let spot = Spot(
-            id: UUID(),
-            mapkitId: "I6FD7682FD36BB3BE",
-            name: "Peace Pagoda",
-            latitude: 37.7849447,
-            longitude: -122.4303306,
-            createdAt: .now,
-        )
+        let spot = Spot.peacePagoda
 
         let listing = SpotInfoListing(from: spot)
 
@@ -41,14 +34,7 @@ struct SpotInfoListingTests {
 
     @Test("init from spot sets correct coordinates")
     func testInitFromSpotSetsCorrectCoordinates() {
-        let spot = Spot(
-            id: UUID(),
-            mapkitId: "I6FD7682FD36BB3BE",
-            name: "Test Spot",
-            latitude: 37.7849447,
-            longitude: -122.4303306,
-            createdAt: .now,
-        )
+        let spot = Spot.peacePagoda
 
         let listing = SpotInfoListing(from: spot)
 
@@ -75,14 +61,7 @@ struct SpotInfoListingTests {
 
     @Test("SpotInfoListing is Identifiable")
     func testSpotInfoListingIsIdentifiable() {
-        let spot = Spot(
-            id: UUID(),
-            mapkitId: "I6FD7682FD36BB3BE",
-            name: "Test Spot",
-            latitude: 37.7849447,
-            longitude: -122.4303306,
-            createdAt: .now,
-        )
+        let spot = Spot.peacePagoda
 
         let listing = SpotInfoListing(from: spot)
 
@@ -91,4 +70,3 @@ struct SpotInfoListingTests {
         #expect(identifiableId == spot.id)
     }
 }
-

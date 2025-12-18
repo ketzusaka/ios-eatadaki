@@ -11,7 +11,7 @@ public struct SpotsView: View {
     @Environment(ThemeManager.self) var themeManager
     @Environment(\.colorScheme) var colorScheme
     @State var viewModel: SpotsViewModel
-    
+
     private let dependencies: SpotsViewDependencies
 
     public init(dependencies: SpotsViewDependencies) {

@@ -10,7 +10,7 @@ public struct SpotsDetailView: View {
     @Environment(ThemeManager.self) var themeManager
     @Environment(\.colorScheme) var colorScheme
     @State var viewModel: SpotsDetailViewModel
-    
+
     public init(
         dependencies: SpotsDetailViewDependencies,
         spotInfoListing: SpotInfoListing,
@@ -20,7 +20,7 @@ public struct SpotsDetailView: View {
             spotInfoListing: spotInfoListing,
         )
     }
-    
+
     public init(
         dependencies: SpotsDetailViewModelDependencies,
         spotIds: SpotIDs,
@@ -30,17 +30,16 @@ public struct SpotsDetailView: View {
             spotIds: spotIds,
         )
     }
-    
+
     public var body: some View {
         VStack {
             switch viewModel.stage {
             case .uninitialized, .initializing:
                 if let preview = viewModel.preview {
                     mapView(name: preview.name, coordinates: preview.coordinates)
-                    
+
                     LoadingView()
                     Spacer()
-                    
                 } else {
                     LoadingView()
                 }
@@ -56,7 +55,7 @@ public struct SpotsDetailView: View {
             await viewModel.initialize()
         }
     }
-    
+
     @ViewBuilder
     private func mapView(name: String, coordinates: Coordinates) -> some View {
         let position = MapCameraPosition.region(
@@ -65,7 +64,7 @@ public struct SpotsDetailView: View {
                 span: MKCoordinateSpan(latitudeDelta: 0.0025, longitudeDelta: 0.0025),
             )
         )
-        
+
         Map(position: .constant(position)) {
             Marker(name, coordinate: CLLocationCoordinate2D(latitude: coordinates.latitude, longitude: coordinates.longitude))
         }
@@ -77,49 +76,31 @@ public struct SpotsDetailView: View {
 
 #if DEBUG
 #Preview("Success from spot IDs") {
-    let dependencies = FakeSpotsDetailViewModelDependencies() {
-        $0.fakeSpotsRepository.stubFetchSpotWithIDs = { _ in
-            Spot(
-                id: UUID(),
-                mapkitId: "I6FD7682FD36BB3BE",
-                name: "Peace Pagoda",
-                latitude: 37.7849447,
-                longitude: -122.4303306,
-                createdAt: .now,
-            )
-        }
+    let dependencies = FakeSpotsDetailViewModelDependencies {
+        $0.fakeSpotsRepository.stubFetchSpotWithIDs = { _ in Spot.peacePagoda }
     }
-    
+
     NavigationStack {
         SpotsDetailView(
             dependencies: dependencies,
-            spotIds: SpotIDs(mapkitId: "I6FD7682FD36BB3BE"),
+            spotIds: SpotIDs(mapkitId: Spot.peacePagoda.mapkitId),
         )
         .environment(ThemeManager())
     }
 }
 
 #Preview("Preview data") {
-    let dependencies = FakeSpotsDetailViewModelDependencies() {
+    let dependencies = FakeSpotsDetailViewModelDependencies {
         $0.fakeSpotsRepository.stubFetchSpotWithIDs = { (_) async throws(SpotsRepositoryError) -> Spot in
             try? await Task.sleep(nanoseconds: .max)
             throw SpotsRepositoryError.spotNotFound
         }
     }
-    
+
     NavigationStack {
         SpotsDetailView(
             dependencies: dependencies,
-            spotInfoListing: SpotInfoListing(
-                from: Spot(
-                    id: UUID(),
-                    mapkitId: "I6FD7682FD36BB3BE",
-                    name: "Peace Pagoda",
-                    latitude: 37.7849447,
-                    longitude: -122.4303306,
-                    createdAt: .now,
-                )
-            ),
+            spotInfoListing: SpotInfoListing(from: Spot.peacePagoda),
         )
         .environment(ThemeManager())
     }

@@ -12,7 +12,7 @@ extension Text {
             .font(theme.captionTextFont)
             .foregroundColor(theme.captionTextColor)
     }
-    
+
     public func listMainTextStyling(using theme: ThemeTokens) -> some View {
         self
             .font(theme.listMainTextFont)
