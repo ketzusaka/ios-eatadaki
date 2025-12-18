@@ -5,12 +5,17 @@ import EatadakiLocationKit
 import EatadakiUI
 import SwiftUI
 
+public typealias SpotsViewDependencies = SpotsViewModelDependencies
+
 public struct SpotsView: View {
     @Environment(ThemeManager.self) var themeManager
     @Environment(\.colorScheme) var colorScheme
     @State var viewModel: SpotsViewModel
+    
+    private let dependencies: SpotsViewDependencies
 
-    public init(dependencies: SpotsViewModelDependencies) {
+    public init(dependencies: SpotsViewDependencies) {
+        self.dependencies = dependencies
         self.viewModel = SpotsViewModel(dependencies: dependencies)
     }
 
@@ -87,8 +92,15 @@ public struct SpotsView: View {
 
         List {
             ForEach(viewModel.spots) { spot in
-                Text(spot.name)
-                    .listMainTextStyling(using: theme)
+                NavigationLink {
+                    SpotsDetailView(
+                        dependencies: dependencies,
+                        spotInfoListing: spot,
+                    )
+                } label: {
+                    Text(spot.name)
+                        .listMainTextStyling(using: theme)
+                }
             }
         }
     }

@@ -41,6 +41,8 @@ Please refer to the architecture documentation at `docs/ARCHITECTURE.md` for det
 
 - **Test Helper Placement**: Place all helper methods (private functions used for test setup) at the end of test structs, after all test methods. Use a `// MARK: - Helpers` comment to separate them.
 - **Date Usage in Tests**: Use `.now` instead of `Date()` for creating current date values in test code (e.g., `createdAt: .now`).
+- **Never use sleep in tests**: **Never use `Task.sleep` or any timing-based delays in tests**. Tests must be deterministic.
+  - ❌ **Incorrect**: `try? await Task.sleep(nanoseconds: 10_000_000); #expect(viewModel.stage == .initializing)`
 - **Database Testing**: **Never perform assertions inside database read/write blocks**. Fetch data from the database and perform assertions outside the block. Running test macros (like `#expect` or `#require`) inside database blocks causes the test runner to crash instead of properly reporting failures.
   - ❌ **Incorrect**: `try db.read { database in let entry = try Row.fetchOne(...); #expect(entry != nil) }`
   - ✅ **Correct**: `let entry = try await db.read { database in try Row.fetchOne(...) }; #expect(entry != nil)`
