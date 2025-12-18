@@ -1,13 +1,13 @@
 import Foundation
 import GRDB
 
-public enum SpotReason: String, Codable {
+public enum SpotReason: String, Codable, Sendable {
     case createdByUser = "createdByUser"
     case findResult = "findResult"
     case foundAndViewed = "foundAndViewed"
 }
 
-public struct Spot: Codable, Identifiable {
+public struct Spot: Codable, Identifiable, Sendable {
     public var id: UUID
     public var mapkitId: String?
     public var remoteId: String?
@@ -40,6 +40,8 @@ public struct Spot: Codable, Identifiable {
 
 extension Spot: TableRecord, FetchableRecord, PersistableRecord {
     public static var databaseTableName: String { "spots" }
+    
+    public static let experiences = hasMany(Experience.self)
 
     public mutating func update(with spot: Spot) {
         self.name = spot.name

@@ -108,6 +108,7 @@ struct ExperiencesDatabaseMigratorTests {
             let columnNames = Set(tableInfo.map { $0["name"] as String })
 
             #expect(columnNames.contains("id"))
+            #expect(columnNames.contains("spotId"))
             #expect(columnNames.contains("remoteId"))
             #expect(columnNames.contains("name"))
             #expect(columnNames.contains("description"))
@@ -117,6 +118,11 @@ struct ExperiencesDatabaseMigratorTests {
             let idRow = try #require(tableInfo.first { $0["name"] as String == "id" })
             let idPk = idRow["pk"] as? Int64 ?? 0
             #expect(idPk == 1)
+
+            // Check spotId is not null
+            let spotIdRow = try #require(tableInfo.first { $0["name"] as String == "spotId" })
+            let spotIdNotNull = spotIdRow["notnull"] as? Int64 ?? 0
+            #expect(spotIdNotNull == 1)
 
             // Check name is not null
             let nameRow = try #require(tableInfo.first { $0["name"] as String == "name" })
@@ -188,6 +194,9 @@ struct ExperiencesDatabaseMigratorTests {
             let experiencesRemoteIdIndex = try Row.fetchOne(database, sql: "SELECT name FROM sqlite_master WHERE type='index' AND name='experiences_remoteId'")
             #expect(experiencesRemoteIdIndex != nil)
 
+            let experiencesSpotIdIndex = try Row.fetchOne(database, sql: "SELECT name FROM sqlite_master WHERE type='index' AND name='experiences_spotId'")
+            #expect(experiencesSpotIdIndex != nil)
+
             // Check experiences_ratings indexes
             let ratingsExperienceIdIndex = try Row.fetchOne(database, sql: "SELECT name FROM sqlite_master WHERE type='index' AND name='experiences_ratings_experienceId'")
             #expect(ratingsExperienceIdIndex != nil)
@@ -254,8 +263,18 @@ struct ExperiencesDatabaseMigratorTests {
 
         try migrator.migrate()
 
+        let testSpot = Spot(
+            id: UUID(),
+            name: "Test Spot",
+            latitude: 37.7849447,
+            longitude: -122.4303306,
+            createdAt: .now,
+            reason: .findResult,
+        )
+
         let testExperience = Experience(
             id: UUID(),
+            spotId: testSpot.id,
             remoteId: "test-remote-id",
             name: "Test Experience",
             description: "Test Description",
@@ -263,12 +282,14 @@ struct ExperiencesDatabaseMigratorTests {
         )
 
         try db.write { database in
+            try testSpot.insert(database)
             try testExperience.insert(database)
         }
 
         try db.read { database in
             let fetchedExperience = try #require(try? Experience.fetchOne(database, key: testExperience.id))
             #expect(fetchedExperience.id == testExperience.id)
+            #expect(fetchedExperience.spotId == testExperience.spotId)
             #expect(fetchedExperience.name == testExperience.name)
             #expect(fetchedExperience.description == testExperience.description)
         }

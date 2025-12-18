@@ -29,12 +29,14 @@ final public class ExperiencesDatabaseMigrator {
             // Create experiences table
             try db.create(table: Experience.databaseTableName, ifNotExists: true) { t in
                 t.column("id", .text).primaryKey()
+                t.column("spotId", .text).notNull().references(Spot.databaseTableName, onDelete: .cascade)
                 t.column("remoteId", .text)
                 t.column("name", .text).notNull()
                 t.column("description", .text)
                 t.column("createdAt", .datetime).notNull()
             }
             try db.execute(sql: "CREATE INDEX IF NOT EXISTS experiences_remoteId ON experiences(remoteId) WHERE remoteId IS NOT NULL")
+            try db.execute(sql: "CREATE INDEX IF NOT EXISTS experiences_spotId ON experiences(spotId)")
 
             // Create experience ratings table
             try db.execute(sql: """
