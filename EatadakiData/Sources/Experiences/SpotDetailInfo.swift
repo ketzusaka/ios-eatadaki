@@ -13,3 +13,4 @@ public struct SpotDetailInfo: FetchableRecord, Decodable, Sendable {
         self.experiences = experiences
     }
 }
+

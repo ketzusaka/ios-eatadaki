@@ -206,6 +206,15 @@ let entry = try #require(fetchedEntry)
 4. **Resilient Initialization**: Graceful handling of initialization failures
 5. **Simple State Machine**: Easy to understand and maintain state transitions
 
+## Data Modeling
+Models will have a few types so we want a consistent naming scheme to help us find the correct one.  
+
+- A model has a concept name, like a `Spot` or `User`, and then we build the real type names off their purpose.
+- A model representing a persisted entity should be suffixed `Record`; e.g. `SpotRecord` and `UserRecord`.
+- A model representing persisted data, but not a specific entity, should be suffixed `Info` + level of detail in the data. Our typical options are `InfoSummary`, `InfoPartial`, and `InfoDetailed`.
+- A model representing a network request should be suffixed `Request`. 
+- A model representing a network response should be suffixed `Response`. If the response has varying levels of detail it should have the same detail suffix as persisted data.
+
 ## Future Considerations
 
 - Add error states for initialization failures
