@@ -26,7 +26,7 @@ public struct FoundSpot {
     }
 }
 
-public extension Spot {
+public extension SpotRecord {
     init(from foundSpot: FoundSpot) {
         self.init(
             id: foundSpot.id,

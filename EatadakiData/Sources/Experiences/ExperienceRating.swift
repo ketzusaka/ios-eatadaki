@@ -1,7 +1,7 @@
 import Foundation
 import GRDB
 
-public struct ExperienceRating: Codable {
+public struct ExperienceRatingRecord: Codable {
     public var id: UUID
     public var experienceId: UUID
     public var rating: Int
@@ -9,6 +9,6 @@ public struct ExperienceRating: Codable {
     public var createdAt: Date
 }
 
-extension ExperienceRating: TableRecord, FetchableRecord, PersistableRecord {
+extension ExperienceRatingRecord: TableRecord, FetchableRecord, PersistableRecord {
     public static var databaseTableName: String { "experiences_ratings" }
 }

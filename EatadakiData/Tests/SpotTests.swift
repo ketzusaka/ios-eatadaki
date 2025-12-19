@@ -2,11 +2,11 @@ import EatadakiData
 import Foundation
 import Testing
 
-@Suite("Spot Tests")
-struct SpotTests {
+@Suite("SpotRecord Tests")
+struct SpotRecordTests {
     @Test("Update updates name")
     func testUpdateUpdatesName() {
-        var spot = Spot(
+        var spot = SpotRecord(
             id: UUID(),
             mapkitId: "original-mapkit",
             remoteId: "original-remote",
@@ -16,7 +16,7 @@ struct SpotTests {
             createdAt: Date(timeIntervalSince1970: 0),
         )
 
-        let updatedSpot = Spot(
+        let updatedSpot = SpotRecord(
             id: UUID(),
             mapkitId: "new-mapkit",
             remoteId: "new-remote",
@@ -33,7 +33,7 @@ struct SpotTests {
 
     @Test("Update updates latitude")
     func testUpdateUpdatesLatitude() {
-        var spot = Spot(
+        var spot = SpotRecord(
             id: UUID(),
             name: "Test Spot",
             latitude: 37.7849447,
@@ -41,7 +41,7 @@ struct SpotTests {
             createdAt: Date(timeIntervalSince1970: 0),
         )
 
-        let updatedSpot = Spot(
+        let updatedSpot = SpotRecord(
             id: UUID(),
             name: "Test Spot",
             latitude: 40.7128,
@@ -56,7 +56,7 @@ struct SpotTests {
 
     @Test("Update updates longitude")
     func testUpdateUpdatesLongitude() {
-        var spot = Spot(
+        var spot = SpotRecord(
             id: UUID(),
             name: "Test Spot",
             latitude: 37.7849447,
@@ -64,7 +64,7 @@ struct SpotTests {
             createdAt: Date(timeIntervalSince1970: 0),
         )
 
-        let updatedSpot = Spot(
+        let updatedSpot = SpotRecord(
             id: UUID(),
             name: "Test Spot",
             latitude: 37.7849447,
@@ -79,7 +79,7 @@ struct SpotTests {
 
     @Test("Update updates remoteId")
     func testUpdateUpdatesRemoteId() {
-        var spot = Spot(
+        var spot = SpotRecord(
             id: UUID(),
             remoteId: "original-remote",
             name: "Test Spot",
@@ -88,7 +88,7 @@ struct SpotTests {
             createdAt: Date(timeIntervalSince1970: 0),
         )
 
-        let updatedSpot = Spot(
+        let updatedSpot = SpotRecord(
             id: UUID(),
             remoteId: "new-remote",
             name: "Test Spot",
@@ -104,7 +104,7 @@ struct SpotTests {
 
     @Test("Update sets remoteId to nil when updated spot has nil remoteId")
     func testUpdateSetsRemoteIdToNil() {
-        var spot = Spot(
+        var spot = SpotRecord(
             id: UUID(),
             remoteId: "original-remote",
             name: "Test Spot",
@@ -113,7 +113,7 @@ struct SpotTests {
             createdAt: Date(timeIntervalSince1970: 0),
         )
 
-        let updatedSpot = Spot(
+        let updatedSpot = SpotRecord(
             id: UUID(),
             remoteId: nil,
             name: "Test Spot",
@@ -130,7 +130,7 @@ struct SpotTests {
     @Test("Update does not change id")
     func testUpdateDoesNotChangeId() {
         let originalId = UUID()
-        var spot = Spot(
+        var spot = SpotRecord(
             id: originalId,
             name: "Test Spot",
             latitude: 37.7849447,
@@ -138,7 +138,7 @@ struct SpotTests {
             createdAt: Date(timeIntervalSince1970: 0),
         )
 
-        let updatedSpot = Spot(
+        let updatedSpot = SpotRecord(
             id: UUID(),
             name: "Updated Name",
             latitude: 40.7128,
@@ -153,7 +153,7 @@ struct SpotTests {
 
     @Test("Update does not change mapkitId")
     func testUpdateDoesNotChangeMapkitId() {
-        var spot = Spot(
+        var spot = SpotRecord(
             id: UUID(),
             mapkitId: "original-mapkit",
             name: "Test Spot",
@@ -162,7 +162,7 @@ struct SpotTests {
             createdAt: Date(timeIntervalSince1970: 0),
         )
 
-        let updatedSpot = Spot(
+        let updatedSpot = SpotRecord(
             id: UUID(),
             mapkitId: "new-mapkit",
             name: "Updated Name",
@@ -179,7 +179,7 @@ struct SpotTests {
     @Test("Update does not change createdAt")
     func testUpdateDoesNotChangeCreatedAt() {
         let originalDate = Date(timeIntervalSince1970: 0)
-        var spot = Spot(
+        var spot = SpotRecord(
             id: UUID(),
             name: "Test Spot",
             latitude: 37.7849447,
@@ -187,7 +187,7 @@ struct SpotTests {
             createdAt: originalDate,
         )
 
-        let updatedSpot = Spot(
+        let updatedSpot = SpotRecord(
             id: UUID(),
             name: "Updated Name",
             latitude: 40.7128,
@@ -206,7 +206,7 @@ struct SpotTests {
         let originalMapkitId = "original-mapkit"
         let originalDate = Date(timeIntervalSince1970: 0)
 
-        var spot = Spot(
+        var spot = SpotRecord(
             id: originalId,
             mapkitId: originalMapkitId,
             remoteId: "original-remote",
@@ -216,7 +216,7 @@ struct SpotTests {
             createdAt: originalDate,
         )
 
-        let updatedSpot = Spot(
+        let updatedSpot = SpotRecord(
             id: UUID(),
             mapkitId: "new-mapkit",
             remoteId: "new-remote",

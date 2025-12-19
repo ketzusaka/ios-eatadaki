@@ -17,7 +17,7 @@ struct UserRepositoryTests {
     @Test("Fetch user returns user when user exists")
     func testFetchUserReturnsUserWhenUserExists() async throws {
         let repository = try setupRepository()
-        let testUser = User(
+        let testUser = UserRecord(
             id: UUID(),
             email: "test@example.com",
             createdAt: .now
@@ -34,7 +34,7 @@ struct UserRepositoryTests {
     @Test("Save user successfully")
     func testSaveUser() async throws {
         let repository = try setupRepository()
-        let testUser = User(
+        let testUser = UserRecord(
             id: UUID(),
             email: "test@example.com",
             createdAt: .now
@@ -51,12 +51,12 @@ struct UserRepositoryTests {
     @Test("Save user replaces existing user")
     func testSaveUserReplacesExistingUser() async throws {
         let repository = try setupRepository()
-        let firstUser = User(
+        let firstUser = UserRecord(
             id: UUID(),
             email: "first@example.com",
             createdAt: .now
         )
-        let secondUser = User(
+        let secondUser = UserRecord(
             id: UUID(),
             email: "second@example.com",
             createdAt: .now
@@ -75,17 +75,17 @@ struct UserRepositoryTests {
     @Test("Save user ensures only one user exists")
     func testSaveUserEnsuresOnlyOneUserExists() async throws {
         let repository = try setupRepository()
-        let user1 = User(
+        let user1 = UserRecord(
             id: UUID(),
             email: "user1@example.com",
             createdAt: .now
         )
-        let user2 = User(
+        let user2 = UserRecord(
             id: UUID(),
             email: "user2@example.com",
             createdAt: .now
         )
-        let user3 = User(
+        let user3 = UserRecord(
             id: UUID(),
             email: "user3@example.com",
             createdAt: .now
@@ -105,7 +105,7 @@ struct UserRepositoryTests {
     @Test("Clear user successfully")
     func testClearUser() async throws {
         let repository = try setupRepository()
-        let testUser = User(
+        let testUser = UserRecord(
             id: UUID(),
             email: "test@example.com",
             createdAt: .now
@@ -132,7 +132,7 @@ struct UserRepositoryTests {
     @Test("Save and fetch user roundtrip")
     func testSaveAndFetchUserRoundtrip() async throws {
         let repository = try setupRepository()
-        let testUser = User(
+        let testUser = UserRecord(
             id: UUID(),
             email: "roundtrip@example.com",
             createdAt: .now
@@ -165,7 +165,7 @@ struct UserRepositoryTests {
     @Test("Observe user returns user when user exists")
     func testObserveUserReturnsUserWhenUserExists() async throws {
         let repository = try setupRepository()
-        let testUser = User(
+        let testUser = UserRecord(
             id: UUID(),
             email: "observe@example.com",
             createdAt: .now
@@ -179,7 +179,7 @@ struct UserRepositoryTests {
         // Should get the user (iterator.next() returns User?? - unwrap both levels)
         let observedUserOptional = try await iterator.next()
         let observedUser = try #require(observedUserOptional)
-        let user: User = try #require(observedUser)
+        let user: UserRecord = try #require(observedUser)
         #expect(user.id == testUser.id)
         #expect(user.email == testUser.email)
     }
@@ -194,7 +194,7 @@ struct UserRepositoryTests {
         let initialUser = try await iterator.next()
         #expect(initialUser == .some(nil))
 
-        let testUser = User(
+        let testUser = UserRecord(
             id: UUID(),
             email: "update@example.com",
             createdAt: Date(timeIntervalSince1970: 0)
@@ -203,14 +203,14 @@ struct UserRepositoryTests {
 
         let nextUser = try await iterator.next()
         let optionalUser = try #require(nextUser)
-        let user: User = try #require(optionalUser)
+        let user: UserRecord = try #require(optionalUser)
         #expect(user == testUser)
     }
 
     @Test("Observe user emits nil when user is cleared")
     func testObserveUserEmitsNilWhenUserIsCleared() async throws {
         let repository = try setupRepository()
-        let testUser = User(
+        let testUser = UserRecord(
             id: UUID(),
             email: "clear@example.com",
             createdAt: Date(timeIntervalSince1970: 0),

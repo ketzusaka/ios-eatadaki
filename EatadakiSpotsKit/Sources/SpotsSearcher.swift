@@ -30,7 +30,7 @@ public actor RealSpotSearcher: SpotsSearcher {
     public func findAndCacheSpots(request: FindSpotsRequest) async throws(SpotsSearcherError) {
         let result = try await spotsProvider.findSpots(request: request)
         for foundSpot in result.spots {
-            let spot = Spot(from: foundSpot)
+            let spot = SpotRecord(from: foundSpot)
             do {
                 try await spotsRepository.save(spot: spot)
             } catch {

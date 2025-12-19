@@ -2,8 +2,8 @@ import EatadakiData
 import Foundation
 
 #if DEBUG
-public extension Spot {
-    static let peacePagoda = Spot(
+public extension SpotRecord {
+    static let peacePagoda = SpotRecord(
         id: UUID(uuidString: "00000000-0000-0000-0000-000000000001")!,
         mapkitId: "I6FD7682FD36BB3BE",
         name: "Peace Pagoda",
@@ -12,7 +12,7 @@ public extension Spot {
         createdAt: Date(timeIntervalSince1970: 0),
     )
 
-    static let kinokuniya = Spot(
+    static let kinokuniya = SpotRecord(
         id: UUID(uuidString: "00000000-0000-0000-0000-000000000002")!,
         mapkitId: "IBB934C01F6A585EA",
         name: "Kinokuniya",

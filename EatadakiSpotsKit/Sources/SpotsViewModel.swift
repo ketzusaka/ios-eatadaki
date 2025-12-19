@@ -22,7 +22,7 @@ public final class SpotsViewModel {
 
     public var stage: Stage = .uninitialized
     public var currentLocation: CLLocation?
-    public var spots: [SpotInfoListing] = []
+    public var spots: [SpotInfoSummary] = []
     public var hasReceivedContent = false
     public var searchQuery: String = "" {
         didSet {
@@ -104,13 +104,13 @@ public final class SpotsViewModel {
             for try await spots in observation {
                 guard !Task.isCancelled else { return }
                 guard let self else { return }
-                let listableSpots = spots.map(SpotInfoListing.init(from:))
+                let listableSpots = spots.map(SpotInfoSummary.init(from:))
                 await self.updateSpots(with: listableSpots)
             }
         }
     }
 
-    private func updateSpots(with spots: [SpotInfoListing]) async {
+    private func updateSpots(with spots: [SpotInfoSummary]) async {
         self.spots = spots
     }
 

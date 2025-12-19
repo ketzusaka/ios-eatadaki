@@ -7,19 +7,19 @@ public class FakeUserRepository: UserRepository {
     }
 
     public private(set) var invokedCountFetchUser: Int = 0
-    public var stubFetchUser: () async throws(UserRepositoryError) -> User? = {
+    public var stubFetchUser: () async throws(UserRepositoryError) -> UserRecord? = {
         nil
     }
 
-    public func fetchUser() async throws(UserRepositoryError) -> User? {
+    public func fetchUser() async throws(UserRepositoryError) -> UserRecord? {
         invokedCountFetchUser += 1
         return try await stubFetchUser()
     }
 
-    public private(set) var invocationsSaveUser: [User] = []
-    public var stubSaveUser: (User) async throws(UserRepositoryError) -> Void = { _ in }
+    public private(set) var invocationsSaveUser: [UserRecord] = []
+    public var stubSaveUser: (UserRecord) async throws(UserRepositoryError) -> Void = { _ in }
 
-    public func saveUser(_ user: User) async throws(UserRepositoryError) {
+    public func saveUser(_ user: UserRecord) async throws(UserRepositoryError) {
         invocationsSaveUser.append(user)
         try await stubSaveUser(user)
     }

@@ -17,7 +17,7 @@ struct RealSpotsRepositoryTests {
 
     @Test("Create spot successfully")
     func testCreateSpot() async throws {
-        let testSpot = Spot(
+        let testSpot = SpotRecord(
             id: UUID(),
             mapkitId: "test-mapkit-id",
             remoteId: "test-remote-id",
@@ -37,7 +37,7 @@ struct RealSpotsRepositoryTests {
 
     @Test("Fetch spot by ID successfully")
     func testFetchSpotByID() async throws {
-        let testSpot = Spot(
+        let testSpot = SpotRecord(
             id: UUID(),
             name: "Test Spot",
             latitude: 37.7849447,
@@ -70,7 +70,7 @@ struct RealSpotsRepositoryTests {
 
     @Test("Fetch all spots returns single spot")
     func testFetchSpotsSingle() async throws {
-        let testSpot = Spot(
+        let testSpot = SpotRecord(
             id: UUID(),
             name: "Test Spot",
             latitude: 37.7849447,
@@ -88,21 +88,21 @@ struct RealSpotsRepositoryTests {
 
     @Test("Fetch all spots returns multiple spots")
     func testFetchSpotsMultiple() async throws {
-        let spot1 = Spot(
+        let spot1 = SpotRecord(
             id: UUID(),
             name: "Spot 1",
             latitude: 37.7849447,
             longitude: -122.4303306,
             createdAt: .now,
         )
-        let spot2 = Spot(
+        let spot2 = SpotRecord(
             id: UUID(),
             name: "Spot 2",
             latitude: 37.7849544,
             longitude: -122.4317274,
             createdAt: .now,
         )
-        let spot3 = Spot(
+        let spot3 = SpotRecord(
             id: UUID(),
             name: "Spot 3",
             latitude: 37.7749,
@@ -127,21 +127,21 @@ struct RealSpotsRepositoryTests {
 
     @Test("Fetch spots with default sort returns spots sorted by name ascending")
     func testFetchSpotsDefaultSort() async throws {
-        let spotA = Spot(
+        let spotA = SpotRecord(
             id: UUID(),
             name: "Alpha Spot",
             latitude: 37.7849447,
             longitude: -122.4303306,
             createdAt: .now,
         )
-        let spotZ = Spot(
+        let spotZ = SpotRecord(
             id: UUID(),
             name: "Zulu Spot",
             latitude: 37.7849544,
             longitude: -122.4317274,
             createdAt: .now,
         )
-        let spotM = Spot(
+        let spotM = SpotRecord(
             id: UUID(),
             name: "Mike Spot",
             latitude: 37.7749,
@@ -163,21 +163,21 @@ struct RealSpotsRepositoryTests {
 
     @Test("Fetch spots sorted by name ascending")
     func testFetchSpotsSortByNameAscending() async throws {
-        let spotA = Spot(
+        let spotA = SpotRecord(
             id: UUID(),
             name: "Alpha Spot",
             latitude: 37.7849447,
             longitude: -122.4303306,
             createdAt: .now,
         )
-        let spotZ = Spot(
+        let spotZ = SpotRecord(
             id: UUID(),
             name: "Zulu Spot",
             latitude: 37.7849544,
             longitude: -122.4317274,
             createdAt: .now,
         )
-        let spotM = Spot(
+        let spotM = SpotRecord(
             id: UUID(),
             name: "Mike Spot",
             latitude: 37.7749,
@@ -205,21 +205,21 @@ struct RealSpotsRepositoryTests {
 
     @Test("Fetch spots sorted by name descending")
     func testFetchSpotsSortByNameDescending() async throws {
-        let spotA = Spot(
+        let spotA = SpotRecord(
             id: UUID(),
             name: "Alpha Spot",
             latitude: 37.7849447,
             longitude: -122.4303306,
             createdAt: .now,
         )
-        let spotZ = Spot(
+        let spotZ = SpotRecord(
             id: UUID(),
             name: "Zulu Spot",
             latitude: 37.7849544,
             longitude: -122.4317274,
             createdAt: .now,
         )
-        let spotM = Spot(
+        let spotM = SpotRecord(
             id: UUID(),
             name: "Mike Spot",
             latitude: 37.7749,
@@ -254,7 +254,7 @@ struct RealSpotsRepositoryTests {
         )
 
         // Spot 1: Very close (Mission District, ~1km away)
-        let spot1 = Spot(
+        let spot1 = SpotRecord(
             id: UUID(),
             name: "Close Spot",
             latitude: 37.7849447,
@@ -262,7 +262,7 @@ struct RealSpotsRepositoryTests {
             createdAt: .now,
         )
         // Spot 2: Medium distance (Oakland, ~10km away)
-        let spot2 = Spot(
+        let spot2 = SpotRecord(
             id: UUID(),
             name: "Medium Spot",
             latitude: 37.8044,
@@ -270,7 +270,7 @@ struct RealSpotsRepositoryTests {
             createdAt: .now,
         )
         // Spot 3: Far (San Jose, ~70km away)
-        let spot3 = Spot(
+        let spot3 = SpotRecord(
             id: UUID(),
             name: "Far Spot",
             latitude: 37.3382,
@@ -306,7 +306,7 @@ struct RealSpotsRepositoryTests {
         )
 
         // Spot 1: Very close (Mission District, ~1km away)
-        let spot1 = Spot(
+        let spot1 = SpotRecord(
             id: UUID(),
             name: "Close Spot",
             latitude: 37.7849447,
@@ -314,7 +314,7 @@ struct RealSpotsRepositoryTests {
             createdAt: .now,
         )
         // Spot 2: Medium distance (Oakland, ~10km away)
-        let spot2 = Spot(
+        let spot2 = SpotRecord(
             id: UUID(),
             name: "Medium Spot",
             latitude: 37.8044,
@@ -322,7 +322,7 @@ struct RealSpotsRepositoryTests {
             createdAt: .now,
         )
         // Spot 3: Far (San Jose, ~70km away)
-        let spot3 = Spot(
+        let spot3 = SpotRecord(
             id: UUID(),
             name: "Far Spot",
             latitude: 37.3382,
@@ -359,7 +359,7 @@ struct RealSpotsRepositoryTests {
 
         // Create spots at varying distances but in different directions
         // Spot 1: North (37.7849, -122.4194) - very close
-        let spot1 = Spot(
+        let spot1 = SpotRecord(
             id: UUID(),
             name: "North Spot",
             latitude: 37.7849,
@@ -367,7 +367,7 @@ struct RealSpotsRepositoryTests {
             createdAt: .now,
         )
         // Spot 2: South (37.7649, -122.4194) - very close
-        let spot2 = Spot(
+        let spot2 = SpotRecord(
             id: UUID(),
             name: "South Spot",
             latitude: 37.7649,
@@ -375,7 +375,7 @@ struct RealSpotsRepositoryTests {
             createdAt: .now,
         )
         // Spot 3: East (37.7749, -122.4094) - very close
-        let spot3 = Spot(
+        let spot3 = SpotRecord(
             id: UUID(),
             name: "East Spot",
             latitude: 37.7749,
@@ -383,7 +383,7 @@ struct RealSpotsRepositoryTests {
             createdAt: .now,
         )
         // Spot 4: West (37.7749, -122.4294) - very close
-        let spot4 = Spot(
+        let spot4 = SpotRecord(
             id: UUID(),
             name: "West Spot",
             latitude: 37.7749,
@@ -421,7 +421,7 @@ struct RealSpotsRepositoryTests {
             longitude: -122.4194,
         )
 
-        let spot = Spot(
+        let spot = SpotRecord(
             id: UUID(),
             name: "Single Spot",
             latitude: 37.7849447,
@@ -467,21 +467,21 @@ struct RealSpotsRepositoryTests {
 
     @Test("Fetch spots with query filter returns matching spots")
     func testFetchSpotsWithQuery() async throws {
-        let spot1 = Spot(
+        let spot1 = SpotRecord(
             id: UUID(),
             name: "Coffee Shop",
             latitude: 37.7849447,
             longitude: -122.4303306,
             createdAt: .now,
         )
-        let spot2 = Spot(
+        let spot2 = SpotRecord(
             id: UUID(),
             name: "Pizza Place",
             latitude: 37.7849544,
             longitude: -122.4317274,
             createdAt: .now,
         )
-        let spot3 = Spot(
+        let spot3 = SpotRecord(
             id: UUID(),
             name: "Coffee Bar",
             latitude: 37.7749,
@@ -511,21 +511,21 @@ struct RealSpotsRepositoryTests {
 
     @Test("Fetch spots with query filter sorted by name")
     func testFetchSpotsWithQuerySortByName() async throws {
-        let spot1 = Spot(
+        let spot1 = SpotRecord(
             id: UUID(),
             name: "Coffee Shop",
             latitude: 37.7849447,
             longitude: -122.4303306,
             createdAt: .now,
         )
-        let spot2 = Spot(
+        let spot2 = SpotRecord(
             id: UUID(),
             name: "Coffee Bar",
             latitude: 37.7749,
             longitude: -122.4194,
             createdAt: .now,
         )
-        let spot3 = Spot(
+        let spot3 = SpotRecord(
             id: UUID(),
             name: "Coffee House",
             latitude: 37.7849544,
@@ -560,7 +560,7 @@ struct RealSpotsRepositoryTests {
         )
 
         // Close spot matching query
-        let spot1 = Spot(
+        let spot1 = SpotRecord(
             id: UUID(),
             name: "Coffee Shop",
             latitude: 37.7849447,
@@ -568,7 +568,7 @@ struct RealSpotsRepositoryTests {
             createdAt: .now,
         )
         // Far spot matching query
-        let spot2 = Spot(
+        let spot2 = SpotRecord(
             id: UUID(),
             name: "Coffee Bar",
             latitude: 37.3382,
@@ -576,7 +576,7 @@ struct RealSpotsRepositoryTests {
             createdAt: .now,
         )
         // Close spot not matching query
-        let spot3 = Spot(
+        let spot3 = SpotRecord(
             id: UUID(),
             name: "Pizza Place",
             latitude: 37.7849544,
@@ -605,14 +605,14 @@ struct RealSpotsRepositoryTests {
 
     @Test("Fetch spots with empty query returns all spots")
     func testFetchSpotsWithEmptyQuery() async throws {
-        let spot1 = Spot(
+        let spot1 = SpotRecord(
             id: UUID(),
             name: "Coffee Shop",
             latitude: 37.7849447,
             longitude: -122.4303306,
             createdAt: .now,
         )
-        let spot2 = Spot(
+        let spot2 = SpotRecord(
             id: UUID(),
             name: "Pizza Place",
             latitude: 37.7849544,
@@ -638,14 +638,14 @@ struct RealSpotsRepositoryTests {
 
     @Test("Fetch spots with nil query returns all spots")
     func testFetchSpotsWithNilQuery() async throws {
-        let spot1 = Spot(
+        let spot1 = SpotRecord(
             id: UUID(),
             name: "Coffee Shop",
             latitude: 37.7849447,
             longitude: -122.4303306,
             createdAt: .now,
         )
-        let spot2 = Spot(
+        let spot2 = SpotRecord(
             id: UUID(),
             name: "Pizza Place",
             latitude: 37.7849544,
@@ -671,14 +671,14 @@ struct RealSpotsRepositoryTests {
 
     @Test("Fetch spots with query that matches no spots returns empty array")
     func testFetchSpotsWithNoMatches() async throws {
-        let spot1 = Spot(
+        let spot1 = SpotRecord(
             id: UUID(),
             name: "Coffee Shop",
             latitude: 37.7849447,
             longitude: -122.4303306,
             createdAt: .now,
         )
-        let spot2 = Spot(
+        let spot2 = SpotRecord(
             id: UUID(),
             name: "Pizza Place",
             latitude: 37.7849544,
@@ -703,21 +703,21 @@ struct RealSpotsRepositoryTests {
 
     @Test("Fetch spots with partial query match")
     func testFetchSpotsWithPartialMatch() async throws {
-        let spot1 = Spot(
+        let spot1 = SpotRecord(
             id: UUID(),
             name: "Great Coffee Shop",
             latitude: 37.7849447,
             longitude: -122.4303306,
             createdAt: .now,
         )
-        let spot2 = Spot(
+        let spot2 = SpotRecord(
             id: UUID(),
             name: "Pizza Place",
             latitude: 37.7849544,
             longitude: -122.4317274,
             createdAt: .now,
         )
-        let spot3 = Spot(
+        let spot3 = SpotRecord(
             id: UUID(),
             name: "Best Coffee House",
             latitude: 37.7749,
@@ -761,14 +761,14 @@ struct RealSpotsRepositoryTests {
         let initialSpots = try await iterator.next()
         #expect(initialSpots?.isEmpty == true)
 
-        let spot1 = Spot(
+        let spot1 = SpotRecord(
             id: UUID(),
             name: "Coffee Shop",
             latitude: 37.7849447,
             longitude: -122.4303306,
             createdAt: .now,
         )
-        let spot2 = Spot(
+        let spot2 = SpotRecord(
             id: UUID(),
             name: "Pizza Place",
             latitude: 37.7849544,
@@ -804,7 +804,7 @@ struct RealSpotsRepositoryTests {
         let initialSpots = try await iterator.next()
         #expect(initialSpots?.isEmpty == true)
 
-        let testSpot = Spot(
+        let testSpot = SpotRecord(
             id: UUID(),
             name: "Test Spot",
             latitude: 37.7849447,
@@ -821,21 +821,21 @@ struct RealSpotsRepositoryTests {
 
     @Test("Observe spots with name sort emits sorted results")
     func testObserveSpotsNameSort() async throws {
-        let spotA = Spot(
+        let spotA = SpotRecord(
             id: UUID(),
             name: "Alpha Spot",
             latitude: 37.7849447,
             longitude: -122.4303306,
             createdAt: .now,
         )
-        let spotZ = Spot(
+        let spotZ = SpotRecord(
             id: UUID(),
             name: "Zulu Spot",
             latitude: 37.7849544,
             longitude: -122.4317274,
             createdAt: .now,
         )
-        let spotM = Spot(
+        let spotM = SpotRecord(
             id: UUID(),
             name: "Mike Spot",
             latitude: 37.7749,
@@ -872,7 +872,7 @@ struct RealSpotsRepositoryTests {
         )
 
         // Spot 1: Very close (Mission District, ~1km away)
-        let spot1 = Spot(
+        let spot1 = SpotRecord(
             id: UUID(),
             name: "Close Spot",
             latitude: 37.7849447,
@@ -880,7 +880,7 @@ struct RealSpotsRepositoryTests {
             createdAt: .now,
         )
         // Spot 2: Medium distance (Oakland, ~10km away)
-        let spot2 = Spot(
+        let spot2 = SpotRecord(
             id: UUID(),
             name: "Medium Spot",
             latitude: 37.8044,
@@ -888,7 +888,7 @@ struct RealSpotsRepositoryTests {
             createdAt: .now,
         )
         // Spot 3: Far (San Jose, ~70km away)
-        let spot3 = Spot(
+        let spot3 = SpotRecord(
             id: UUID(),
             name: "Far Spot",
             latitude: 37.3382,
@@ -927,7 +927,7 @@ struct RealSpotsRepositoryTests {
         let initialSpots = try await iterator.next()
         #expect(initialSpots?.isEmpty == true)
 
-        let testSpot = Spot(
+        let testSpot = SpotRecord(
             id: UUID(),
             name: "Original Name",
             latitude: 37.7849447,
@@ -951,7 +951,7 @@ struct RealSpotsRepositoryTests {
 
     @Test("Create spot with all optional fields")
     func testCreateSpotWithOptionalFields() async throws {
-        let testSpot = Spot(
+        let testSpot = SpotRecord(
             id: UUID(),
             mapkitId: "mapkit-123",
             remoteId: "remote-456",
@@ -970,7 +970,7 @@ struct RealSpotsRepositoryTests {
 
     @Test("Create spot without optional fields")
     func testCreateSpotWithoutOptionalFields() async throws {
-        let testSpot = Spot(
+        let testSpot = SpotRecord(
             id: UUID(),
             name: "Minimal Spot",
             latitude: 37.7849447,
@@ -990,7 +990,7 @@ struct RealSpotsRepositoryTests {
 
     @Test("Fetch spot by SpotIDs with UUID successfully")
     func testFetchSpotBySpotIDsWithUUID() async throws {
-        let testSpot = Spot(
+        let testSpot = SpotRecord(
             id: UUID(),
             mapkitId: "mapkit-123",
             remoteId: "remote-456",
@@ -1010,7 +1010,7 @@ struct RealSpotsRepositoryTests {
 
     @Test("Fetch spot by SpotIDs with mapkitId successfully")
     func testFetchSpotBySpotIDsWithMapkitId() async throws {
-        let testSpot = Spot(
+        let testSpot = SpotRecord(
             id: UUID(),
             mapkitId: "mapkit-123",
             remoteId: "remote-456",
@@ -1031,7 +1031,7 @@ struct RealSpotsRepositoryTests {
 
     @Test("Fetch spot by SpotIDs with remoteId successfully")
     func testFetchSpotBySpotIDsWithRemoteId() async throws {
-        let testSpot = Spot(
+        let testSpot = SpotRecord(
             id: UUID(),
             mapkitId: "mapkit-123",
             remoteId: "remote-456",
@@ -1052,7 +1052,7 @@ struct RealSpotsRepositoryTests {
 
     @Test("Fetch spot by SpotIDs with UUID and mapkitId matches by UUID")
     func testFetchSpotBySpotIDsWithUUIDAndMapkitId() async throws {
-        let testSpot = Spot(
+        let testSpot = SpotRecord(
             id: UUID(),
             mapkitId: "mapkit-123",
             remoteId: "remote-456",
@@ -1072,7 +1072,7 @@ struct RealSpotsRepositoryTests {
 
     @Test("Fetch spot by SpotIDs with UUID and mapkitId matches by mapkitId")
     func testFetchSpotBySpotIDsWithUUIDAndMapkitIdMatchesMapkitId() async throws {
-        let testSpot = Spot(
+        let testSpot = SpotRecord(
             id: UUID(),
             mapkitId: "mapkit-123",
             remoteId: "remote-456",
@@ -1093,7 +1093,7 @@ struct RealSpotsRepositoryTests {
 
     @Test("Fetch spot by SpotIDs with all IDs provided")
     func testFetchSpotBySpotIDsWithAllIDs() async throws {
-        let testSpot = Spot(
+        let testSpot = SpotRecord(
             id: UUID(),
             mapkitId: "mapkit-123",
             remoteId: "remote-456",
@@ -1137,7 +1137,7 @@ struct RealSpotsRepositoryTests {
 
     @Test("Fetch spot by SpotIDs matches spot with only mapkitId when searching by mapkitId")
     func testFetchSpotBySpotIDsMatchesByMapkitIdOnly() async throws {
-        let testSpot = Spot(
+        let testSpot = SpotRecord(
             id: UUID(),
             mapkitId: "mapkit-123",
             name: "Test Spot",
@@ -1156,7 +1156,7 @@ struct RealSpotsRepositoryTests {
 
     @Test("Fetch spot by SpotIDs matches spot with only remoteId when searching by remoteId")
     func testFetchSpotBySpotIDsMatchesByRemoteIdOnly() async throws {
-        let testSpot = Spot(
+        let testSpot = SpotRecord(
             id: UUID(),
             remoteId: "remote-456",
             name: "Test Spot",
@@ -1177,7 +1177,7 @@ struct RealSpotsRepositoryTests {
 
     @Test("Save creates new spot when spot does not exist")
     func testSaveCreatesNewSpot() async throws {
-        let newSpot = Spot(
+        let newSpot = SpotRecord(
             id: UUID(),
             mapkitId: "mapkit-123",
             remoteId: "remote-456",
@@ -1203,7 +1203,7 @@ struct RealSpotsRepositoryTests {
 
     @Test("Save updates existing spot when found by id")
     func testSaveUpdatesExistingSpotByID() async throws {
-        let originalSpot = Spot(
+        let originalSpot = SpotRecord(
             id: UUID(),
             mapkitId: "mapkit-123",
             remoteId: "remote-456",
@@ -1215,7 +1215,7 @@ struct RealSpotsRepositoryTests {
 
         _ = try await repository.create(spot: originalSpot)
 
-        let updatedSpot = Spot(
+        let updatedSpot = SpotRecord(
             id: originalSpot.id,
             mapkitId: originalSpot.mapkitId,
             remoteId: "updated-remote-id",
@@ -1238,7 +1238,7 @@ struct RealSpotsRepositoryTests {
 
     @Test("Save updates existing spot when found by mapkitId")
     func testSaveUpdatesExistingSpotByMapkitId() async throws {
-        let originalSpot = Spot(
+        let originalSpot = SpotRecord(
             id: UUID(),
             mapkitId: "mapkit-123",
             remoteId: "remote-456",
@@ -1250,7 +1250,7 @@ struct RealSpotsRepositoryTests {
 
         _ = try await repository.create(spot: originalSpot)
 
-        let updatedSpot = Spot(
+        let updatedSpot = SpotRecord(
             id: UUID(), // Different ID
             mapkitId: "mapkit-123", // Same mapkitId
             remoteId: "updated-remote-id",
@@ -1273,7 +1273,7 @@ struct RealSpotsRepositoryTests {
 
     @Test("Save updates existing spot when found by remoteId")
     func testSaveUpdatesExistingSpotByRemoteId() async throws {
-        let originalSpot = Spot(
+        let originalSpot = SpotRecord(
             id: UUID(),
             mapkitId: "mapkit-123",
             remoteId: "remote-456",
@@ -1285,7 +1285,7 @@ struct RealSpotsRepositoryTests {
 
         _ = try await repository.create(spot: originalSpot)
 
-        let updatedSpot = Spot(
+        let updatedSpot = SpotRecord(
             id: UUID(), // Different ID
             mapkitId: nil, // No mapkitId
             remoteId: "remote-456", // Same remoteId
@@ -1308,7 +1308,7 @@ struct RealSpotsRepositoryTests {
     @Test("Save updates only mutable fields and preserves others")
     func testSaveUpdatesOnlyMutableFields() async throws {
         let originalDate = Date(timeIntervalSince1970: 1000)
-        let originalSpot = Spot(
+        let originalSpot = SpotRecord(
             id: UUID(),
             mapkitId: "mapkit-123",
             remoteId: "remote-456",
@@ -1320,7 +1320,7 @@ struct RealSpotsRepositoryTests {
 
         _ = try await repository.create(spot: originalSpot)
 
-        let updatedSpot = Spot(
+        let updatedSpot = SpotRecord(
             id: originalSpot.id, // Same ID to find the existing record
             mapkitId: "different-mapkit", // Different mapkitId (should be ignored/preserved)
             remoteId: "updated-remote-id",
@@ -1346,7 +1346,7 @@ struct RealSpotsRepositoryTests {
 
     @Test("Save creates new spot when no matching IDs found")
     func testSaveCreatesNewSpotWhenNoMatch() async throws {
-        let existingSpot = Spot(
+        let existingSpot = SpotRecord(
             id: UUID(),
             mapkitId: "mapkit-123",
             remoteId: "remote-456",
@@ -1358,7 +1358,7 @@ struct RealSpotsRepositoryTests {
 
         _ = try await repository.create(spot: existingSpot)
 
-        let newSpot = Spot(
+        let newSpot = SpotRecord(
             id: UUID(), // Different ID
             mapkitId: "different-mapkit", // Different mapkitId
             remoteId: "different-remote", // Different remoteId
@@ -1387,7 +1387,7 @@ struct RealSpotsRepositoryTests {
 
         let repository = RealSpotsRepository(db: db)
 
-        let testSpot = Spot(
+        let testSpot = SpotRecord(
             id: UUID(),
             name: "Test Spot",
             latitude: 37.7849447,
@@ -1433,7 +1433,7 @@ struct RealSpotsRepositoryTests {
 
         let repository = RealSpotsRepository(db: db)
 
-        let originalSpot = Spot(
+        let originalSpot = SpotRecord(
             id: UUID(),
             name: "Original Spot",
             latitude: 37.7849447,
@@ -1484,7 +1484,7 @@ struct RealSpotsRepositoryTests {
 
         let repository = RealSpotsRepository(db: db)
 
-        let newSpot = Spot(
+        let newSpot = SpotRecord(
             id: UUID(),
             name: "New Spot",
             latitude: 37.7849447,

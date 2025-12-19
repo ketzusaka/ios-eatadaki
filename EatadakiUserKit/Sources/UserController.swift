@@ -4,11 +4,11 @@ import Observation
 
 @Observable
 public class UserController {
-    public private(set) var user: User?
+    public private(set) var user: UserRecord?
 
     private let userRepository: any UserRepository
 
-    public init(userRepository: any UserRepository, user: User?) {
+    public init(userRepository: any UserRepository, user: UserRecord?) {
         self.userRepository = userRepository
         self.user = user
     }

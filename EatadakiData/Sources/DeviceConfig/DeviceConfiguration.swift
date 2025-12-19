@@ -16,7 +16,7 @@ public enum DeviceConfigurationKey: String, Codable, DatabaseValueConvertible {
     }
 }
 
-public struct DeviceConfiguration: Codable {
+public struct DeviceConfigurationRecord: Codable {
     public var key: DeviceConfigurationKey
     public var value: String
 
@@ -26,6 +26,6 @@ public struct DeviceConfiguration: Codable {
     }
 }
 
-extension DeviceConfiguration: TableRecord, FetchableRecord, PersistableRecord {
+extension DeviceConfigurationRecord: TableRecord, FetchableRecord, PersistableRecord {
     public static var databaseTableName: String { "deviceConfiguration" }
 }

@@ -4,12 +4,12 @@ import Foundation
 import MapKit
 import Testing
 
-@Suite("SpotInfoDetail Tests")
-struct SpotInfoDetailTests {
+@Suite("SpotInfoDetailed Tests")
+struct SpotInfoDetailedTests {
     @Test("init from spot sets correct id")
     func testInitFromSpotSetsCorrectId() {
         let spotId = UUID()
-        let spot = Spot(
+        let spot = SpotRecord(
             id: spotId,
             mapkitId: "I6FD7682FD36BB3BE",
             name: "Test Spot",
@@ -18,25 +18,25 @@ struct SpotInfoDetailTests {
             createdAt: .now,
         )
 
-        let detail = SpotInfoDetail(from: spot)
+        let detail = SpotInfoDetailed(from: spot)
 
         #expect(detail.id == spotId)
     }
 
     @Test("init from spot sets correct name")
     func testInitFromSpotSetsCorrectName() {
-        let spot = Spot.peacePagoda
+        let spot = SpotRecord.peacePagoda
 
-        let detail = SpotInfoDetail(from: spot)
+        let detail = SpotInfoDetailed(from: spot)
 
         #expect(detail.name == "Peace Pagoda")
     }
 
     @Test("init from spot sets correct coordinates")
     func testInitFromSpotSetsCorrectCoordinates() {
-        let spot = Spot.peacePagoda
+        let spot = SpotRecord.peacePagoda
 
-        let detail = SpotInfoDetail(from: spot)
+        let detail = SpotInfoDetailed(from: spot)
 
         #expect(detail.coordinates.latitude == 37.7849447)
         #expect(detail.coordinates.longitude == -122.4303306)
@@ -44,7 +44,7 @@ struct SpotInfoDetailTests {
 
     @Test("init from spot with different coordinates")
     func testInitFromSpotWithDifferentCoordinates() {
-        let spot = Spot(
+        let spot = SpotRecord(
             id: UUID(),
             mapkitId: "I6FD7682FD36BB3BE",
             name: "Test Spot",
@@ -53,17 +53,17 @@ struct SpotInfoDetailTests {
             createdAt: .now,
         )
 
-        let detail = SpotInfoDetail(from: spot)
+        let detail = SpotInfoDetailed(from: spot)
 
         #expect(detail.coordinates.latitude == 40.7128)
         #expect(detail.coordinates.longitude == -74.0060)
     }
 
-    @Test("SpotInfoDetail is Identifiable")
-    func testSpotInfoDetailIsIdentifiable() {
-        let spot = Spot.peacePagoda
+    @Test("SpotInfoDetailed is Identifiable")
+    func testSpotInfoDetailedIsIdentifiable() {
+        let spot = SpotRecord.peacePagoda
 
-        let detail = SpotInfoDetail(from: spot)
+        let detail = SpotInfoDetailed(from: spot)
 
         // Verify it conforms to Identifiable by checking it has an id property
         let identifiableId: UUID = detail.id

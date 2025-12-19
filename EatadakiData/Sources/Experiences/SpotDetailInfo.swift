@@ -1,16 +1,15 @@
 import Foundation
 import GRDB
 
-public struct SpotDetailInfo: FetchableRecord, Decodable, Sendable {
-    public var spot: Spot
-    public var experiences: [Experience]
+public struct SpotInfoDetailed: FetchableRecord, Decodable, Sendable {
+    public var spot: SpotRecord
+    public var experiences: [ExperienceRecord]
 
     public init(
-        spot: Spot,
-        experiences: [Experience],
+        spot: SpotRecord,
+        experiences: [ExperienceRecord],
     ) {
         self.spot = spot
         self.experiences = experiences
     }
 }
-

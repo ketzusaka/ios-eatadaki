@@ -19,7 +19,7 @@ public final class SpotsDetailViewModel {
     public enum Stage: Equatable, Sendable {
         case uninitialized // App hasn't called `initialized()`
         case initializing // Reading detail data
-        case loaded(SpotInfoDetail) // Fetching finished successfully
+        case loaded(SpotInfoDetailed) // Fetching finished successfully
         case loadingFailed(SpotsDetailViewModelError) // Fetching finished unsuccessfully
     }
 
@@ -29,7 +29,7 @@ public final class SpotsDetailViewModel {
     public var stage: Stage = .uninitialized
 
     public var preview: Preview?
-    public var spotDetail: SpotInfoDetail? {
+    public var spotDetail: SpotInfoDetailed? {
         switch stage {
         case .loaded(let spotDetail):
             spotDetail
@@ -44,7 +44,7 @@ public final class SpotsDetailViewModel {
 
     public init(
         dependencies: SpotsDetailViewModelDependencies,
-        spotInfoListing: SpotInfoListing,
+        spotInfoListing: SpotInfoSummary,
     ) {
         self.dependencies = dependencies
         self.spotIds = SpotIDs(id: spotInfoListing.id)
@@ -68,7 +68,7 @@ public final class SpotsDetailViewModel {
         do {
             // TODO: We should route through a dep that can hit the network(s) if no cached record.
             let spot = try await dependencies.spotsRepository.fetchSpot(withIDs: spotIds)
-            let spotInfoDetail = SpotInfoDetail(from: spot)
+            let spotInfoDetail = SpotInfoDetailed(from: spot)
             stage = .loaded(spotInfoDetail)
         } catch {
             stage = .loadingFailed(.unableToLoad)

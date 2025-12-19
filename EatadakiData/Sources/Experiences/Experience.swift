@@ -1,7 +1,7 @@
 import Foundation
 import GRDB
 
-public struct Experience: Codable, Sendable {
+public struct ExperienceRecord: Codable, Sendable {
     public var id: UUID
     public var spotId: UUID
     public var remoteId: String?
@@ -19,8 +19,8 @@ public struct Experience: Codable, Sendable {
     }
 }
 
-extension Experience: TableRecord, FetchableRecord, PersistableRecord {
+extension ExperienceRecord: TableRecord, FetchableRecord, PersistableRecord {
     public static var databaseTableName: String { "experiences" }
-    
-    public static let spot = belongsTo(Spot.self)
+
+    public static let spot = belongsTo(SpotRecord.self)
 }

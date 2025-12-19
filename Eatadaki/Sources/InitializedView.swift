@@ -46,7 +46,7 @@ struct InitializedView: View {
 }
 
 #Preview("Authenticated") {
-    let fakeUser = User(id: UUID(), email: "test@example.com", createdAt: .now)
+    let fakeUser = UserRecord(id: UUID(), email: "test@example.com", createdAt: .now)
     let fakeUserDataService = FakeUserDataService {
         $0.stubUserRepository = FakeUserRepository {
             $0.stubFetchUser = { fakeUser }

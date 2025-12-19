@@ -13,7 +13,7 @@ final public class UserDatabaseMigrator {
 
         migrator.registerMigration("v1") { db in
             // Create user table
-            try db.create(table: User.databaseTableName, ifNotExists: true) { t in
+            try db.create(table: UserRecord.databaseTableName, ifNotExists: true) { t in
                 t.column("id", .text).primaryKey()
                 t.column("email", .text).notNull()
                 t.column("createdAt", .datetime).notNull()

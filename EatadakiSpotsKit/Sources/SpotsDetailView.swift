@@ -13,7 +13,7 @@ public struct SpotsDetailView: View {
 
     public init(
         dependencies: SpotsDetailViewDependencies,
-        spotInfoListing: SpotInfoListing,
+        spotInfoListing: SpotInfoSummary,
     ) {
         self.viewModel = SpotsDetailViewModel(
             dependencies: dependencies,
@@ -77,13 +77,13 @@ public struct SpotsDetailView: View {
 #if DEBUG
 #Preview("Success from spot IDs") {
     let dependencies = FakeSpotsDetailViewModelDependencies {
-        $0.fakeSpotsRepository.stubFetchSpotWithIDs = { _ in Spot.peacePagoda }
+        $0.fakeSpotsRepository.stubFetchSpotWithIDs = { _ in SpotRecord.peacePagoda }
     }
 
     NavigationStack {
         SpotsDetailView(
             dependencies: dependencies,
-            spotIds: SpotIDs(mapkitId: Spot.peacePagoda.mapkitId),
+            spotIds: SpotIDs(mapkitId: SpotRecord.peacePagoda.mapkitId),
         )
         .environment(ThemeManager())
     }
@@ -91,7 +91,7 @@ public struct SpotsDetailView: View {
 
 #Preview("Preview data") {
     let dependencies = FakeSpotsDetailViewModelDependencies {
-        $0.fakeSpotsRepository.stubFetchSpotWithIDs = { (_) async throws(SpotsRepositoryError) -> Spot in
+        $0.fakeSpotsRepository.stubFetchSpotWithIDs = { (_) async throws(SpotsRepositoryError) -> SpotRecord in
             try? await Task.sleep(nanoseconds: .max)
             throw SpotsRepositoryError.spotNotFound
         }
@@ -100,7 +100,7 @@ public struct SpotsDetailView: View {
     NavigationStack {
         SpotsDetailView(
             dependencies: dependencies,
-            spotInfoListing: SpotInfoListing(from: Spot.peacePagoda),
+            spotInfoListing: SpotInfoSummary(from: SpotRecord.peacePagoda),
         )
         .environment(ThemeManager())
     }

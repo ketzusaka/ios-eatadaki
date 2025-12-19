@@ -27,7 +27,7 @@ public actor RealDeviceConfigurationController: DeviceConfigurationController {
         get async throws(DeviceConfigurationControllerError) {
             do {
                 return try await db.read { db in
-                    try Bool(DeviceConfiguration.fetchOne(db, key: DeviceConfigurationKey.optInLocationServices.rawValue)?.value ?? "false") ?? false
+                    try Bool(DeviceConfigurationRecord.fetchOne(db, key: DeviceConfigurationKey.optInLocationServices.rawValue)?.value ?? "false") ?? false
                 }
             } catch let error as DeviceConfigurationControllerError {
                 throw error
@@ -42,9 +42,9 @@ public actor RealDeviceConfigurationController: DeviceConfigurationController {
             try await db.write { db in
                 let keyString = DeviceConfigurationKey.optInLocationServices.rawValue
                 // Delete existing config if it exists
-                _ = try DeviceConfiguration.filter(Column("key") == keyString).deleteAll(db)
+                _ = try DeviceConfigurationRecord.filter(Column("key") == keyString).deleteAll(db)
                 // Insert new config
-                let config = DeviceConfiguration(key: .optInLocationServices, value: optInLocationServices ? "true" : "false")
+                let config = DeviceConfigurationRecord(key: .optInLocationServices, value: optInLocationServices ? "true" : "false")
                 try config.insert(db)
             }
         } catch let error as DeviceConfigurationControllerError {

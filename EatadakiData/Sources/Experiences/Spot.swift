@@ -7,7 +7,7 @@ public enum SpotReason: String, Codable, Sendable {
     case foundAndViewed = "foundAndViewed"
 }
 
-public struct Spot: Codable, Identifiable, Sendable {
+public struct SpotRecord: Codable, Identifiable, Sendable {
     public var id: UUID
     public var mapkitId: String?
     public var remoteId: String?
@@ -38,12 +38,12 @@ public struct Spot: Codable, Identifiable, Sendable {
     }
 }
 
-extension Spot: TableRecord, FetchableRecord, PersistableRecord {
+extension SpotRecord: TableRecord, FetchableRecord, PersistableRecord {
     public static var databaseTableName: String { "spots" }
-    
-    public static let experiences = hasMany(Experience.self)
 
-    public mutating func update(with spot: Spot) {
+    public static let experiences = hasMany(ExperienceRecord.self)
+
+    public mutating func update(with spot: SpotRecord) {
         self.name = spot.name
         self.latitude = spot.latitude
         self.longitude = spot.longitude

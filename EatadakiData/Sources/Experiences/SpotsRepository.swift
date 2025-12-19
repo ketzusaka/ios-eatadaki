@@ -25,16 +25,16 @@ public struct SpotIDs: Equatable {
 }
 
 public protocol SpotsRepository: AnyObject {
-    func fetchSpot(withID id: UUID) async throws(SpotsRepositoryError) -> Spot
-    func fetchSpot(withIDs ids: SpotIDs) async throws(SpotsRepositoryError) -> Spot
-    func fetchSpots(request: FetchSpotsDataRequest) async throws(SpotsRepositoryError) -> [Spot]
-    func observeSpots(request: FetchSpotsDataRequest) async -> any AsyncSequence<[Spot], SpotsRepositoryError>
+    func fetchSpot(withID id: UUID) async throws(SpotsRepositoryError) -> SpotRecord
+    func fetchSpot(withIDs ids: SpotIDs) async throws(SpotsRepositoryError) -> SpotRecord
+    func fetchSpots(request: FetchSpotsDataRequest) async throws(SpotsRepositoryError) -> [SpotRecord]
+    func observeSpots(request: FetchSpotsDataRequest) async -> any AsyncSequence<[SpotRecord], SpotsRepositoryError>
 
     @discardableResult
-    func create(spot: Spot) async throws(SpotsRepositoryError) -> Spot
+    func create(spot: SpotRecord) async throws(SpotsRepositoryError) -> SpotRecord
 
     @discardableResult
-    func save(spot: Spot) async throws(SpotsRepositoryError) -> Spot
+    func save(spot: SpotRecord) async throws(SpotsRepositoryError) -> SpotRecord
 }
 
 public protocol SpotsRepositoryDependencies {
@@ -52,10 +52,10 @@ public actor RealSpotsRepository: SpotsRepository {
         self.db = db
     }
 
-    public func fetchSpot(withID id: UUID) async throws(SpotsRepositoryError) -> Spot {
+    public func fetchSpot(withID id: UUID) async throws(SpotsRepositoryError) -> SpotRecord {
         do {
             return try await db.read { db in
-                guard let spot = try Spot.fetchOne(db, key: id) else {
+                guard let spot = try SpotRecord.fetchOne(db, key: id) else {
                     throw SpotsRepositoryError.spotNotFound
                 }
                 return spot
@@ -67,7 +67,7 @@ public actor RealSpotsRepository: SpotsRepository {
         }
     }
 
-    public func fetchSpot(withIDs ids: SpotIDs) async throws(SpotsRepositoryError) -> Spot {
+    public func fetchSpot(withIDs ids: SpotIDs) async throws(SpotsRepositoryError) -> SpotRecord {
         guard ids.hasAnyID else {
             throw SpotsRepositoryError.noIDsProvided
         }
@@ -93,7 +93,7 @@ public actor RealSpotsRepository: SpotsRepository {
                     throw SpotsRepositoryError.noIDsProvided
                 }
 
-                let request = Spot.filter(condition)
+                let request = SpotRecord.filter(condition)
                 guard let spot = try request.fetchOne(db) else {
                     throw SpotsRepositoryError.spotNotFound
                 }
@@ -106,15 +106,15 @@ public actor RealSpotsRepository: SpotsRepository {
         }
     }
 
-    public func fetchSpots(request: FetchSpotsDataRequest = .default) async throws(SpotsRepositoryError) -> [Spot] {
+    public func fetchSpots(request: FetchSpotsDataRequest = .default) async throws(SpotsRepositoryError) -> [SpotRecord] {
         do {
             return try await db.read { db in
-                var baseQuery: QueryInterfaceRequest<Spot>
+                var baseQuery: QueryInterfaceRequest<SpotRecord>
 
                 if let query = request.query, !query.isEmpty {
-                    baseQuery = Spot.filter(Column("name").like("%\(query)%", escape: "\\"))
+                    baseQuery = SpotRecord.filter(Column("name").like("%\(query)%", escape: "\\"))
                 } else {
-                    baseQuery = Spot.all()
+                    baseQuery = SpotRecord.all()
                 }
 
                 switch request.sort.field {
@@ -153,7 +153,7 @@ public actor RealSpotsRepository: SpotsRepository {
                         coordinate.longitude,
                         coordinate.longitude,
                     ])
-                    return try Spot.fetchAll(db, sql: sql, arguments: StatementArguments(arguments))
+                    return try SpotRecord.fetchAll(db, sql: sql, arguments: StatementArguments(arguments))
                 }
             }
         } catch let error as SpotsRepositoryError {
@@ -163,14 +163,14 @@ public actor RealSpotsRepository: SpotsRepository {
         }
     }
 
-    public func observeSpots(request: FetchSpotsDataRequest = .default) async -> any AsyncSequence<[Spot], SpotsRepositoryError> {
-        let baseStream: any AsyncSequence<[Spot], Error>
+    public func observeSpots(request: FetchSpotsDataRequest = .default) async -> any AsyncSequence<[SpotRecord], SpotsRepositoryError> {
+        let baseStream: any AsyncSequence<[SpotRecord], Error>
         switch request.sort.field {
         case .name:
             let ordering = request.sort.direction == .ascending
                 ? Column("name").asc
                 : Column("name").desc
-            var query = Spot.all()
+            var query = SpotRecord.all()
             if let searchQuery = request.query, !searchQuery.isEmpty {
                 query = query.filter(Column("name").like("%\(searchQuery)%", escape: "\\"))
             }
@@ -210,13 +210,13 @@ public actor RealSpotsRepository: SpotsRepository {
                 coordinate.longitude,
             ])
             let observation = ValueObservation.tracking { db in
-                try Spot.fetchAll(db, sql: sql, arguments: StatementArguments(arguments))
+                try SpotRecord.fetchAll(db, sql: sql, arguments: StatementArguments(arguments))
             }
 
             baseStream = observation.values(in: db)
         }
 
-        return ErrorTransformingSequence<[Spot], SpotsRepositoryError>(
+        return ErrorTransformingSequence<[SpotRecord], SpotsRepositoryError>(
             baseStream: baseStream,
             transformError: { error in
                 if let spotsError = error as? SpotsRepositoryError {
@@ -229,7 +229,7 @@ public actor RealSpotsRepository: SpotsRepository {
     }
 
     @discardableResult
-    public func create(spot: Spot) async throws(SpotsRepositoryError) -> Spot {
+    public func create(spot: SpotRecord) async throws(SpotsRepositoryError) -> SpotRecord {
         do {
             return try await db.write { [weak self] db in
                 try spot.insert(db)
@@ -244,7 +244,7 @@ public actor RealSpotsRepository: SpotsRepository {
     }
 
     @discardableResult
-    public func save(spot: Spot) async throws(SpotsRepositoryError) -> Spot {
+    public func save(spot: SpotRecord) async throws(SpotsRepositoryError) -> SpotRecord {
         let spotIDs = SpotIDs(
             id: spot.id,
             mapkitId: spot.mapkitId,
@@ -271,7 +271,7 @@ public actor RealSpotsRepository: SpotsRepository {
         }
     }
 
-    nonisolated private func updateGeospatialIndex(for spot: Spot, in db: Database) throws {
+    nonisolated private func updateGeospatialIndex(for spot: SpotRecord, in db: Database) throws {
         let spotIdString = spot.id.uuidString
         let longitude = spot.longitude
         let latitude = spot.latitude

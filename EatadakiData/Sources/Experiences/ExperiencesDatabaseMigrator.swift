@@ -13,7 +13,7 @@ final public class ExperiencesDatabaseMigrator {
 
         migrator.registerMigration("v1") { db in
             // Create spots table
-            try db.create(table: Spot.databaseTableName, ifNotExists: true) { t in
+            try db.create(table: SpotRecord.databaseTableName, ifNotExists: true) { t in
                 t.column("id", .text).primaryKey()
                 t.column("mapkitId", .text)
                 t.column("remoteId", .text)
@@ -27,9 +27,9 @@ final public class ExperiencesDatabaseMigrator {
             try db.execute(sql: "CREATE INDEX IF NOT EXISTS spots_remoteId ON spots(remoteId) WHERE remoteId IS NOT NULL")
 
             // Create experiences table
-            try db.create(table: Experience.databaseTableName, ifNotExists: true) { t in
+            try db.create(table: ExperienceRecord.databaseTableName, ifNotExists: true) { t in
                 t.column("id", .text).primaryKey()
-                t.column("spotId", .text).notNull().references(Spot.databaseTableName, onDelete: .cascade)
+                t.column("spotId", .text).notNull().references(SpotRecord.databaseTableName, onDelete: .cascade)
                 t.column("remoteId", .text)
                 t.column("name", .text).notNull()
                 t.column("description", .text)

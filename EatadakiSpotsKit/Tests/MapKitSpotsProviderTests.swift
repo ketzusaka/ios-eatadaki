@@ -107,14 +107,14 @@ struct MapKitSpotsProviderTests {
         let result = try await provider.findSpots(request: testRequest)
 
         try #require(result.spots.count == 2)
-        #expect(result.spots[0].name == Spot.peacePagoda.name)
-        #expect(result.spots[0].mapkitId == Spot.peacePagoda.mapkitId)
-        #expect(result.spots[0].latitude == Spot.peacePagoda.latitude)
-        #expect(result.spots[0].longitude == Spot.peacePagoda.longitude)
-        #expect(result.spots[1].name == Spot.kinokuniya.name)
-        #expect(result.spots[1].mapkitId == Spot.kinokuniya.mapkitId)
-        #expect(result.spots[1].latitude == Spot.kinokuniya.latitude)
-        #expect(result.spots[1].longitude == Spot.kinokuniya.longitude)
+        #expect(result.spots[0].name == SpotRecord.peacePagoda.name)
+        #expect(result.spots[0].mapkitId == SpotRecord.peacePagoda.mapkitId)
+        #expect(result.spots[0].latitude == SpotRecord.peacePagoda.latitude)
+        #expect(result.spots[0].longitude == SpotRecord.peacePagoda.longitude)
+        #expect(result.spots[1].name == SpotRecord.kinokuniya.name)
+        #expect(result.spots[1].mapkitId == SpotRecord.kinokuniya.mapkitId)
+        #expect(result.spots[1].latitude == SpotRecord.kinokuniya.latitude)
+        #expect(result.spots[1].longitude == SpotRecord.kinokuniya.longitude)
     }
 
     @Test("findSpots filters out mapItems without identifier")
@@ -140,7 +140,7 @@ struct MapKitSpotsProviderTests {
 
         #expect(result.spots.count == 1)
         let spot = try #require(result.spots.first)
-        #expect(spot.name == Spot.peacePagoda.name)
+        #expect(spot.name == SpotRecord.peacePagoda.name)
     }
 
     @Test("findSpots filters out mapItems without name")
@@ -165,12 +165,12 @@ struct MapKitSpotsProviderTests {
         let result = try await provider.findSpots(request: testRequest)
 
         try #require(result.spots.count == 2)
-        #expect(result.spots[0].name == Spot.peacePagoda.name)
-        #expect(result.spots[0].mapkitId == Spot.peacePagoda.mapkitId)
-        #expect(result.spots[0].latitude == Spot.peacePagoda.latitude)
-        #expect(result.spots[0].longitude == Spot.peacePagoda.longitude)
+        #expect(result.spots[0].name == SpotRecord.peacePagoda.name)
+        #expect(result.spots[0].mapkitId == SpotRecord.peacePagoda.mapkitId)
+        #expect(result.spots[0].latitude == SpotRecord.peacePagoda.latitude)
+        #expect(result.spots[0].longitude == SpotRecord.peacePagoda.longitude)
         #expect(result.spots[1].name == "Unknown Location")
-        #expect(result.spots[1].mapkitId == Spot.kinokuniya.mapkitId)
+        #expect(result.spots[1].mapkitId == SpotRecord.kinokuniya.mapkitId)
     }
 
     @Test("findSpots wraps search errors in providerError")
@@ -229,10 +229,10 @@ struct MapKitSpotsProviderTests {
         includeName: Bool = true,
     ) -> TestableMapItem {
         createMockMapItem(
-            identifier: includeIdentifier ? Spot.peacePagoda.mapkitId : nil,
-            name: includeName ? Spot.peacePagoda.name : nil,
-            latitude: Spot.peacePagoda.latitude,
-            longitude: Spot.peacePagoda.longitude,
+            identifier: includeIdentifier ? SpotRecord.peacePagoda.mapkitId : nil,
+            name: includeName ? SpotRecord.peacePagoda.name : nil,
+            latitude: SpotRecord.peacePagoda.latitude,
+            longitude: SpotRecord.peacePagoda.longitude,
         )
     }
 
@@ -241,10 +241,10 @@ struct MapKitSpotsProviderTests {
         includeName: Bool = true,
     ) -> TestableMapItem {
         createMockMapItem(
-            identifier: includeIdentifier ? Spot.kinokuniya.mapkitId : nil,
-            name: includeName ? Spot.kinokuniya.name : nil,
-            latitude: Spot.kinokuniya.latitude,
-            longitude: Spot.kinokuniya.longitude,
+            identifier: includeIdentifier ? SpotRecord.kinokuniya.mapkitId : nil,
+            name: includeName ? SpotRecord.kinokuniya.name : nil,
+            latitude: SpotRecord.kinokuniya.latitude,
+            longitude: SpotRecord.kinokuniya.longitude,
         )
     }
 

@@ -1,7 +1,7 @@
 import Foundation
 import GRDB
 
-public struct User: Codable, Equatable {
+public struct UserRecord: Codable, Equatable {
     public var id: UUID
     public var email: String
     public var createdAt: Date
@@ -13,6 +13,6 @@ public struct User: Codable, Equatable {
     }
 }
 
-extension User: TableRecord, FetchableRecord, PersistableRecord {
+extension UserRecord: TableRecord, FetchableRecord, PersistableRecord {
     public static var databaseTableName: String { "user" }
 }

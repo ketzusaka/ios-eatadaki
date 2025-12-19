@@ -74,7 +74,7 @@ struct UserDatabaseMigratorTests {
 
         try migrator.migrate()
 
-        let testUser = User(
+        let testUser = UserRecord(
             id: UUID(),
             email: "test@example.com",
             createdAt: .now
@@ -85,7 +85,7 @@ struct UserDatabaseMigratorTests {
         }
 
         try db.read { database in
-            let fetchedUser = try #require(try? User.fetchOne(database))
+            let fetchedUser = try #require(try? UserRecord.fetchOne(database))
             #expect(fetchedUser.id == testUser.id)
             #expect(fetchedUser.email == testUser.email)
         }

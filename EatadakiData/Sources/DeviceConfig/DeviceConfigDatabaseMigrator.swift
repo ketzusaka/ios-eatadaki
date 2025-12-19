@@ -13,7 +13,7 @@ final public class DeviceConfigDatabaseMigrator {
 
         migrator.registerMigration("v1") { db in
             // Create device configuration table (key-value store)
-            try db.create(table: DeviceConfiguration.databaseTableName, ifNotExists: true) { t in
+            try db.create(table: DeviceConfigurationRecord.databaseTableName, ifNotExists: true) { t in
                 t.column("key", .text).primaryKey()
                 t.column("value", .text).notNull()
             }

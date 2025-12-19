@@ -176,7 +176,7 @@ struct RealSpotSearcherTests {
         }
 
         let repositoryError = SpotsRepositoryError.databaseError("Database save failed")
-        fakeRepository.stubSave = { (_) async throws(SpotsRepositoryError) -> Spot in
+        fakeRepository.stubSave = { (_) async throws(SpotsRepositoryError) -> SpotRecord in
             throw repositoryError
         }
 
@@ -225,12 +225,12 @@ struct RealSpotSearcherTests {
 
         var saveCallCount = 0
         let repositoryError = SpotsRepositoryError.databaseError("Database save failed")
-        fakeRepository.stubSave = { (_) async throws(SpotsRepositoryError) -> Spot in
+        fakeRepository.stubSave = { (_) async throws(SpotsRepositoryError) -> SpotRecord in
             saveCallCount += 1
             if saveCallCount == 1 {
                 throw repositoryError
             }
-            return Spot(
+            return SpotRecord(
                 id: UUID(),
                 name: "Should not reach here",
                 latitude: 0,

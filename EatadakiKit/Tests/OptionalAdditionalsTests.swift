@@ -66,4 +66,3 @@ struct OptionalAdditionalsTests {
         }
     }
 }
-

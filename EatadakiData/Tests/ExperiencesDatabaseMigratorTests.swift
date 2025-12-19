@@ -230,7 +230,7 @@ struct ExperiencesDatabaseMigratorTests {
 
         try migrator.migrate()
 
-        let testSpot = Spot(
+        let testSpot = SpotRecord(
             id: UUID(),
             mapkitId: "test-mapkit-id",
             remoteId: "test-remote-id",
@@ -246,7 +246,7 @@ struct ExperiencesDatabaseMigratorTests {
         }
 
         try db.read { database in
-            let fetchedSpot = try #require(try? Spot.fetchOne(database, key: testSpot.id))
+            let fetchedSpot = try #require(try? SpotRecord.fetchOne(database, key: testSpot.id))
             #expect(fetchedSpot.id == testSpot.id)
             #expect(fetchedSpot.name == testSpot.name)
             #expect(fetchedSpot.mapkitId == testSpot.mapkitId)
@@ -263,7 +263,7 @@ struct ExperiencesDatabaseMigratorTests {
 
         try migrator.migrate()
 
-        let testSpot = Spot(
+        let testSpot = SpotRecord(
             id: UUID(),
             name: "Test Spot",
             latitude: 37.7849447,
@@ -272,7 +272,7 @@ struct ExperiencesDatabaseMigratorTests {
             reason: .findResult,
         )
 
-        let testExperience = Experience(
+        let testExperience = ExperienceRecord(
             id: UUID(),
             spotId: testSpot.id,
             remoteId: "test-remote-id",
@@ -287,7 +287,7 @@ struct ExperiencesDatabaseMigratorTests {
         }
 
         try db.read { database in
-            let fetchedExperience = try #require(try? Experience.fetchOne(database, key: testExperience.id))
+            let fetchedExperience = try #require(try? ExperienceRecord.fetchOne(database, key: testExperience.id))
             #expect(fetchedExperience.id == testExperience.id)
             #expect(fetchedExperience.spotId == testExperience.spotId)
             #expect(fetchedExperience.name == testExperience.name)
@@ -395,7 +395,7 @@ struct ExperiencesDatabaseMigratorTests {
 
         try migrator.migrate()
 
-        let testSpot = Spot(
+        let testSpot = SpotRecord(
             id: UUID(),
             mapkitId: "test-mapkit-id",
             remoteId: "test-remote-id",
@@ -463,7 +463,7 @@ struct ExperiencesDatabaseMigratorTests {
 
         // Insert a few spots
         let spots = [
-            Spot(
+            SpotRecord(
                 id: UUID(),
                 name: "Spot 1",
                 latitude: centerLat,
@@ -471,7 +471,7 @@ struct ExperiencesDatabaseMigratorTests {
                 createdAt: .now,
                 reason: .findResult,
             ),
-            Spot(
+            SpotRecord(
                 id: UUID(),
                 name: "Spot 2",
                 latitude: centerLat + 0.01,
@@ -479,7 +479,7 @@ struct ExperiencesDatabaseMigratorTests {
                 createdAt: .now,
                 reason: .findResult,
             ),
-            Spot(
+            SpotRecord(
                 id: UUID(),
                 name: "Spot 3",
                 latitude: centerLat + 1.0,
