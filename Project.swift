@@ -243,5 +243,37 @@ let project = Project(
             sources: ["Eatadaki/Tests/UITests/**"],
             dependencies: [.target(name: "Eatadaki")]
         )
+    ],
+    schemes: [
+        .scheme(
+            name: "All Unit Tests",
+            buildAction: .buildAction(
+                targets: [
+                    "Eatadaki",
+                    "EatadakiUI",
+                    "EatadakiData",
+                    "EatadakiKit",
+                    "EatadakiLocationKit",
+                    "EatadakiSpotsKit",
+                    "EatadakiExperiencesKit",
+                    "EatadakiUserKit"
+                ]
+            ),
+            testAction: .targets(
+                [
+                    // "EatadakiTests",
+                    "EatadakiDataTests",
+                    "EatadakiKitTests",
+                    "EatadakiLocationKitTests",
+                    "EatadakiSpotsKitTests",
+                    // "EatadakiExperiencesKitTests",
+                    // "EatadakiUserKitTests",
+                ],
+                configuration: .debug,
+                options: .options(
+                    coverage: true
+                )
+            )
+        )
     ]
 )

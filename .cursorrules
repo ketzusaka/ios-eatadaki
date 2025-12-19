@@ -88,6 +88,10 @@ public class FakeFileSystemProvider: FileSystemProvider {
 
 - **Tuist Generation**: Always use `tuist generate --no-open` to prevent Xcode from automatically opening after generation. This avoids interrupting the user's workflow.
 - **Command Output**: Do not use `tail`, `head`, `grep`, or similar tools with commands. These commands prevent seeing the full command output as it's emitted. Always run commands directly without piping to `tail` or `head`.
+- **Validating Changes**: When making code changes that should be validated:
+  1. Generate the project: `tuist generate --no-open`
+  2. Build and run the "All Unit Tests" scheme: `xcodebuild test -workspace ios-eatadaki/Eatadaki.xcworkspace -scheme "All Unit Tests" -destination 'platform=iOS Simulator,name=iPhone 17 Pro'`
+  3. This ensures all unit tests pass before considering changes complete
 
 ## SwiftUI Preview Guidelines
 
