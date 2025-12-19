@@ -48,8 +48,8 @@ struct RealSpotsRepositoryTests {
         _ = try await repository.create(spot: testSpot)
         let fetchedSpot = try await repository.fetchSpot(withID: testSpot.id)
 
-        #expect(fetchedSpot.id == testSpot.id)
-        #expect(fetchedSpot.name == testSpot.name)
+        #expect(fetchedSpot.spot.id == testSpot.id)
+        #expect(fetchedSpot.spot.name == testSpot.name)
     }
 
     @Test("Fetch spot by ID throws notFound when spot does not exist")
@@ -82,8 +82,8 @@ struct RealSpotsRepositoryTests {
         let spots = try await repository.fetchSpots()
 
         #expect(spots.count == 1)
-        #expect(spots.first?.id == testSpot.id)
-        #expect(spots.first?.name == testSpot.name)
+        #expect(spots.first?.spot.id == testSpot.id)
+        #expect(spots.first?.spot.name == testSpot.name)
     }
 
     @Test("Fetch all spots returns multiple spots")
@@ -117,7 +117,7 @@ struct RealSpotsRepositoryTests {
         let spots = try await repository.fetchSpots()
 
         #expect(spots.count == 3)
-        let spotIds = Set(spots.map { $0.id })
+        let spotIds = Set(spots.map(\.spot.id))
         #expect(spotIds.contains(spot1.id))
         #expect(spotIds.contains(spot2.id))
         #expect(spotIds.contains(spot3.id))
@@ -156,9 +156,9 @@ struct RealSpotsRepositoryTests {
         let spots = try await repository.fetchSpots()
 
         try #require(spots.count == 3)
-        #expect(spots[0].name == "Alpha Spot")
-        #expect(spots[1].name == "Mike Spot")
-        #expect(spots[2].name == "Zulu Spot")
+        #expect(spots[0].spot.name == "Alpha Spot")
+        #expect(spots[1].spot.name == "Mike Spot")
+        #expect(spots[2].spot.name == "Zulu Spot")
     }
 
     @Test("Fetch spots sorted by name ascending")
@@ -198,9 +198,9 @@ struct RealSpotsRepositoryTests {
         let spots = try await repository.fetchSpots(request: request)
 
         try #require(spots.count == 3)
-        #expect(spots[0].name == "Alpha Spot")
-        #expect(spots[1].name == "Mike Spot")
-        #expect(spots[2].name == "Zulu Spot")
+        #expect(spots[0].spot.name == "Alpha Spot")
+        #expect(spots[1].spot.name == "Mike Spot")
+        #expect(spots[2].spot.name == "Zulu Spot")
     }
 
     @Test("Fetch spots sorted by name descending")
@@ -240,9 +240,9 @@ struct RealSpotsRepositoryTests {
         let spots = try await repository.fetchSpots(request: request)
 
         #expect(spots.count == 3)
-        #expect(spots[0].name == "Zulu Spot")
-        #expect(spots[1].name == "Mike Spot")
-        #expect(spots[2].name == "Alpha Spot")
+        #expect(spots[0].spot.name == "Zulu Spot")
+        #expect(spots[1].spot.name == "Mike Spot")
+        #expect(spots[2].spot.name == "Alpha Spot")
     }
 
     @Test("Fetch spots sorted by distance ascending")
@@ -292,9 +292,9 @@ struct RealSpotsRepositoryTests {
 
         try #require(spots.count == 3)
         // Verify ordering: closest first
-        #expect(spots[0].name == "Close Spot")
-        #expect(spots[1].name == "Medium Spot")
-        #expect(spots[2].name == "Far Spot")
+        #expect(spots[0].spot.name == "Close Spot")
+        #expect(spots[1].spot.name == "Medium Spot")
+        #expect(spots[2].spot.name == "Far Spot")
     }
 
     @Test("Fetch spots sorted by distance descending")
@@ -344,9 +344,9 @@ struct RealSpotsRepositoryTests {
 
         try #require(spots.count == 3)
         // Verify ordering: farthest first
-        #expect(spots[0].name == "Far Spot")
-        #expect(spots[1].name == "Medium Spot")
-        #expect(spots[2].name == "Close Spot")
+        #expect(spots[0].spot.name == "Far Spot")
+        #expect(spots[1].spot.name == "Medium Spot")
+        #expect(spots[2].spot.name == "Close Spot")
     }
 
     @Test("Fetch spots sorted by distance with multiple spots at similar distances")
@@ -407,7 +407,7 @@ struct RealSpotsRepositoryTests {
         try #require(spots.count == 4)
         // All spots should be at approximately the same distance, so ordering should be consistent
         // Verify that the reference point is included in the results and sorting is stable
-        let spotNames = spots.map(\.name)
+        let spotNames = spots.map(\.spot.name)
         #expect(spotNames.contains("North Spot"))
         #expect(spotNames.contains("South Spot"))
         #expect(spotNames.contains("East Spot"))
@@ -441,8 +441,8 @@ struct RealSpotsRepositoryTests {
 
         #expect(spots.count == 1)
         let fetchedSpot = try #require(spots.first)
-        #expect(fetchedSpot.id == spot.id)
-        #expect(fetchedSpot.name == spot.name)
+        #expect(fetchedSpot.spot.id == spot.id)
+        #expect(fetchedSpot.spot.name == spot.name)
     }
 
     @Test("Fetch spots sorted by distance with empty results")
@@ -503,7 +503,7 @@ struct RealSpotsRepositoryTests {
         let spots = try await repository.fetchSpots(request: request)
 
         try #require(spots.count == 2)
-        let spotNames = spots.map(\.name)
+        let spotNames = spots.map(\.spot.name)
         #expect(spotNames.contains("Coffee Bar"))
         #expect(spotNames.contains("Coffee Shop"))
         #expect(!spotNames.contains("Pizza Place"))
@@ -547,9 +547,9 @@ struct RealSpotsRepositoryTests {
         let spots = try await repository.fetchSpots(request: request)
 
         try #require(spots.count == 3)
-        #expect(spots[0].name == "Coffee Bar")
-        #expect(spots[1].name == "Coffee House")
-        #expect(spots[2].name == "Coffee Shop")
+        #expect(spots[0].spot.name == "Coffee Bar")
+        #expect(spots[1].spot.name == "Coffee House")
+        #expect(spots[2].spot.name == "Coffee Shop")
     }
 
     @Test("Fetch spots with query filter sorted by distance")
@@ -599,8 +599,8 @@ struct RealSpotsRepositoryTests {
 
         try #require(spots.count == 2)
         // Should be sorted by distance: closer first
-        #expect(spots[0].name == "Coffee Shop")
-        #expect(spots[1].name == "Coffee Bar")
+        #expect(spots[0].spot.name == "Coffee Shop")
+        #expect(spots[1].spot.name == "Coffee Bar")
     }
 
     @Test("Fetch spots with empty query returns all spots")
@@ -633,7 +633,7 @@ struct RealSpotsRepositoryTests {
         let spots = try await repository.fetchSpots(request: request)
 
         try #require(spots.count == 2)
-        #expect(spots.map(\.name).sorted() == ["Coffee Shop", "Pizza Place"])
+        #expect(spots.map(\.spot.name).sorted() == ["Coffee Shop", "Pizza Place"])
     }
 
     @Test("Fetch spots with nil query returns all spots")
@@ -666,7 +666,7 @@ struct RealSpotsRepositoryTests {
         let spots = try await repository.fetchSpots(request: request)
 
         try #require(spots.count == 2)
-        #expect(spots.map(\.name).sorted() == ["Coffee Shop", "Pizza Place"])
+        #expect(spots.map(\.spot.name).sorted() == ["Coffee Shop", "Pizza Place"])
     }
 
     @Test("Fetch spots with query that matches no spots returns empty array")
@@ -739,7 +739,7 @@ struct RealSpotsRepositoryTests {
         let spots = try await repository.fetchSpots(request: request)
 
         try #require(spots.count == 2)
-        let spotNames = spots.map(\.name).sorted()
+        let spotNames = spots.map(\.spot.name).sorted()
         #expect(spotNames.contains("Best Coffee House"))
         #expect(spotNames.contains("Great Coffee Shop"))
         #expect(!spotNames.contains("Pizza Place"))
@@ -964,8 +964,8 @@ struct RealSpotsRepositoryTests {
         let createdSpot = try await repository.create(spot: testSpot)
         let fetchedSpot = try await repository.fetchSpot(withID: createdSpot.id)
 
-        #expect(fetchedSpot.mapkitId == "mapkit-123")
-        #expect(fetchedSpot.remoteId == "remote-456")
+        #expect(fetchedSpot.spot.mapkitId == "mapkit-123")
+        #expect(fetchedSpot.spot.remoteId == "remote-456")
     }
 
     @Test("Create spot without optional fields")
@@ -981,9 +981,9 @@ struct RealSpotsRepositoryTests {
         let createdSpot = try await repository.create(spot: testSpot)
         let fetchedSpot = try await repository.fetchSpot(withID: createdSpot.id)
 
-        #expect(fetchedSpot.mapkitId == nil)
-        #expect(fetchedSpot.remoteId == nil)
-        #expect(fetchedSpot.name == "Minimal Spot")
+        #expect(fetchedSpot.spot.mapkitId == nil)
+        #expect(fetchedSpot.spot.remoteId == nil)
+        #expect(fetchedSpot.spot.name == "Minimal Spot")
     }
 
     // MARK: - fetchSpot(withIDs:) Tests
@@ -1004,8 +1004,8 @@ struct RealSpotsRepositoryTests {
         let spotIDs = SpotIDs(id: testSpot.id)
         let fetchedSpot = try await repository.fetchSpot(withIDs: spotIDs)
 
-        #expect(fetchedSpot.id == testSpot.id)
-        #expect(fetchedSpot.name == testSpot.name)
+        #expect(fetchedSpot.spot.id == testSpot.id)
+        #expect(fetchedSpot.spot.name == testSpot.name)
     }
 
     @Test("Fetch spot by SpotIDs with mapkitId successfully")
@@ -1024,9 +1024,9 @@ struct RealSpotsRepositoryTests {
         let spotIDs = SpotIDs(mapkitId: testSpot.mapkitId)
         let fetchedSpot = try await repository.fetchSpot(withIDs: spotIDs)
 
-        #expect(fetchedSpot.id == testSpot.id)
-        #expect(fetchedSpot.mapkitId == testSpot.mapkitId)
-        #expect(fetchedSpot.name == testSpot.name)
+        #expect(fetchedSpot.spot.id == testSpot.id)
+        #expect(fetchedSpot.spot.mapkitId == testSpot.mapkitId)
+        #expect(fetchedSpot.spot.name == testSpot.name)
     }
 
     @Test("Fetch spot by SpotIDs with remoteId successfully")
@@ -1045,9 +1045,9 @@ struct RealSpotsRepositoryTests {
         let spotIDs = SpotIDs(remoteId: testSpot.remoteId)
         let fetchedSpot = try await repository.fetchSpot(withIDs: spotIDs)
 
-        #expect(fetchedSpot.id == testSpot.id)
-        #expect(fetchedSpot.remoteId == testSpot.remoteId)
-        #expect(fetchedSpot.name == testSpot.name)
+        #expect(fetchedSpot.spot.id == testSpot.id)
+        #expect(fetchedSpot.spot.remoteId == testSpot.remoteId)
+        #expect(fetchedSpot.spot.name == testSpot.name)
     }
 
     @Test("Fetch spot by SpotIDs with UUID and mapkitId matches by UUID")
@@ -1066,8 +1066,8 @@ struct RealSpotsRepositoryTests {
         let spotIDs = SpotIDs(id: testSpot.id, mapkitId: "different-mapkit-id")
         let fetchedSpot = try await repository.fetchSpot(withIDs: spotIDs)
 
-        #expect(fetchedSpot.id == testSpot.id)
-        #expect(fetchedSpot.name == testSpot.name)
+        #expect(fetchedSpot.spot.id == testSpot.id)
+        #expect(fetchedSpot.spot.name == testSpot.name)
     }
 
     @Test("Fetch spot by SpotIDs with UUID and mapkitId matches by mapkitId")
@@ -1086,9 +1086,9 @@ struct RealSpotsRepositoryTests {
         let spotIDs = SpotIDs(id: UUID(), mapkitId: testSpot.mapkitId)
         let fetchedSpot = try await repository.fetchSpot(withIDs: spotIDs)
 
-        #expect(fetchedSpot.id == testSpot.id)
-        #expect(fetchedSpot.mapkitId == testSpot.mapkitId)
-        #expect(fetchedSpot.name == testSpot.name)
+        #expect(fetchedSpot.spot.id == testSpot.id)
+        #expect(fetchedSpot.spot.mapkitId == testSpot.mapkitId)
+        #expect(fetchedSpot.spot.name == testSpot.name)
     }
 
     @Test("Fetch spot by SpotIDs with all IDs provided")
@@ -1111,10 +1111,10 @@ struct RealSpotsRepositoryTests {
         )
         let fetchedSpot = try await repository.fetchSpot(withIDs: spotIDs)
 
-        #expect(fetchedSpot.id == testSpot.id)
-        #expect(fetchedSpot.mapkitId == testSpot.mapkitId)
-        #expect(fetchedSpot.remoteId == testSpot.remoteId)
-        #expect(fetchedSpot.name == testSpot.name)
+        #expect(fetchedSpot.spot.id == testSpot.id)
+        #expect(fetchedSpot.spot.mapkitId == testSpot.mapkitId)
+        #expect(fetchedSpot.spot.remoteId == testSpot.remoteId)
+        #expect(fetchedSpot.spot.name == testSpot.name)
     }
 
     @Test("Fetch spot by SpotIDs throws noIDsProvided when all IDs are nil")
@@ -1150,8 +1150,8 @@ struct RealSpotsRepositoryTests {
         let spotIDs = SpotIDs(mapkitId: "mapkit-123")
         let fetchedSpot = try await repository.fetchSpot(withIDs: spotIDs)
 
-        #expect(fetchedSpot.id == testSpot.id)
-        #expect(fetchedSpot.mapkitId == "mapkit-123")
+        #expect(fetchedSpot.spot.id == testSpot.id)
+        #expect(fetchedSpot.spot.mapkitId == "mapkit-123")
     }
 
     @Test("Fetch spot by SpotIDs matches spot with only remoteId when searching by remoteId")
@@ -1169,8 +1169,8 @@ struct RealSpotsRepositoryTests {
         let spotIDs = SpotIDs(remoteId: "remote-456")
         let fetchedSpot = try await repository.fetchSpot(withIDs: spotIDs)
 
-        #expect(fetchedSpot.id == testSpot.id)
-        #expect(fetchedSpot.remoteId == "remote-456")
+        #expect(fetchedSpot.spot.id == testSpot.id)
+        #expect(fetchedSpot.spot.remoteId == "remote-456")
     }
 
     // MARK: - save(spot:) Tests
@@ -1197,8 +1197,8 @@ struct RealSpotsRepositoryTests {
 
         // Verify it was actually created
         let fetchedSpot = try await repository.fetchSpot(withID: savedSpot.id)
-        #expect(fetchedSpot.id == savedSpot.id)
-        #expect(fetchedSpot.name == savedSpot.name)
+        #expect(fetchedSpot.spot.id == savedSpot.id)
+        #expect(fetchedSpot.spot.name == savedSpot.name)
     }
 
     @Test("Save updates existing spot when found by id")

@@ -12,16 +12,16 @@ public typealias SpotsViewModelDependencies = LocationServiceProviding & DeviceC
 public final class SpotsViewModel {
     public struct Spot: Identifiable {
         public let backingData: SpotInfoSummary
-        
+
         public var id: UUID { backingData.spot.id }
         public var name: String { backingData.spot.name }
         public var coordinates: Coordinates { Coordinates(latitude: backingData.spot.latitude, longitude: backingData.spot.latitude) }
-        
+
         public init(from spotSummary: SpotInfoSummary) {
             self.backingData = spotSummary
         }
     }
-    
+
     public enum Stage {
         case uninitialized // App hasn't called `initialized()`
         case initializing // Determines opt-in state

@@ -13,9 +13,8 @@ public enum SpotsDetailViewModelError: Error, Equatable {
 public final class SpotDetailViewModel {
     /// The `Spot` data represented within this view model when loaded
     public struct Spot: Identifiable, Equatable, Sendable {
-        
         public let backingData: SpotRecord
-        
+
         public var id: UUID { backingData.id }
         public var name: String { backingData.name }
         public var coordinates: Coordinates { Coordinates(latitude: backingData.latitude, longitude: backingData.longitude) }
@@ -24,7 +23,7 @@ public final class SpotDetailViewModel {
             self.backingData = spotInfo
         }
     }
-    
+
     /// The `Spot` data represented within this view when we have some information, but not all.
     public struct Preview {
         public var name: String
@@ -82,9 +81,9 @@ public final class SpotDetailViewModel {
         stage = .initializing
         do {
             // TODO: We should route through a dep that can hit the network(s) if no cached record.
-            let spot = try await dependencies.spotsRepository.fetchSpot(withIDs: spotIds)
-            let spotInfoDetail = Spot(from: spot)
-            stage = .loaded(spotInfoDetail)
+            let spotInfoDetailed = try await dependencies.spotsRepository.fetchSpot(withIDs: spotIds)
+            let spot = Spot(from: spotInfoDetailed.spot)
+            stage = .loaded(spot)
         } catch {
             stage = .loadingFailed(.unableToLoad)
         }

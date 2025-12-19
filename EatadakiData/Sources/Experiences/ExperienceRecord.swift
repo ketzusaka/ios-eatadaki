@@ -22,5 +22,13 @@ public struct ExperienceRecord: Codable, Sendable {
 extension ExperienceRecord: TableRecord, FetchableRecord, PersistableRecord {
     public static var databaseTableName: String { "experiences" }
 
-    public static let spot = belongsTo(SpotRecord.self)
+    public static let spot = belongsTo(
+        SpotRecord.self,
+        using: ForeignKey(["spotId"])
+    )
+
+    public static let ratings = hasMany(
+        ExperienceRatingRecord.self,
+        using: ForeignKey(["experienceId"])
+    )
 }

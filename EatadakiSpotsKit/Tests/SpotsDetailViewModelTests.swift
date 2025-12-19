@@ -53,7 +53,9 @@ struct SpotDetailViewModelTests {
             longitude: -122.4303306,
             createdAt: .now,
         )
-        dependencies.fakeSpotsRepository.stubFetchSpotWithIDs = { _ in spot }
+        dependencies.fakeSpotsRepository.stubFetchSpotWithIDs = { _ in
+            SpotInfoDetailed(spot: spot, experiences: [])
+        }
         let spotIds = SpotIDs(mapkitId: SpotRecord.peacePagoda.mapkitId)
         let viewModel = SpotDetailViewModel(
             dependencies: dependencies,
@@ -96,7 +98,9 @@ struct SpotDetailViewModelTests {
             longitude: -122.4303306,
             createdAt: .now,
         )
-        dependencies.fakeSpotsRepository.stubFetchSpotWithIDs = { _ in spot }
+        dependencies.fakeSpotsRepository.stubFetchSpotWithIDs = { _ in
+            SpotInfoDetailed(spot: spot, experiences: [])
+        }
         let spotIds = SpotIDs(mapkitId: SpotRecord.peacePagoda.mapkitId)
         let viewModel = SpotDetailViewModel(
             dependencies: dependencies,
@@ -117,7 +121,7 @@ struct SpotDetailViewModelTests {
     @Test("initialize sets stage to loadingFailed on error")
     func testInitializeFailure() async {
         let dependencies = FakeSpotDetailViewModelDependencies()
-        dependencies.fakeSpotsRepository.stubFetchSpotWithIDs = { (_) async throws(SpotsRepositoryError) -> SpotRecord in
+        dependencies.fakeSpotsRepository.stubFetchSpotWithIDs = { (_) async throws(SpotsRepositoryError) -> SpotInfoDetailed in
             throw SpotsRepositoryError.spotNotFound
         }
         let spotIds = SpotIDs(mapkitId: SpotRecord.peacePagoda.mapkitId)
@@ -144,7 +148,9 @@ struct SpotDetailViewModelTests {
             longitude: -122.4303306,
             createdAt: .now,
         )
-        dependencies.fakeSpotsRepository.stubFetchSpotWithIDs = { _ in spot }
+        dependencies.fakeSpotsRepository.stubFetchSpotWithIDs = { _ in
+            SpotInfoDetailed(spot: spot, experiences: [])
+        }
         let spotIds = SpotIDs(mapkitId: SpotRecord.peacePagoda.mapkitId)
         let viewModel = SpotDetailViewModel(
             dependencies: dependencies,
@@ -180,7 +186,9 @@ struct SpotDetailViewModelTests {
             longitude: -122.4303306,
             createdAt: .now,
         )
-        dependencies.fakeSpotsRepository.stubFetchSpotWithIDs = { _ in spot }
+        dependencies.fakeSpotsRepository.stubFetchSpotWithIDs = { _ in
+            SpotInfoDetailed(spot: spot, experiences: [])
+        }
         let spotIds = SpotIDs(mapkitId: SpotRecord.peacePagoda.mapkitId)
         let viewModel = SpotDetailViewModel(
             dependencies: dependencies,

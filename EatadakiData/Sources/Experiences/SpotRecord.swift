@@ -41,7 +41,10 @@ public struct SpotRecord: Codable, Identifiable, Equatable, Sendable {
 extension SpotRecord: TableRecord, FetchableRecord, PersistableRecord {
     public static var databaseTableName: String { "spots" }
 
-    public static let experiences = hasMany(ExperienceRecord.self)
+    public static let experiences = hasMany(
+        ExperienceRecord.self,
+        using: ForeignKey(["spotId"])
+    )
 
     public mutating func update(with spot: SpotRecord) {
         self.name = spot.name

@@ -75,7 +75,9 @@ public struct SpotsDetailView: View {
 #if DEBUG
 #Preview("Success from spot IDs") {
     let dependencies = FakeSpotDetailViewModelDependencies {
-        $0.fakeSpotsRepository.stubFetchSpotWithIDs = { _ in SpotRecord.peacePagoda }
+        $0.fakeSpotsRepository.stubFetchSpotWithIDs = { _ in
+            SpotInfoDetailed(spot: SpotRecord.peacePagoda, experiences: [])
+        }
     }
 
     NavigationStack {
@@ -89,7 +91,7 @@ public struct SpotsDetailView: View {
 
 #Preview("Preview data") {
     let dependencies = FakeSpotDetailViewModelDependencies {
-        $0.fakeSpotsRepository.stubFetchSpotWithIDs = { (_) async throws(SpotsRepositoryError) -> SpotRecord in
+        $0.fakeSpotsRepository.stubFetchSpotWithIDs = { (_) async throws(SpotsRepositoryError) -> SpotInfoDetailed in
             try? await Task.sleep(nanoseconds: .max)
             throw SpotsRepositoryError.spotNotFound
         }

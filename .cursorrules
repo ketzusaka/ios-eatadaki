@@ -35,6 +35,10 @@ Please refer to the architecture documentation at `docs/ARCHITECTURE.md` for det
 - Consider the state machine when adding new features
 - Ensure proper state transitions
 - Maintain separation between UI, Data, and Business Logic layers
+
+## Terminal Commands
+
+- **Never use `head` or other output-limiting commands**: When running terminal commands, do not pipe output through `head`, `tail`, or similar commands. Show full output or use appropriate flags to control verbosity.
 - Update architecture documentation if making significant structural changes
 
 ## Testing Guidelines
@@ -87,7 +91,7 @@ public class FakeFileSystemProvider: FileSystemProvider {
 ## Development Workflow
 
 - **Tuist Generation**: Always use `tuist generate --no-open` to prevent Xcode from automatically opening after generation. This avoids interrupting the user's workflow.
-- **Command Output**: Do not use `tail`, `head`, `grep`, or similar tools with commands. These commands prevent seeing the full command output as it's emitted. Always run commands directly without piping to `tail` or `head`.
+- **Command Output**: **NEVER use `head`, `tail`, `grep`, or any other output-filtering or limiting commands**. Always run commands directly without any piping or filtering. Show the full, unfiltered output as it's emitted.
 - **Validating Changes**: When making code changes that should be validated:
   1. Generate the project: `tuist generate --no-open`
   2. Build and run the "All Unit Tests" scheme: `xcodebuild test -workspace ios-eatadaki/Eatadaki.xcworkspace -scheme "All Unit Tests" -destination 'platform=iOS Simulator,name=iPhone 17 Pro'`

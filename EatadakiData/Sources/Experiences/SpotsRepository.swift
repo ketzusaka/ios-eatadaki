@@ -25,9 +25,9 @@ public struct SpotIDs: Equatable {
 }
 
 public protocol SpotsRepository: AnyObject {
-    func fetchSpot(withID id: UUID) async throws(SpotsRepositoryError) -> SpotRecord
-    func fetchSpot(withIDs ids: SpotIDs) async throws(SpotsRepositoryError) -> SpotRecord
-    func fetchSpots(request: FetchSpotsDataRequest) async throws(SpotsRepositoryError) -> [SpotRecord]
+    func fetchSpot(withID id: UUID) async throws(SpotsRepositoryError) -> SpotInfoDetailed
+    func fetchSpot(withIDs ids: SpotIDs) async throws(SpotsRepositoryError) -> SpotInfoDetailed
+    func fetchSpots(request: FetchSpotsDataRequest) async throws(SpotsRepositoryError) -> [SpotInfoSummary]
     func observeSpots(request: FetchSpotsDataRequest) async -> any AsyncSequence<[SpotInfoSummary], SpotsRepositoryError>
 
     @discardableResult
@@ -52,13 +52,16 @@ public actor RealSpotsRepository: SpotsRepository {
         self.db = db
     }
 
-    public func fetchSpot(withID id: UUID) async throws(SpotsRepositoryError) -> SpotRecord {
+    public func fetchSpot(withID id: UUID) async throws(SpotsRepositoryError) -> SpotInfoDetailed {
         do {
             return try await db.read { db in
-                guard let spot = try SpotRecord.fetchOne(db, key: id) else {
+                let request = SpotRecord
+                    .including(all: SpotRecord.experiences)
+                    .filter(id: id)
+                guard let spotInfo = try SpotInfoDetailed.fetchOne(db, request) else {
                     throw SpotsRepositoryError.spotNotFound
                 }
-                return spot
+                return spotInfo
             }
         } catch let error as SpotsRepositoryError {
             throw error
@@ -67,37 +70,22 @@ public actor RealSpotsRepository: SpotsRepository {
         }
     }
 
-    public func fetchSpot(withIDs ids: SpotIDs) async throws(SpotsRepositoryError) -> SpotRecord {
+    public func fetchSpot(withIDs ids: SpotIDs) async throws(SpotsRepositoryError) -> SpotInfoDetailed {
         guard ids.hasAnyID else {
             throw SpotsRepositoryError.noIDsProvided
         }
 
         do {
             return try await db.read { db in
-                var condition: SQLSpecificExpressible?
-
-                if let id = ids.id {
-                    let idCondition = Column("id") == id
-                    condition = condition.map { $0 || idCondition } ?? idCondition
-                }
-                if let mapkitId = ids.mapkitId {
-                    let mapkitCondition = Column("mapkitId") == mapkitId
-                    condition = condition.map { $0 || mapkitCondition } ?? mapkitCondition
-                }
-                if let remoteId = ids.remoteId {
-                    let remoteCondition = Column("remoteId") == remoteId
-                    condition = condition.map { $0 || remoteCondition } ?? remoteCondition
-                }
-
-                guard let condition else {
-                    throw SpotsRepositoryError.noIDsProvided
-                }
-
-                let request = SpotRecord.filter(condition)
-                guard let spot = try request.fetchOne(db) else {
+                let condition = try ids.condition
+                
+                let request = SpotRecord
+                    .including(all: SpotRecord.experiences)
+                    .filter(condition)
+                guard let spotInfo = try SpotInfoDetailed.fetchOne(db, request) else {
                     throw SpotsRepositoryError.spotNotFound
                 }
-                return spot
+                return spotInfo
             }
         } catch let error as SpotsRepositoryError {
             throw error
@@ -106,7 +94,7 @@ public actor RealSpotsRepository: SpotsRepository {
         }
     }
 
-    public func fetchSpots(request: FetchSpotsDataRequest = .default) async throws(SpotsRepositoryError) -> [SpotRecord] {
+    public func fetchSpots(request: FetchSpotsDataRequest = .default) async throws(SpotsRepositoryError) -> [SpotInfoSummary] {
         do {
             return try await db.read { db in
                 var baseQuery: QueryInterfaceRequest<SpotRecord>
@@ -122,7 +110,8 @@ public actor RealSpotsRepository: SpotsRepository {
                     let ordering = request.sort.direction == .ascending
                         ? Column("name").asc
                         : Column("name").desc
-                    return try baseQuery.order(ordering).fetchAll(db)
+                    let spots = try baseQuery.order(ordering).fetchAll(db)
+                    return spots.map { SpotInfoSummary(spot: $0) }
 
                 case .distance(let coordinate):
                     let orderDirection = request.sort.direction == .ascending ? "ASC" : "DESC"
@@ -153,7 +142,8 @@ public actor RealSpotsRepository: SpotsRepository {
                         coordinate.longitude,
                         coordinate.longitude,
                     ])
-                    return try SpotRecord.fetchAll(db, sql: sql, arguments: StatementArguments(arguments))
+                    let spots = try SpotRecord.fetchAll(db, sql: sql, arguments: StatementArguments(arguments))
+                    return spots.map { SpotInfoSummary(spot: $0) }
                 }
             }
         } catch let error as SpotsRepositoryError {
@@ -251,6 +241,43 @@ public actor RealSpotsRepository: SpotsRepository {
         }
     }
 
+    private func fetchSpotRecord(withID id: UUID) async throws(SpotsRepositoryError) -> SpotRecord {
+        do {
+            return try await db.read { db in
+                guard let spot = try SpotRecord.fetchOne(db, key: id) else {
+                    throw SpotsRepositoryError.spotNotFound
+                }
+                return spot
+            }
+        } catch let error as SpotsRepositoryError {
+            throw error
+        } catch {
+            throw SpotsRepositoryError.databaseError(error.localizedDescription)
+        }
+    }
+
+    private func fetchSpotRecord(withIDs ids: SpotIDs) async throws(SpotsRepositoryError) -> SpotRecord {
+        guard ids.hasAnyID else {
+            throw SpotsRepositoryError.noIDsProvided
+        }
+
+        do {
+            return try await db.read { db in
+                let condition = try ids.condition
+
+                let request = SpotRecord.filter(condition)
+                guard let spot = try request.fetchOne(db) else {
+                    throw SpotsRepositoryError.spotNotFound
+                }
+                return spot
+            }
+        } catch let error as SpotsRepositoryError {
+            throw error
+        } catch {
+            throw SpotsRepositoryError.databaseError(error.localizedDescription)
+        }
+    }
+
     @discardableResult
     public func save(spot: SpotRecord) async throws(SpotsRepositoryError) -> SpotRecord {
         let spotIDs = SpotIDs(
@@ -261,7 +288,7 @@ public actor RealSpotsRepository: SpotsRepository {
 
         do {
             // Try to find an existing spot
-            var existingSpot = try await fetchSpot(withIDs: spotIDs)
+            var existingSpot = try await fetchSpotRecord(withIDs: spotIDs)
             existingSpot.update(with: spot)
 
             return try await db.write { [existingSpot, weak self] db in
@@ -319,5 +346,32 @@ public actor RealSpotsRepository: SpotsRepository {
             sql: "DELETE FROM spots_geospatial_index WHERE spotId = ?",
             arguments: [spotIdString]
         )
+    }
+}
+
+extension SpotIDs {
+    var condition: SQLSpecificExpressible {
+        get throws {
+            var condition: SQLSpecificExpressible?
+
+            if let id {
+                let idCondition = Column("id") == id
+                condition = condition.map { $0 || idCondition } ?? idCondition
+            }
+            if let mapkitId {
+                let mapkitCondition = Column("mapkitId") == mapkitId
+                condition = condition.map { $0 || mapkitCondition } ?? mapkitCondition
+            }
+            if let remoteId {
+                let remoteCondition = Column("remoteId") == remoteId
+                condition = condition.map { $0 || remoteCondition } ?? remoteCondition
+            }
+
+            guard let condition else {
+                throw SpotsRepositoryError.noIDsProvided
+            }
+            
+            return condition
+        }
     }
 }

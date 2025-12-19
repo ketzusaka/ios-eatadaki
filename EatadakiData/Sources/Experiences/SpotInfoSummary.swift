@@ -9,7 +9,7 @@ public struct SpotInfoSummary: FetchableRecord, Decodable, Sendable {
     ) {
         self.spot = spot
     }
-    
+
     public init(row: Row) throws {
         spot = try SpotRecord(row: row)
     }

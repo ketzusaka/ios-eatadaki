@@ -11,4 +11,9 @@ public struct ExperienceRatingRecord: Codable {
 
 extension ExperienceRatingRecord: TableRecord, FetchableRecord, PersistableRecord {
     public static var databaseTableName: String { "experiences_ratings" }
+
+    public static let experience = belongsTo(
+        ExperienceRecord.self,
+        using: ForeignKey(["experienceId"])
+    )
 }
