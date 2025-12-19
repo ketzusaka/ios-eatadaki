@@ -95,7 +95,7 @@ public struct SpotsView: View {
                 NavigationLink {
                     SpotsDetailView(
                         dependencies: dependencies,
-                        spotInfoListing: spot,
+                        spotInfoListing: spot.backingData,
                     )
                 } label: {
                     Text(spot.name)

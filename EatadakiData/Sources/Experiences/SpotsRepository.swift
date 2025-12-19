@@ -28,7 +28,7 @@ public protocol SpotsRepository: AnyObject {
     func fetchSpot(withID id: UUID) async throws(SpotsRepositoryError) -> SpotRecord
     func fetchSpot(withIDs ids: SpotIDs) async throws(SpotsRepositoryError) -> SpotRecord
     func fetchSpots(request: FetchSpotsDataRequest) async throws(SpotsRepositoryError) -> [SpotRecord]
-    func observeSpots(request: FetchSpotsDataRequest) async -> any AsyncSequence<[SpotRecord], SpotsRepositoryError>
+    func observeSpots(request: FetchSpotsDataRequest) async -> any AsyncSequence<[SpotInfoSummary], SpotsRepositoryError>
 
     @discardableResult
     func create(spot: SpotRecord) async throws(SpotsRepositoryError) -> SpotRecord
@@ -163,20 +163,28 @@ public actor RealSpotsRepository: SpotsRepository {
         }
     }
 
-    public func observeSpots(request: FetchSpotsDataRequest = .default) async -> any AsyncSequence<[SpotRecord], SpotsRepositoryError> {
-        let baseStream: any AsyncSequence<[SpotRecord], Error>
+    public func observeSpots(request: FetchSpotsDataRequest = .default) async -> any AsyncSequence<[SpotInfoSummary], SpotsRepositoryError> {
+        let baseStream: any AsyncSequence<[SpotInfoSummary], Error>
         switch request.sort.field {
         case .name:
-            let ordering = request.sort.direction == .ascending
-                ? Column("name").asc
-                : Column("name").desc
-            var query = SpotRecord.all()
+            let orderDirection = request.sort.direction == .ascending ? "ASC" : "DESC"
+            let sql: String
+            var arguments: [DatabaseValueConvertible] = []
             if let searchQuery = request.query, !searchQuery.isEmpty {
-                query = query.filter(Column("name").like("%\(searchQuery)%", escape: "\\"))
+                sql = """
+                    SELECT * FROM spots
+                    WHERE name LIKE ?
+                    ORDER BY name \(orderDirection)
+                """
+                arguments.append("%\(searchQuery)%")
+            } else {
+                sql = """
+                    SELECT * FROM spots
+                    ORDER BY name \(orderDirection)
+                """
             }
-            let orderedQuery = query.order(ordering)
             let observation = ValueObservation.tracking { db in
-                try orderedQuery.fetchAll(db)
+                try SpotInfoSummary.fetchAll(db, sql: sql, arguments: StatementArguments(arguments))
             }
 
             baseStream = observation.values(in: db)
@@ -210,13 +218,13 @@ public actor RealSpotsRepository: SpotsRepository {
                 coordinate.longitude,
             ])
             let observation = ValueObservation.tracking { db in
-                try SpotRecord.fetchAll(db, sql: sql, arguments: StatementArguments(arguments))
+                try SpotInfoSummary.fetchAll(db, sql: sql, arguments: StatementArguments(arguments))
             }
 
             baseStream = observation.values(in: db)
         }
 
-        return ErrorTransformingSequence<[SpotRecord], SpotsRepositoryError>(
+        return ErrorTransformingSequence<[SpotInfoSummary], SpotsRepositoryError>(
             baseStream: baseStream,
             transformError: { error in
                 if let spotsError = error as? SpotsRepositoryError {

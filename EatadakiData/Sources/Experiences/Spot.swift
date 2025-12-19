@@ -1,13 +1,13 @@
 import Foundation
 import GRDB
 
-public enum SpotReason: String, Codable, Sendable {
+public enum SpotReason: String, Codable, Equatable, Sendable {
     case createdByUser = "createdByUser"
     case findResult = "findResult"
     case foundAndViewed = "foundAndViewed"
 }
 
-public struct SpotRecord: Codable, Identifiable, Sendable {
+public struct SpotRecord: Codable, Identifiable, Equatable, Sendable {
     public var id: UUID
     public var mapkitId: String?
     public var remoteId: String?

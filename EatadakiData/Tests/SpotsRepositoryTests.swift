@@ -781,7 +781,7 @@ struct RealSpotsRepositoryTests {
         // Should only emit spots matching the query
         let filteredSpots = try await iterator.next()
         try #require(filteredSpots?.count == 1)
-        #expect(filteredSpots?.first?.name == "Coffee Shop")
+        #expect(filteredSpots?.first?.spot.name == "Coffee Shop")
     }
 
     // MARK: - observeSpots Tests
@@ -815,8 +815,8 @@ struct RealSpotsRepositoryTests {
 
         let spotsAfterCreate = try await iterator.next()
         try #require(spotsAfterCreate?.count == 1)
-        #expect(spotsAfterCreate?.first?.id == testSpot.id)
-        #expect(spotsAfterCreate?.first?.name == "Test Spot")
+        #expect(spotsAfterCreate?.first?.spot.id == testSpot.id)
+        #expect(spotsAfterCreate?.first?.spot.name == "Test Spot")
     }
 
     @Test("Observe spots with name sort emits sorted results")
@@ -859,9 +859,9 @@ struct RealSpotsRepositoryTests {
         let spotsOptional = try await iterator.next()
         let spots = try #require(spotsOptional)
         try #require(spots.count == 3)
-        #expect(spots[0].name == "Alpha Spot")
-        #expect(spots[1].name == "Mike Spot")
-        #expect(spots[2].name == "Zulu Spot")
+        #expect(spots[0].spot.name == "Alpha Spot")
+        #expect(spots[1].spot.name == "Mike Spot")
+        #expect(spots[2].spot.name == "Zulu Spot")
     }
 
     @Test("Observe spots with distance sort emits sorted results")
@@ -913,9 +913,9 @@ struct RealSpotsRepositoryTests {
         let spots = try #require(spotsOptional)
         try #require(spots.count == 3)
         // Verify ordering: closest first
-        #expect(spots[0].name == "Close Spot")
-        #expect(spots[1].name == "Medium Spot")
-        #expect(spots[2].name == "Far Spot")
+        #expect(spots[0].spot.name == "Close Spot")
+        #expect(spots[1].spot.name == "Medium Spot")
+        #expect(spots[2].spot.name == "Far Spot")
     }
 
     @Test("Observe spots emits updates when spot is saved")
@@ -938,7 +938,7 @@ struct RealSpotsRepositoryTests {
 
         let spotsAfterCreate = try await iterator.next()
         try #require(spotsAfterCreate?.count == 1)
-        #expect(spotsAfterCreate?.first?.name == "Original Name")
+        #expect(spotsAfterCreate?.first?.spot.name == "Original Name")
 
         var updatedSpot = testSpot
         updatedSpot.name = "Updated Name"
@@ -946,7 +946,7 @@ struct RealSpotsRepositoryTests {
 
         let spotsAfterSave = try await iterator.next()
         try #require(spotsAfterSave?.count == 1)
-        #expect(spotsAfterSave?.first?.name == "Updated Name")
+        #expect(spotsAfterSave?.first?.spot.name == "Updated Name")
     }
 
     @Test("Create spot with all optional fields")

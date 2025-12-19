@@ -51,14 +51,14 @@ public class FakeSpotsRepository: SpotsRepository {
     }
 
     public private(set) var invocationsObserveSpots: [FetchSpotsDataRequest] = []
-    public var stubObserveSpots: (FetchSpotsDataRequest) -> any AsyncSequence<[SpotRecord], SpotsRepositoryError> = { _ in
+    public var stubObserveSpots: (FetchSpotsDataRequest) -> any AsyncSequence<[SpotInfoSummary], SpotsRepositoryError> = { _ in
         struct EmptySpotsSequence: AsyncSequence {
-            typealias Element = [SpotRecord]
+            typealias Element = [SpotInfoSummary]
             typealias Failure = SpotsRepositoryError
             typealias AsyncIterator = Iterator
 
             struct Iterator: AsyncIteratorProtocol {
-                mutating func next() async throws(SpotsRepositoryError) -> [SpotRecord]? {
+                mutating func next() async throws(SpotsRepositoryError) -> [SpotInfoSummary]? {
                     nil
                 }
             }
@@ -70,7 +70,7 @@ public class FakeSpotsRepository: SpotsRepository {
         return EmptySpotsSequence()
     }
 
-    public func observeSpots(request: FetchSpotsDataRequest = .default) async -> any AsyncSequence<[SpotRecord], SpotsRepositoryError> {
+    public func observeSpots(request: FetchSpotsDataRequest = .default) async -> any AsyncSequence<[SpotInfoSummary], SpotsRepositoryError> {
         invocationsObserveSpots.append(request)
         return stubObserveSpots(request)
     }

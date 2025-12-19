@@ -9,13 +9,13 @@ public typealias SpotsDetailViewDependencies = SpotsDetailViewModelDependencies
 public struct SpotsDetailView: View {
     @Environment(ThemeManager.self) var themeManager
     @Environment(\.colorScheme) var colorScheme
-    @State var viewModel: SpotsDetailViewModel
+    @State var viewModel: SpotDetailViewModel
 
     public init(
         dependencies: SpotsDetailViewDependencies,
         spotInfoListing: SpotInfoSummary,
     ) {
-        self.viewModel = SpotsDetailViewModel(
+        self.viewModel = SpotDetailViewModel(
             dependencies: dependencies,
             spotInfoListing: spotInfoListing,
         )
@@ -25,27 +25,25 @@ public struct SpotsDetailView: View {
         dependencies: SpotsDetailViewModelDependencies,
         spotIds: SpotIDs,
     ) {
-        self.viewModel = SpotsDetailViewModel(
+        self.viewModel = SpotDetailViewModel(
             dependencies: dependencies,
             spotIds: spotIds,
         )
     }
 
     public var body: some View {
-        VStack {
+        ScrollView {
             switch viewModel.stage {
             case .uninitialized, .initializing:
                 if let preview = viewModel.preview {
                     mapView(name: preview.name, coordinates: preview.coordinates)
 
                     LoadingView()
-                    Spacer()
                 } else {
                     LoadingView()
                 }
-            case .loaded(let spotInfoDetail):
-                mapView(name: spotInfoDetail.name, coordinates: spotInfoDetail.coordinates)
-                Spacer()
+            case .loaded(let spot):
+                mapView(name: spot.name, coordinates: spot.coordinates)
             case .loadingFailed:
                 Text("Uh oh!")
             }
@@ -76,7 +74,7 @@ public struct SpotsDetailView: View {
 
 #if DEBUG
 #Preview("Success from spot IDs") {
-    let dependencies = FakeSpotsDetailViewModelDependencies {
+    let dependencies = FakeSpotDetailViewModelDependencies {
         $0.fakeSpotsRepository.stubFetchSpotWithIDs = { _ in SpotRecord.peacePagoda }
     }
 
@@ -90,7 +88,7 @@ public struct SpotsDetailView: View {
 }
 
 #Preview("Preview data") {
-    let dependencies = FakeSpotsDetailViewModelDependencies {
+    let dependencies = FakeSpotDetailViewModelDependencies {
         $0.fakeSpotsRepository.stubFetchSpotWithIDs = { (_) async throws(SpotsRepositoryError) -> SpotRecord in
             try? await Task.sleep(nanoseconds: .max)
             throw SpotsRepositoryError.spotNotFound
@@ -100,7 +98,7 @@ public struct SpotsDetailView: View {
     NavigationStack {
         SpotsDetailView(
             dependencies: dependencies,
-            spotInfoListing: SpotInfoSummary(from: SpotRecord.peacePagoda),
+            spotInfoListing: SpotInfoSummary(spot: SpotRecord.peacePagoda),
         )
         .environment(ThemeManager())
     }

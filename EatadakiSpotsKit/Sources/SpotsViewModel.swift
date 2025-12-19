@@ -10,6 +10,18 @@ public typealias SpotsViewModelDependencies = LocationServiceProviding & DeviceC
 @Observable
 @MainActor
 public final class SpotsViewModel {
+    public struct Spot: Identifiable {
+        public let backingData: SpotInfoSummary
+        
+        public var id: UUID { backingData.spot.id }
+        public var name: String { backingData.spot.name }
+        public var coordinates: Coordinates { Coordinates(latitude: backingData.spot.latitude, longitude: backingData.spot.latitude) }
+        
+        public init(from spotSummary: SpotInfoSummary) {
+            self.backingData = spotSummary
+        }
+    }
+    
     public enum Stage {
         case uninitialized // App hasn't called `initialized()`
         case initializing // Determines opt-in state
@@ -22,7 +34,7 @@ public final class SpotsViewModel {
 
     public var stage: Stage = .uninitialized
     public var currentLocation: CLLocation?
-    public var spots: [SpotInfoSummary] = []
+    public var spots: [Spot] = []
     public var hasReceivedContent = false
     public var searchQuery: String = "" {
         didSet {
@@ -101,16 +113,16 @@ public final class SpotsViewModel {
             guard let observation = await self?.dependencies.spotsRepository.observeSpots(request: request) else {
                 return
             }
-            for try await spots in observation {
+            for try await spotSummaries in observation {
                 guard !Task.isCancelled else { return }
                 guard let self else { return }
-                let listableSpots = spots.map(SpotInfoSummary.init(from:))
+                let listableSpots = spotSummaries.map(Spot.init(from:))
                 await self.updateSpots(with: listableSpots)
             }
         }
     }
 
-    private func updateSpots(with spots: [SpotInfoSummary]) async {
+    private func updateSpots(with spots: [Spot]) async {
         self.spots = spots
     }
 
