@@ -38,11 +38,11 @@ public final class AddExperienceViewModel {
                 spotId: spotId,
                 name: name,
                 description: description,
-                rating: CreateRating(
+                rating: showAddRating ? CreateRating(
                     spotId: spotId,
                     rating: experienceRating,
                     note: experienceNote.nilIfEmpty,
-                ),
+                ) : nil,
             )
 
             // TODO: Communicate back to the creator somehow that the experience was created so it can push into it.

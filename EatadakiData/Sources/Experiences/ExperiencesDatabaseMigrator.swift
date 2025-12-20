@@ -34,6 +34,8 @@ final public class ExperiencesDatabaseMigrator {
                 t.column("name", .text).notNull()
                 t.column("description", .text)
                 t.column("createdAt", .datetime).notNull()
+                t.column("rating", .integer)
+                t.column("ratingNote", .text)
             }
             try db.execute(sql: "CREATE INDEX IF NOT EXISTS experiences_remoteId ON experiences(remoteId) WHERE remoteId IS NOT NULL")
             try db.execute(sql: "CREATE INDEX IF NOT EXISTS experiences_spotId ON experiences(spotId)")

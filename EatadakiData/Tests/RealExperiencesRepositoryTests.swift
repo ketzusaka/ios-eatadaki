@@ -40,6 +40,8 @@ struct RealExperiencesRepositoryTests {
         #expect(experience.spotId == spot.id)
         #expect(experience.name == "Test Experience")
         #expect(experience.description == "A test experience")
+        #expect(experience.rating == 5)
+        #expect(experience.ratingNote == "Great experience!")
     }
 
     @Test("Create experience without description")
@@ -66,6 +68,8 @@ struct RealExperiencesRepositoryTests {
         #expect(experience.spotId == spot.id)
         #expect(experience.name == "Test Experience")
         #expect(experience.description == nil)
+        #expect(experience.rating == 4)
+        #expect(experience.ratingNote == nil)
     }
 
     @Test("Create experience creates rating in database")
@@ -97,6 +101,10 @@ struct RealExperiencesRepositoryTests {
         #expect(ratingRecord.experienceId == experience.id)
         #expect(ratingRecord.rating == 5)
         #expect(ratingRecord.notes == "Amazing!")
+        
+        // Verify cached rating fields on experience
+        #expect(experience.rating == 5)
+        #expect(experience.ratingNote == "Amazing!")
     }
 
     @Test("Create experience throws spotNotFound when spot does not exist")
@@ -168,6 +176,10 @@ struct RealExperiencesRepositoryTests {
         let ratingRecord = try #require(fetchedRating)
         #expect(ratingRecord.rating == 3)
         #expect(ratingRecord.notes == nil)
+        
+        // Verify cached rating fields on experience
+        #expect(experience.rating == 3)
+        #expect(experience.ratingNote == nil)
     }
 
     @Test("Create experience generates unique IDs")
@@ -264,8 +276,34 @@ struct RealExperiencesRepositoryTests {
         #expect(exp.id == experience.id)
         #expect(exp.name == "Test Experience")
         #expect(exp.description == "Test description")
+        #expect(exp.rating == 5)
+        #expect(exp.ratingNote == "Test note")
         #expect(rat.experienceId == experience.id)
         #expect(rat.rating == 5)
         #expect(rat.notes == "Test note")
+    }
+    
+    @Test("Create experience without rating has nil cached rating fields")
+    func testCreateExperienceWithoutRating() async throws {
+        let spot = SpotRecord(
+            id: UUID(),
+            name: "Test Spot",
+            latitude: 37.7849447,
+            longitude: -122.4303306,
+            createdAt: .now,
+        )
+        try await db.write { database in
+            try spot.insert(database)
+        }
+
+        let experience = try await repository.createExperience(
+            spotId: spot.id,
+            name: "Test Experience",
+            description: "A test experience",
+            rating: nil,
+        )
+
+        #expect(experience.rating == nil)
+        #expect(experience.ratingNote == nil)
     }
 }

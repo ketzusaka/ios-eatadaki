@@ -12,7 +12,7 @@ public protocol ExperiencesRepository: AnyObject {
         spotId: UUID,
         name: String,
         description: String?,
-        rating: CreateRating,
+        rating: CreateRating?,
     ) async throws(ExperiencesRepositoryError) -> ExperienceRecord
 }
 
@@ -31,10 +31,10 @@ public actor RealExperiencesRepository: ExperiencesRepository {
         spotId: UUID,
         name: String,
         description: String?,
-        rating: CreateRating,
+        rating: CreateRating?,
     ) async throws(ExperiencesRepositoryError) -> ExperienceRecord {
         // Validate that rating's spotId matches the provided spotId
-        guard rating.spotId == spotId else {
+        guard rating == nil || rating!.spotId == spotId else {
             throw ExperiencesRepositoryError.invalidRating
         }
 
@@ -45,26 +45,30 @@ public actor RealExperiencesRepository: ExperiencesRepository {
                     throw ExperiencesRepositoryError.spotNotFound
                 }
 
-                // Create experience
+                // Create experience with cached rating if provided
                 let experience = ExperienceRecord(
                     id: UUID(),
                     spotId: spotId,
                     remoteId: nil,
                     name: name,
                     description: description,
+                    rating: rating?.rating,
+                    ratingNote: rating?.note,
                     createdAt: .now,
                 )
                 try experience.insert(db)
 
-                // Create rating
-                let experienceRating = ExperienceRatingRecord(
-                    id: UUID(),
-                    experienceId: experience.id,
-                    rating: rating.rating,
-                    notes: rating.note,
-                    createdAt: .now,
-                )
-                try experienceRating.insert(db)
+                // Create rating record
+                if let rating  {
+                    let experienceRating = ExperienceRatingRecord(
+                        id: UUID(),
+                        experienceId: experience.id,
+                        rating: rating.rating,
+                        notes: rating.note,
+                        createdAt: .now,
+                    )
+                    try experienceRating.insert(db)
+                }
 
                 return experience
             }

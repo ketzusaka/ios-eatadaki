@@ -8,13 +8,26 @@ public struct ExperienceRecord: Identifiable, Codable, Equatable, Sendable {
     public var name: String
     public var description: String?
     public var createdAt: Date
+    public var rating: Int?
+    public var ratingNote: String?
 
-    public init(id: UUID, spotId: UUID, remoteId: String? = nil, name: String, description: String? = nil, createdAt: Date) {
+    public init(
+        id: UUID,
+        spotId: UUID,
+        remoteId: String? = nil,
+        name: String,
+        description: String? = nil,
+        rating: Int? = nil,
+        ratingNote: String? = nil,
+        createdAt: Date,
+    ) {
         self.id = id
         self.spotId = spotId
         self.remoteId = remoteId
         self.name = name
         self.description = description
+        self.rating = rating
+        self.ratingNote = ratingNote
         self.createdAt = createdAt
     }
 }
