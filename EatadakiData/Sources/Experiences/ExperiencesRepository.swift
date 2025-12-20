@@ -4,6 +4,7 @@ import GRDB
 public enum ExperiencesRepositoryError: Error, Equatable {
     case databaseError(String)
     case spotNotFound
+    case experienceNotFound
     case invalidRating
 }
 
@@ -16,6 +17,8 @@ public protocol ExperiencesRepository: AnyObject {
     ) async throws(ExperiencesRepositoryError) -> ExperienceRecord
     
     func fetchExperiences(request: FetchExperiencesDataRequest) async throws(ExperiencesRepositoryError) -> [ExperienceInfoSummary]
+    
+    func fetchExperience(withID id: UUID) async throws(ExperiencesRepositoryError) -> ExperienceInfoDetailed
 }
 
 public protocol ExperiencesRepositoryProviding {
@@ -87,6 +90,25 @@ public actor RealExperiencesRepository: ExperiencesRepository {
                 let query = ExperienceRecord
                     .including(required: ExperienceRecord.spot)
                 return try ExperienceInfoSummary.fetchAll(db, query)
+            }
+        } catch let error as ExperiencesRepositoryError {
+            throw error
+        } catch {
+            throw ExperiencesRepositoryError.databaseError(error.localizedDescription)
+        }
+    }
+
+    public func fetchExperience(withID id: UUID) async throws(ExperiencesRepositoryError) -> ExperienceInfoDetailed {
+        do {
+            return try await db.read { db in
+                let request = ExperienceRecord
+                    .including(required: ExperienceRecord.spot)
+                    .including(all: ExperienceRecord.ratings)
+                    .filter(id: id)
+                guard let experienceInfo = try ExperienceInfoDetailed.fetchOne(db, request) else {
+                    throw ExperiencesRepositoryError.experienceNotFound
+                }
+                return experienceInfo
             }
         } catch let error as ExperiencesRepositoryError {
             throw error
