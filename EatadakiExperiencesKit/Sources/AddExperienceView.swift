@@ -27,53 +27,49 @@ public struct AddExperienceView: View {
 
         NavigationStack {
             ScrollView {
-                VStack(alignment: .leading) {
-                    Text("Name")
-                        .headlineTextStyling(using: theme)
-
-                    TextField("We recommend matching the menu!", text: $viewModel.name)
-                }
-
-                Spacer(minLength: 24)
-
-                VStack(alignment: .leading) {
-                    Text("Description")
-                        .headlineTextStyling(using: theme)
-
-                    TextEditor(text: $viewModel.description)
-                        .overlay(
-                            RoundedRectangle(cornerRadius: 8)
-                                .stroke(Color.gray.opacity(0.3), lineWidth: 1)
+                VStack(spacing: 24) {
+                    VStack(alignment: .leading) {
+                        Text("Name")
+                            .headlineTextStyling(using: theme)
+                        
+                        TextField("We recommend matching the menu!", text: $viewModel.name)
+                    }
+                                        
+                    VStack(alignment: .leading) {
+                        Text("Description")
+                            .headlineTextStyling(using: theme)
+                        
+                        TextEditor(text: $viewModel.description)
+                            .overlay(
+                                RoundedRectangle(cornerRadius: 8)
+                                    .stroke(Color.gray.opacity(0.3), lineWidth: 1)
+                            )
+                            .frame(height: 150)
+                        
+                        Text("A description is optional.")
+                            .captionTextStyling(using: theme)
+                    }
+                                        
+                    VStack(alignment: .leading) {
+                        Text("Rating")
+                            .headlineTextStyling(using: theme)
+                        
+                        Toggle(isOn: $viewModel.showAddRating) {
+                            Text("Include a Rating?")
+                        }
+                    }
+                                        
+                    if viewModel.showAddRating {
+                        EditExperienceRatingView(
+                            rating: $viewModel.experienceRating,
+                            note: $viewModel.experienceNote,
                         )
-                        .frame(height: 150)
-
-                    Text("A description is optional.")
-                        .captionTextStyling(using: theme)
-                }
-
-                Spacer(minLength: 24)
-
-                VStack(alignment: .leading) {
-                    Text("Rating")
-                        .headlineTextStyling(using: theme)
-
-                    Toggle(isOn: $viewModel.showAddRating) {
-                        Text("Include a Rating?")
+                        .transition(.opacity)
                     }
                 }
-
-                Spacer(minLength: 24)
-
-                if viewModel.showAddRating {
-                    EditExperienceRatingView(
-                        rating: $viewModel.experienceRating,
-                        note: $viewModel.experienceNote,
-                    )
-                    .transition(.opacity)
-                }
+                .padding()
             }
             .animation(.easeInOut, value: viewModel.showAddRating)
-            .padding()
             .navigationTitle("Add Experience")
             .toolbar {
                 ToolbarItem(placement: .navigationBarLeading) {

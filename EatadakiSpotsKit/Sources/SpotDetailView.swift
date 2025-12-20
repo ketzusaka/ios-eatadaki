@@ -56,13 +56,31 @@ public struct SpotDetailView: View {
                 if spot.experiences.isEmpty {
                     noExperiencesView
                 } else {
-                    ForEach(spot.experiences) { experience in
-                        Text(experience.name)
+                    VStack(spacing: 8) {
+                        ForEach(spot.experiences) { experience in
+                            HStack {
+                                Text(experience.name)
+                                
+                                Spacer()
+                                
+                                if let rating = experience.rating {
+                                    Text(String(Double(rating) / 2))
+                                }
+                            }
+                            .padding()
+                            .overlay(
+                                RoundedRectangle(cornerRadius: 8)
+                                    .stroke(style: StrokeStyle(lineWidth: 1))
+                            )
+                            .padding([.leading, .trailing])
+                        }
                     }
 
                     Button("Add a new experience") {
                         viewModel.isShowingAddExperienceFlow = true
                     }
+                    
+                    Spacer(minLength: 16)
                 }
 
             case .loadingFailed:
