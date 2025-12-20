@@ -129,7 +129,8 @@ let project = Project(
                 .target(name: "EatadakiData"),
                 .target(name: "EatadakiKit"),
                 .target(name: "EatadakiLocationKit"),
-                .target(name: "EatadakiUI")
+                .target(name: "EatadakiUI"),
+                .target(name: "EatadakiExperiencesKit")
             ]
         ),
 

@@ -5,7 +5,7 @@ import EatadakiLocationKit
 import Foundation
 import Observation
 
-public typealias SpotsViewModelDependencies = LocationServiceProviding & DeviceConfigurationControllerProviding & SpotsRepositoryProviding & SpotsSearcherProviding
+public typealias SpotsViewModelDependencies = LocationServiceProviding & DeviceConfigurationControllerProviding & ExperiencesRepositoryProviding & SpotsRepositoryProviding & SpotsSearcherProviding
 
 @Observable
 @MainActor
@@ -149,7 +149,10 @@ public final class SpotsViewModel {
 }
 
 #if DEBUG
-public struct FakeSpotsViewModelDependencies: LocationServiceProviding, DeviceConfigurationControllerProviding, SpotsRepositoryProviding, SpotsSearcherProviding {
+public struct FakeSpotsViewModelDependencies: DeviceConfigurationControllerProviding, ExperiencesRepositoryProviding, LocationServiceProviding, SpotsRepositoryProviding, SpotsSearcherProviding {
+    public var fakeExperiencesRepository = FakeExperiencesRepository()
+    public var experiencesRepository: any ExperiencesRepository { fakeExperiencesRepository }
+
     public var fakeLocationService = FakeLocationService()
     public var locationService: LocationService { fakeLocationService }
 

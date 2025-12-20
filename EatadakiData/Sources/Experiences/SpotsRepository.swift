@@ -78,7 +78,7 @@ public actor RealSpotsRepository: SpotsRepository {
         do {
             return try await db.read { db in
                 let condition = try ids.condition
-                
+
                 let request = SpotRecord
                     .including(all: SpotRecord.experiences)
                     .filter(condition)
@@ -370,7 +370,7 @@ extension SpotIDs {
             guard let condition else {
                 throw SpotsRepositoryError.noIDsProvided
             }
-            
+
             return condition
         }
     }

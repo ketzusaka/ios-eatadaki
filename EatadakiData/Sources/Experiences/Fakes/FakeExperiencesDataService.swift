@@ -13,5 +13,13 @@ public class FakeExperiencesDataService: ExperiencesDataService {
         invokedCountSpotsRepository += 1
         return stubSpotsRepository
     }
+
+    public private(set) var invokedCountExperiencesRepository: Int = 0
+    public var stubExperiencesRepository: ExperiencesRepository = FakeExperiencesRepository()
+
+    public var experiencesRepository: ExperiencesRepository {
+        invokedCountExperiencesRepository += 1
+        return stubExperiencesRepository
+    }
 }
 #endif

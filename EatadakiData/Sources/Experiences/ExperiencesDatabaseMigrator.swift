@@ -39,15 +39,13 @@ final public class ExperiencesDatabaseMigrator {
             try db.execute(sql: "CREATE INDEX IF NOT EXISTS experiences_spotId ON experiences(spotId)")
 
             // Create experience ratings table
-            try db.execute(sql: """
-                CREATE TABLE IF NOT EXISTS experiences_ratings (
-                    id TEXT PRIMARY KEY,
-                    experienceId TEXT NOT NULL REFERENCES experiences(id) ON DELETE CASCADE,
-                    rating INTEGER NOT NULL CHECK (rating >= 1 AND rating <= 10),
-                    notes TEXT,
-                    createdAt DATETIME NOT NULL
-                )
-            """)
+            try db.create(table: ExperienceRatingRecord.databaseTableName, ifNotExists: true) { t in
+                t.column("id", .text).primaryKey()
+                t.column("experienceId", .text).notNull().references(ExperienceRecord.databaseTableName, onDelete: .cascade)
+                t.column("rating", .integer).notNull().check(sql: "rating >= 1 AND rating <= 10")
+                t.column("notes", .text)
+                t.column("createdAt", .datetime).notNull()
+            }
             try db.execute(sql: "CREATE INDEX IF NOT EXISTS experiences_ratings_experienceId ON experiences_ratings(experienceId)")
 
             // Create R-tree virtual table for geospatial spot searches

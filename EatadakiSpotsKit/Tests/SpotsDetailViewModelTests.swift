@@ -30,10 +30,9 @@ struct SpotDetailViewModelTests {
     @Test("initial state with spotIds has uninitialized stage and no preview")
     func testInitialStateWithSpotIds() async {
         let dependencies = FakeSpotDetailViewModelDependencies()
-        let spotIds = SpotIDs(mapkitId: SpotRecord.peacePagoda.mapkitId)
         let viewModel = SpotDetailViewModel(
             dependencies: dependencies,
-            spotIds: spotIds,
+            spotId: SpotRecord.peacePagoda.id,
         )
 
         #expect(viewModel.stage == .uninitialized)
@@ -53,13 +52,12 @@ struct SpotDetailViewModelTests {
             longitude: -122.4303306,
             createdAt: .now,
         )
-        dependencies.fakeSpotsRepository.stubFetchSpotWithIDs = { _ in
+        dependencies.fakeSpotsRepository.stubFetchSpotWithID = { _ in
             SpotInfoDetailed(spot: spot, experiences: [])
         }
-        let spotIds = SpotIDs(mapkitId: SpotRecord.peacePagoda.mapkitId)
         let viewModel = SpotDetailViewModel(
             dependencies: dependencies,
-            spotIds: spotIds,
+            spotId: SpotRecord.peacePagoda.id,
         )
 
         await viewModel.initialize()
@@ -98,20 +96,18 @@ struct SpotDetailViewModelTests {
             longitude: -122.4303306,
             createdAt: .now,
         )
-        dependencies.fakeSpotsRepository.stubFetchSpotWithIDs = { _ in
+        dependencies.fakeSpotsRepository.stubFetchSpotWithID = { _ in
             SpotInfoDetailed(spot: spot, experiences: [])
         }
-        let spotIds = SpotIDs(mapkitId: SpotRecord.peacePagoda.mapkitId)
         let viewModel = SpotDetailViewModel(
             dependencies: dependencies,
-            spotIds: spotIds,
+            spotId: SpotRecord.peacePagoda.id,
         )
 
         await viewModel.initialize()
 
-        #expect(viewModel.stage == .loaded(SpotDetailViewModel.Spot(from: spot)))
-        #expect(dependencies.fakeSpotsRepository.invocationsFetchSpotWithIDs.count == 1)
-        #expect(dependencies.fakeSpotsRepository.invocationsFetchSpotWithIDs.first == spotIds)
+        #expect(viewModel.stage == .loaded(SpotDetailViewModel.Spot(from: SpotInfoDetailed(spot: spot, experiences: []))))
+        #expect(dependencies.fakeSpotsRepository.invocationsFetchSpotWithID == [SpotRecord.peacePagoda.id])
 
         let spotDetail = try #require(viewModel.spot)
         #expect(spotDetail.name == "Test Spot")
@@ -121,20 +117,19 @@ struct SpotDetailViewModelTests {
     @Test("initialize sets stage to loadingFailed on error")
     func testInitializeFailure() async {
         let dependencies = FakeSpotDetailViewModelDependencies()
-        dependencies.fakeSpotsRepository.stubFetchSpotWithIDs = { (_) async throws(SpotsRepositoryError) -> SpotInfoDetailed in
+        dependencies.fakeSpotsRepository.stubFetchSpotWithID = { (_) async throws(SpotsRepositoryError) -> SpotInfoDetailed in
             throw SpotsRepositoryError.spotNotFound
         }
-        let spotIds = SpotIDs(mapkitId: SpotRecord.peacePagoda.mapkitId)
         let viewModel = SpotDetailViewModel(
             dependencies: dependencies,
-            spotIds: spotIds,
+            spotId: SpotRecord.peacePagoda.id,
         )
 
         await viewModel.initialize()
 
         #expect(viewModel.stage == .loadingFailed(.unableToLoad))
         #expect(viewModel.spot == nil)
-        #expect(dependencies.fakeSpotsRepository.invocationsFetchSpotWithIDs.count == 1)
+        #expect(dependencies.fakeSpotsRepository.invocationsFetchSpotWithID.count == 1)
     }
 
     @Test("initialize does not run twice")
@@ -148,28 +143,26 @@ struct SpotDetailViewModelTests {
             longitude: -122.4303306,
             createdAt: .now,
         )
-        dependencies.fakeSpotsRepository.stubFetchSpotWithIDs = { _ in
+        dependencies.fakeSpotsRepository.stubFetchSpotWithID = { _ in
             SpotInfoDetailed(spot: spot, experiences: [])
         }
-        let spotIds = SpotIDs(mapkitId: SpotRecord.peacePagoda.mapkitId)
         let viewModel = SpotDetailViewModel(
             dependencies: dependencies,
-            spotIds: spotIds,
+            spotId: SpotRecord.peacePagoda.id,
         )
 
         await viewModel.initialize()
         await viewModel.initialize()
 
-        #expect(dependencies.fakeSpotsRepository.invocationsFetchSpotWithIDs.count == 1)
+        #expect(dependencies.fakeSpotsRepository.invocationsFetchSpotWithID.count == 1)
     }
 
     @Test("spotDetail returns nil when not loaded")
     func testSpotDetailReturnsNilWhenNotLoaded() async {
         let dependencies = FakeSpotDetailViewModelDependencies()
-        let spotIds = SpotIDs(mapkitId: SpotRecord.peacePagoda.mapkitId)
         let viewModel = SpotDetailViewModel(
             dependencies: dependencies,
-            spotIds: spotIds,
+            spotId: SpotRecord.peacePagoda.id,
         )
 
         #expect(viewModel.spot == nil)
@@ -186,13 +179,12 @@ struct SpotDetailViewModelTests {
             longitude: -122.4303306,
             createdAt: .now,
         )
-        dependencies.fakeSpotsRepository.stubFetchSpotWithIDs = { _ in
+        dependencies.fakeSpotsRepository.stubFetchSpotWithID = { _ in
             SpotInfoDetailed(spot: spot, experiences: [])
         }
-        let spotIds = SpotIDs(mapkitId: SpotRecord.peacePagoda.mapkitId)
         let viewModel = SpotDetailViewModel(
             dependencies: dependencies,
-            spotIds: spotIds,
+            spotId: SpotRecord.peacePagoda.id,
         )
 
         await viewModel.initialize()

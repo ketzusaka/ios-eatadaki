@@ -2,7 +2,7 @@ import EatadakiData
 import EatadakiLocationKit
 import SwiftUI
 
-public typealias SpotsDetailViewModelDependencies = SpotsRepositoryProviding
+public typealias SpotsDetailViewModelDependencies = SpotsRepositoryProviding & ExperiencesRepositoryProviding
 
 public enum SpotsDetailViewModelError: Error, Equatable {
     case unableToLoad
@@ -13,13 +13,14 @@ public enum SpotsDetailViewModelError: Error, Equatable {
 public final class SpotDetailViewModel {
     /// The `Spot` data represented within this view model when loaded
     public struct Spot: Identifiable, Equatable, Sendable {
-        public let backingData: SpotRecord
+        public let backingData: SpotInfoDetailed
 
-        public var id: UUID { backingData.id }
-        public var name: String { backingData.name }
-        public var coordinates: Coordinates { Coordinates(latitude: backingData.latitude, longitude: backingData.longitude) }
+        public var id: UUID { backingData.spot.id }
+        public var name: String { backingData.spot.name }
+        public var coordinates: Coordinates { Coordinates(latitude: backingData.spot.latitude, longitude: backingData.spot.longitude) }
+        public var experiences: [ExperienceRecord] { backingData.experiences }
 
-        public init(from spotInfo: SpotRecord) {
+        public init(from spotInfo: SpotInfoDetailed) {
             self.backingData = spotInfo
         }
     }
@@ -37,9 +38,9 @@ public final class SpotDetailViewModel {
         case loadingFailed(SpotsDetailViewModelError) // Fetching finished unsuccessfully
     }
 
-    private let dependencies: SpotsDetailViewModelDependencies
-    private let spotIds: SpotIDs
+    let dependencies: SpotsDetailViewModelDependencies
 
+    public let spotId: UUID
     public var stage: Stage = .uninitialized
 
     public var preview: Preview?
@@ -56,12 +57,14 @@ public final class SpotDetailViewModel {
         spot?.name ?? preview?.name ?? ""
     }
 
+    public var isShowingAddExperienceFlow: Bool = false
+
     public init(
         dependencies: SpotsDetailViewModelDependencies,
         spotInfoListing: SpotInfoSummary,
     ) {
         self.dependencies = dependencies
-        self.spotIds = SpotIDs(id: spotInfoListing.spot.id)
+        self.spotId = spotInfoListing.spot.id
         self.preview = Preview(
             name: spotInfoListing.spot.name,
             coordinates: spotInfoListing.coordinates,
@@ -70,10 +73,10 @@ public final class SpotDetailViewModel {
 
     public init(
         dependencies: SpotsDetailViewModelDependencies,
-        spotIds: SpotIDs,
+        spotId: UUID,
     ) {
         self.dependencies = dependencies
-        self.spotIds = spotIds
+        self.spotId = spotId
     }
 
     public func initialize() async {
@@ -81,8 +84,8 @@ public final class SpotDetailViewModel {
         stage = .initializing
         do {
             // TODO: We should route through a dep that can hit the network(s) if no cached record.
-            let spotInfoDetailed = try await dependencies.spotsRepository.fetchSpot(withIDs: spotIds)
-            let spot = Spot(from: spotInfoDetailed.spot)
+            let spotInfoDetailed = try await dependencies.spotsRepository.fetchSpot(withID: spotId)
+            let spot = Spot(from: spotInfoDetailed)
             stage = .loaded(spot)
         } catch {
             stage = .loadingFailed(.unableToLoad)
@@ -91,7 +94,10 @@ public final class SpotDetailViewModel {
 }
 
 #if DEBUG
-public struct FakeSpotDetailViewModelDependencies: SpotsRepositoryProviding {
+public struct FakeSpotDetailViewModelDependencies: SpotsRepositoryProviding, ExperiencesRepositoryProviding {
+    public var fakeExperiencesRepository = FakeExperiencesRepository()
+    public var experiencesRepository: any ExperiencesRepository { fakeExperiencesRepository }
+
     public var fakeSpotsRepository = FakeSpotsRepository()
     public var spotsRepository: SpotsRepository { fakeSpotsRepository }
 

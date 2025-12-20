@@ -5,6 +5,7 @@ import os
 
 public protocol ExperiencesDataService {
     var spotsRepository: SpotsRepository { get }
+    var experiencesRepository: ExperiencesRepository { get }
 }
 
 public class RealExperiencesDataService: ExperiencesDataService {
@@ -12,6 +13,10 @@ public class RealExperiencesDataService: ExperiencesDataService {
 
     public lazy var spotsRepository: any SpotsRepository = {
         RealSpotsRepository(db: db)
+    }()
+
+    public lazy var experiencesRepository: any ExperiencesRepository = {
+        RealExperiencesRepository(db: db)
     }()
 
     public init(

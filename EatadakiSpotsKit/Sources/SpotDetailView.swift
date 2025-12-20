@@ -1,4 +1,5 @@
 import EatadakiData
+import EatadakiExperiencesKit
 import EatadakiLocationKit
 import EatadakiUI
 import MapKit
@@ -6,15 +7,17 @@ import SwiftUI
 
 public typealias SpotsDetailViewDependencies = SpotsDetailViewModelDependencies
 
-public struct SpotsDetailView: View {
+public struct SpotDetailView: View {
     @Environment(ThemeManager.self) var themeManager
     @Environment(\.colorScheme) var colorScheme
     @State var viewModel: SpotDetailViewModel
+    let dependencies: SpotsDetailViewDependencies
 
     public init(
         dependencies: SpotsDetailViewDependencies,
         spotInfoListing: SpotInfoSummary,
     ) {
+        self.dependencies = dependencies
         self.viewModel = SpotDetailViewModel(
             dependencies: dependencies,
             spotInfoListing: spotInfoListing,
@@ -23,16 +26,17 @@ public struct SpotsDetailView: View {
 
     public init(
         dependencies: SpotsDetailViewModelDependencies,
-        spotIds: SpotIDs,
+        spotId: UUID,
     ) {
+        self.dependencies = dependencies
         self.viewModel = SpotDetailViewModel(
             dependencies: dependencies,
-            spotIds: spotIds,
+            spotId: spotId,
         )
     }
 
     public var body: some View {
-        ScrollView {
+        ScrollView([.vertical]) {
             switch viewModel.stage {
             case .uninitialized, .initializing:
                 if let preview = viewModel.preview {
@@ -44,6 +48,23 @@ public struct SpotsDetailView: View {
                 }
             case .loaded(let spot):
                 mapView(name: spot.name, coordinates: spot.coordinates)
+
+                Text("Experiences")
+                    .frame(maxWidth: .infinity, alignment: .leading)
+                    .padding()
+
+                if spot.experiences.isEmpty {
+                    noExperiencesView
+                } else {
+                    ForEach(spot.experiences) { experience in
+                        Text(experience.name)
+                    }
+
+                    Button("Add a new experience") {
+                        viewModel.isShowingAddExperienceFlow = true
+                    }
+                }
+
             case .loadingFailed:
                 Text("Uh oh!")
             }
@@ -51,6 +72,13 @@ public struct SpotsDetailView: View {
         .navigationTitle(viewModel.navigationTitle)
         .onFirstAppear {
             await viewModel.initialize()
+        }
+        .sheet(isPresented: $viewModel.isShowingAddExperienceFlow) {
+            AddExperienceView(
+                dependencies: dependencies,
+                spotId: viewModel.spotId,
+                isPresented: $viewModel.isShowingAddExperienceFlow,
+            )
         }
     }
 
@@ -70,6 +98,17 @@ public struct SpotsDetailView: View {
         .frame(height: 200)
         .padding()
     }
+
+    @ViewBuilder
+    private var noExperiencesView: some View {
+        VStack(spacing: 8) {
+            Text("Add the first!")
+            Text("No one has added an experience to this spot yet. Be the first!")
+            Button("Add experience") {
+                viewModel.isShowingAddExperienceFlow = true
+            }
+        }
+    }
 }
 
 #if DEBUG
@@ -81,9 +120,9 @@ public struct SpotsDetailView: View {
     }
 
     NavigationStack {
-        SpotsDetailView(
+        SpotDetailView(
             dependencies: dependencies,
-            spotIds: SpotIDs(mapkitId: SpotRecord.peacePagoda.mapkitId),
+            spotId: SpotRecord.peacePagoda.id,
         )
         .environment(ThemeManager())
     }
@@ -98,7 +137,7 @@ public struct SpotsDetailView: View {
     }
 
     NavigationStack {
-        SpotsDetailView(
+        SpotDetailView(
             dependencies: dependencies,
             spotInfoListing: SpotInfoSummary(spot: SpotRecord.peacePagoda),
         )

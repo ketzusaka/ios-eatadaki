@@ -51,6 +51,11 @@ extension InitializedContext: DeviceConfigurationControllerProviding {
         deviceConfigDataService.deviceConfigurationController
     }
 }
+extension InitializedContext: ExperiencesRepositoryProviding {
+    public var experiencesRepository: ExperiencesRepository {
+        experiencesDataService.experiencesRepository
+    }
+}
 extension InitializedContext: LocationServiceProviding {}
 extension InitializedContext: SpotsSearcherProviding {}
 extension InitializedContext: SpotsRepositoryProviding {

@@ -93,7 +93,7 @@ public struct SpotsView: View {
         List {
             ForEach(viewModel.spots) { spot in
                 NavigationLink {
-                    SpotsDetailView(
+                    SpotDetailView(
                         dependencies: dependencies,
                         spotInfoListing: spot.backingData,
                     )

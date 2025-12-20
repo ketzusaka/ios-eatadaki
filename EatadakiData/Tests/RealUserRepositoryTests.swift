@@ -4,7 +4,7 @@ import GRDB
 import Testing
 
 @Suite("RealUserRepository Tests")
-struct UserRepositoryTests {
+struct RealUserRepositoryTests {
     @Test("Fetch user returns nil when no user exists")
     func testFetchUserReturnsNilWhenNoUserExists() async throws {
         let repository = try setupRepository()
