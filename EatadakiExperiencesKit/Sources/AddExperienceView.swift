@@ -84,7 +84,8 @@ public struct AddExperienceView: View {
 
                 ToolbarItem(placement: .navigationBarTrailing) {
                     Button("Save") {
-                        // TODO: Save the experience
+                        await viewModel.saveExperience()
+                        isPresented = false
                     }
                     .disabled(!viewModel.isValid)
                 }

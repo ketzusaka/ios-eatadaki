@@ -81,6 +81,16 @@ public class FakeSpotsRepository: SpotsRepository {
         return stubObserveSpots(request)
     }
 
+    public private(set) var invocationsObserveSpotWithID: [UUID] = []
+    public var stubObserveSpotWithID: (UUID) -> any AsyncSequence<SpotInfoDetailed, SpotsRepositoryError> = { _ in
+        FakeAsyncSequence()
+    }
+
+    public func observeSpot(withID id: UUID) async -> any AsyncSequence<SpotInfoDetailed, SpotsRepositoryError> {
+        invocationsObserveSpotWithID.append(id)
+        return stubObserveSpotWithID(id)
+    }
+
     public private(set) var invocationsCreate: [SpotRecord] = []
     public var stubCreate: (SpotRecord) async throws(SpotsRepositoryError) -> SpotRecord = { spot in
         spot

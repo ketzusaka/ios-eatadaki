@@ -29,6 +29,7 @@ public protocol SpotsRepository: AnyObject {
     func fetchSpot(withIDs ids: SpotIDs) async throws(SpotsRepositoryError) -> SpotInfoDetailed
     func fetchSpots(request: FetchSpotsDataRequest) async throws(SpotsRepositoryError) -> [SpotInfoSummary]
     func observeSpots(request: FetchSpotsDataRequest) async -> any AsyncSequence<[SpotInfoSummary], SpotsRepositoryError>
+    func observeSpot(withID id: UUID) async -> any AsyncSequence<SpotInfoDetailed, SpotsRepositoryError>
 
     @discardableResult
     func create(spot: SpotRecord) async throws(SpotsRepositoryError) -> SpotRecord
@@ -215,6 +216,30 @@ public actor RealSpotsRepository: SpotsRepository {
         }
 
         return ErrorTransformingSequence<[SpotInfoSummary], SpotsRepositoryError>(
+            baseStream: baseStream,
+            transformError: { error in
+                if let spotsError = error as? SpotsRepositoryError {
+                    spotsError
+                } else {
+                    SpotsRepositoryError.databaseError(error.localizedDescription)
+                }
+            }
+        )
+    }
+
+    public func observeSpot(withID id: UUID) async -> any AsyncSequence<SpotInfoDetailed, SpotsRepositoryError> {
+        let request = SpotRecord
+            .including(all: SpotRecord.experiences)
+            .filter(id: id)
+        let observation = ValueObservation.tracking { db in
+            guard let spot = try SpotInfoDetailed.fetchOne(db, request) else {
+                throw SpotsRepositoryError.spotNotFound
+            }
+            return spot
+        }
+        let baseStream = observation.values(in: db)
+
+        return ErrorTransformingSequence<SpotInfoDetailed, SpotsRepositoryError>(
             baseStream: baseStream,
             transformError: { error in
                 if let spotsError = error as? SpotsRepositoryError {

@@ -59,6 +59,12 @@ public final class SpotDetailViewModel {
 
     public var isShowingAddExperienceFlow: Bool = false
 
+    private var observationTask: Task<Void, any Error>? {
+        didSet {
+            oldValue?.cancel()
+        }
+    }
+
     public init(
         dependencies: SpotsDetailViewModelDependencies,
         spotInfoListing: SpotInfoSummary,
@@ -87,9 +93,37 @@ public final class SpotDetailViewModel {
             let spotInfoDetailed = try await dependencies.spotsRepository.fetchSpot(withID: spotId)
             let spot = Spot(from: spotInfoDetailed)
             stage = .loaded(spot)
+            observeSpotUpdates()
         } catch {
             stage = .loadingFailed(.unableToLoad)
         }
+    }
+
+    private func observeSpotUpdates() {
+        observationTask = Task { [spotId, weak self] in
+            guard let observation = await self?.dependencies.spotsRepository.observeSpot(withID: spotId) else {
+                return
+            }
+            
+            do {
+                for try await spotInfoDetailed in observation {
+                    guard !Task.isCancelled else { return }
+                    guard let self else { return }
+                    let spot = Spot(from: spotInfoDetailed)
+                    await self.updateSpot(spot)
+                }
+            } catch {
+                // TODO: Handle error
+            }
+        }
+    }
+
+    private func updateSpot(_ spot: Spot) async {
+        stage = .loaded(spot)
+    }
+
+    private func updateSpotNotFound() async {
+        stage = .loadingFailed(.unableToLoad)
     }
 }
 
