@@ -14,6 +14,8 @@ public protocol ExperiencesRepository: AnyObject {
         description: String?,
         rating: CreateRating?,
     ) async throws(ExperiencesRepositoryError) -> ExperienceRecord
+    
+    func fetchExperiences(request: FetchExperiencesDataRequest) async throws(ExperiencesRepositoryError) -> [ExperienceInfoSummary]
 }
 
 public protocol ExperiencesRepositoryProviding {
@@ -71,6 +73,20 @@ public actor RealExperiencesRepository: ExperiencesRepository {
                 }
 
                 return experience
+            }
+        } catch let error as ExperiencesRepositoryError {
+            throw error
+        } catch {
+            throw ExperiencesRepositoryError.databaseError(error.localizedDescription)
+        }
+    }
+
+    public func fetchExperiences(request: FetchExperiencesDataRequest = .default) async throws(ExperiencesRepositoryError) -> [ExperienceInfoSummary] {
+        do {
+            return try await db.read { db in
+                let query = ExperienceRecord
+                    .including(required: ExperienceRecord.spot)
+                return try ExperienceInfoSummary.fetchAll(db, query)
             }
         } catch let error as ExperiencesRepositoryError {
             throw error
