@@ -56,12 +56,9 @@ public struct ExperiencesView: View {
 
     @ViewBuilder
     private var experiencesList: some View {
-        let theme = themeManager.tokens(for: colorScheme)
-
         List {
             ForEach(viewModel.experiences) { experience in
-                Text(experience.name)
-                    .listMainTextStyling(using: theme)
+                ExperienceRowView(experience: experience.backingData)
             }
         }
     }
