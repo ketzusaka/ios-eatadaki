@@ -29,7 +29,7 @@ struct RealExperiencesRepositoryTests {
             try spot.insert(database)
         }
 
-        let rating = CreateRating(spotId: spot.id, rating: 5, note: "Great experience!")
+        let rating = CreateRating(rating: 5, note: "Great experience!")
         let experience = try await repository.createExperience(
             spotId: spot.id,
             name: "Test Experience",
@@ -57,7 +57,7 @@ struct RealExperiencesRepositoryTests {
             try spot.insert(database)
         }
 
-        let rating = CreateRating(spotId: spot.id, rating: 4)
+        let rating = CreateRating(rating: 4)
         let experience = try await repository.createExperience(
             spotId: spot.id,
             name: "Test Experience",
@@ -85,7 +85,7 @@ struct RealExperiencesRepositoryTests {
             try spot.insert(database)
         }
 
-        let rating = CreateRating(spotId: spot.id, rating: 5, note: "Amazing!")
+        let rating = CreateRating(rating: 5, note: "Amazing!")
         let experience = try await repository.createExperience(
             spotId: spot.id,
             name: "Test Experience",
@@ -110,37 +110,11 @@ struct RealExperiencesRepositoryTests {
     @Test("Create experience throws spotNotFound when spot does not exist")
     func testCreateExperienceThrowsSpotNotFound() async throws {
         let nonExistentSpotId = UUID()
-        let rating = CreateRating(spotId: nonExistentSpotId, rating: 5)
+        let rating = CreateRating(rating: 5)
 
         await #expect(throws: ExperiencesRepositoryError.spotNotFound) {
             try await repository.createExperience(
                 spotId: nonExistentSpotId,
-                name: "Test Experience",
-                description: nil,
-                rating: rating,
-            )
-        }
-    }
-
-    @Test("Create experience throws invalidRating when rating spotId does not match")
-    func testCreateExperienceThrowsInvalidRating() async throws {
-        let spot = SpotRecord(
-            id: UUID(),
-            name: "Test Spot",
-            latitude: 37.7849447,
-            longitude: -122.4303306,
-            createdAt: .now,
-        )
-        try await db.write { database in
-            try spot.insert(database)
-        }
-
-        let differentSpotId = UUID()
-        let rating = CreateRating(spotId: differentSpotId, rating: 5)
-
-        await #expect(throws: ExperiencesRepositoryError.invalidRating) {
-            try await repository.createExperience(
-                spotId: spot.id,
                 name: "Test Experience",
                 description: nil,
                 rating: rating,
@@ -161,7 +135,7 @@ struct RealExperiencesRepositoryTests {
             try spot.insert(database)
         }
 
-        let rating = CreateRating(spotId: spot.id, rating: 3, note: nil)
+        let rating = CreateRating(rating: 3, note: nil)
         let experience = try await repository.createExperience(
             spotId: spot.id,
             name: "Test Experience",
@@ -195,8 +169,8 @@ struct RealExperiencesRepositoryTests {
             try spot.insert(database)
         }
 
-        let rating1 = CreateRating(spotId: spot.id, rating: 5)
-        let rating2 = CreateRating(spotId: spot.id, rating: 4)
+        let rating1 = CreateRating(rating: 5)
+        let rating2 = CreateRating(rating: 4)
 
         let experience1 = try await repository.createExperience(
             spotId: spot.id,
@@ -228,7 +202,7 @@ struct RealExperiencesRepositoryTests {
         }
 
         let beforeCreation = Date()
-        let rating = CreateRating(spotId: spot.id, rating: 5)
+        let rating = CreateRating(rating: 5)
         let experience = try await repository.createExperience(
             spotId: spot.id,
             name: "Test Experience",
@@ -254,7 +228,7 @@ struct RealExperiencesRepositoryTests {
             try spot.insert(database)
         }
 
-        let rating = CreateRating(spotId: spot.id, rating: 5, note: "Test note")
+        let rating = CreateRating(rating: 5, note: "Test note")
         let experience = try await repository.createExperience(
             spotId: spot.id,
             name: "Test Experience",
@@ -329,7 +303,7 @@ struct RealExperiencesRepositoryTests {
             try spot.insert(database)
         }
 
-        let rating = CreateRating(spotId: spot.id, rating: 5)
+        let rating = CreateRating(rating: 5)
         let experience = try await repository.createExperience(
             spotId: spot.id,
             name: "Test Experience",
@@ -362,8 +336,8 @@ struct RealExperiencesRepositoryTests {
             try spot.insert(database)
         }
 
-        let rating1 = CreateRating(spotId: spot.id, rating: 5)
-        let rating2 = CreateRating(spotId: spot.id, rating: 4)
+        let rating1 = CreateRating(rating: 5)
+        let rating2 = CreateRating(rating: 4)
         let experience1 = try await repository.createExperience(
             spotId: spot.id,
             name: "Experience 1",
@@ -413,8 +387,8 @@ struct RealExperiencesRepositoryTests {
             try spot2.insert(database)
         }
 
-        let rating1 = CreateRating(spotId: spot1.id, rating: 5)
-        let rating2 = CreateRating(spotId: spot2.id, rating: 4)
+        let rating1 = CreateRating(rating: 5)
+        let rating2 = CreateRating(rating: 4)
         let experience1 = try await repository.createExperience(
             spotId: spot1.id,
             name: "Experience 1",
@@ -463,7 +437,7 @@ struct RealExperiencesRepositoryTests {
             try spot.insert(database)
         }
 
-        let rating = CreateRating(spotId: spot.id, rating: 5)
+        let rating = CreateRating(rating: 5)
         _ = try await repository.createExperience(
             spotId: spot.id,
             name: "Test Experience",
@@ -491,7 +465,7 @@ struct RealExperiencesRepositoryTests {
             try spot.insert(database)
         }
 
-        let rating = CreateRating(spotId: spot.id, rating: 5, note: "Great experience!")
+        let rating = CreateRating(rating: 5, note: "Great experience!")
         let experience = try await repository.createExperience(
             spotId: spot.id,
             name: "Test Experience",
@@ -562,7 +536,7 @@ struct RealExperiencesRepositoryTests {
             try spot.insert(database)
         }
 
-        let rating1 = CreateRating(spotId: spot.id, rating: 5, note: "First rating")
+        let rating1 = CreateRating(rating: 5, note: "First rating")
         let experience = try await repository.createExperience(
             spotId: spot.id,
             name: "Test Experience",
@@ -617,7 +591,7 @@ struct RealExperiencesRepositoryTests {
             try spot.insert(database)
         }
 
-        let rating = CreateRating(spotId: spot.id, rating: 5)
+        let rating = CreateRating(rating: 5)
         let experience = try await repository.createExperience(
             spotId: spot.id,
             name: "Test Experience",
@@ -649,7 +623,7 @@ struct RealExperiencesRepositoryTests {
             try spot.insert(database)
         }
 
-        let rating = CreateRating(spotId: spot.id, rating: 5, note: "Great!")
+        let rating = CreateRating(rating: 5, note: "Great!")
         let experience = try await repository.createExperience(
             spotId: spot.id,
             name: "Test Experience",
@@ -692,7 +666,7 @@ struct RealExperiencesRepositoryTests {
             try spot.insert(database)
         }
 
-        let rating = CreateRating(spotId: spot.id, rating: 5)
+        let rating = CreateRating(rating: 5)
         let experience = try await repository.createExperience(
             spotId: spot.id,
             name: "Original Name",
@@ -735,7 +709,7 @@ struct RealExperiencesRepositoryTests {
             try spot.insert(database)
         }
 
-        let rating1 = CreateRating(spotId: spot.id, rating: 5, note: "First rating")
+        let rating1 = CreateRating(rating: 5, note: "First rating")
         let experience = try await repository.createExperience(
             spotId: spot.id,
             name: "Test Experience",
@@ -784,7 +758,7 @@ struct RealExperiencesRepositoryTests {
             try spot.insert(database)
         }
 
-        let rating = CreateRating(spotId: spot.id, rating: 5)
+        let rating = CreateRating(rating: 5)
         let experience = try await repository.createExperience(
             spotId: spot.id,
             name: "Test Experience",

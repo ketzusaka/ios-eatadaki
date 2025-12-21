@@ -43,12 +43,7 @@ public actor RealExperiencesRepository: ExperiencesRepository {
         description: String?,
         rating: CreateRating?,
     ) async throws(ExperiencesRepositoryError) -> ExperienceRecord {
-        // Validate that rating's spotId matches the provided spotId
-        guard rating == nil || rating!.spotId == spotId else {
-            throw ExperiencesRepositoryError.invalidRating
-        }
-
-        return try await perform {
+        try await perform {
             try await db.write { db in
                 // Verify spot exists
                 guard try SpotRecord.filter(Column("id") == spotId).fetchCount(db) > 0 else {

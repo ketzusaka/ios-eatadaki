@@ -39,7 +39,6 @@ public final class AddExperienceViewModel {
                 name: name,
                 description: description,
                 rating: showAddRating ? CreateRating(
-                    spotId: spotId,
                     rating: experienceRating,
                     note: experienceNote.nilIfEmpty,
                 ) : nil,
