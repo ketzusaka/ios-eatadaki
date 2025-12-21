@@ -145,7 +145,8 @@ let project = Project(
             dependencies: [
                 .target(name: "EatadakiData"),
                 .target(name: "EatadakiKit"),
-                .target(name: "EatadakiUI")
+                .target(name: "EatadakiUI"),
+                .target(name: "EatadakiLocationKit")
             ]
         ),
 
@@ -236,6 +237,21 @@ let project = Project(
         ),
 
         .target(
+            name: "EatadakiExperiencesKitTests",
+            destinations: [.iPhone],
+            product: .unitTests,
+            bundleId: "com.aethercodelabs.eatadaki.experienceskit.tests",
+            deploymentTargets: .iOS("26.0"),
+            sources: ["EatadakiExperiencesKit/Tests/**"],
+            dependencies: [
+                .target(name: "EatadakiExperiencesKit"),
+                .target(name: "EatadakiData"),
+                .target(name: "EatadakiLocationKit"),
+                .target(name: "EatadakiKit"),
+            ]
+        ),
+
+        .target(
             name: "EatadakiAppUITests",
             destinations: [.iPhone],
             product: .uiTests,
@@ -260,14 +276,14 @@ let project = Project(
                     "EatadakiUserKit"
                 ]
             ),
-            testAction: .targets(
+                testAction: .targets(
                 [
                     // "EatadakiTests",
                     "EatadakiDataTests",
                     "EatadakiKitTests",
                     "EatadakiLocationKitTests",
                     "EatadakiSpotsKitTests",
-                    // "EatadakiExperiencesKitTests",
+                    "EatadakiExperiencesKitTests",
                     // "EatadakiUserKitTests",
                 ],
                 configuration: .debug,

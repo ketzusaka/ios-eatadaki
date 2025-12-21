@@ -18,7 +18,9 @@ struct InitializedView: View {
                 Label("Spots", systemImage: "mappin.circle")
             }
 
-            ExperiencesView()
+            ExperiencesView(
+                dependencies: context,
+            )
                 .tabItem {
                     Label("Experiences", systemImage: "fork.knife")
                 }
