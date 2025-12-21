@@ -1,4 +1,5 @@
 import EatadakiData
+import EatadakiSpotsKit
 import Foundation
 import GRDB
 import Testing
@@ -18,13 +19,7 @@ struct RealExperiencesRepositoryTests {
 
     @Test("Create experience successfully")
     func testCreateExperience() async throws {
-        let spot = SpotRecord(
-            id: UUID(),
-            name: "Test Spot",
-            latitude: 37.7849447,
-            longitude: -122.4303306,
-            createdAt: .now,
-        )
+        let spot = SpotRecord.peacePagoda
         try await db.write { database in
             try spot.insert(database)
         }
@@ -46,13 +41,7 @@ struct RealExperiencesRepositoryTests {
 
     @Test("Create experience without description")
     func testCreateExperienceWithoutDescription() async throws {
-        let spot = SpotRecord(
-            id: UUID(),
-            name: "Test Spot",
-            latitude: 37.7849447,
-            longitude: -122.4303306,
-            createdAt: .now,
-        )
+        let spot = SpotRecord.peacePagoda
         try await db.write { database in
             try spot.insert(database)
         }
@@ -74,13 +63,7 @@ struct RealExperiencesRepositoryTests {
 
     @Test("Create experience creates rating in database")
     func testCreateExperienceCreatesRating() async throws {
-        let spot = SpotRecord(
-            id: UUID(),
-            name: "Test Spot",
-            latitude: 37.7849447,
-            longitude: -122.4303306,
-            createdAt: .now,
-        )
+        let spot = SpotRecord.peacePagoda
         try await db.write { database in
             try spot.insert(database)
         }
@@ -101,10 +84,6 @@ struct RealExperiencesRepositoryTests {
         #expect(ratingRecord.experienceId == experience.id)
         #expect(ratingRecord.rating == 5)
         #expect(ratingRecord.notes == "Amazing!")
-        
-        // Verify cached rating fields on experience
-        #expect(experience.rating == 5)
-        #expect(experience.ratingNote == "Amazing!")
     }
 
     @Test("Create experience throws spotNotFound when spot does not exist")
@@ -124,13 +103,7 @@ struct RealExperiencesRepositoryTests {
 
     @Test("Create experience with rating without note")
     func testCreateExperienceWithRatingWithoutNote() async throws {
-        let spot = SpotRecord(
-            id: UUID(),
-            name: "Test Spot",
-            latitude: 37.7849447,
-            longitude: -122.4303306,
-            createdAt: .now,
-        )
+        let spot = SpotRecord.peacePagoda
         try await db.write { database in
             try spot.insert(database)
         }
@@ -150,21 +123,11 @@ struct RealExperiencesRepositoryTests {
         let ratingRecord = try #require(fetchedRating)
         #expect(ratingRecord.rating == 3)
         #expect(ratingRecord.notes == nil)
-        
-        // Verify cached rating fields on experience
-        #expect(experience.rating == 3)
-        #expect(experience.ratingNote == nil)
     }
 
     @Test("Create experience generates unique IDs")
     func testCreateExperienceGeneratesUniqueIDs() async throws {
-        let spot = SpotRecord(
-            id: UUID(),
-            name: "Test Spot",
-            latitude: 37.7849447,
-            longitude: -122.4303306,
-            createdAt: .now,
-        )
+        let spot = SpotRecord.peacePagoda
         try await db.write { database in
             try spot.insert(database)
         }
@@ -190,13 +153,7 @@ struct RealExperiencesRepositoryTests {
 
     @Test("Create experience sets createdAt timestamp")
     func testCreateExperienceSetsCreatedAt() async throws {
-        let spot = SpotRecord(
-            id: UUID(),
-            name: "Test Spot",
-            latitude: 37.7849447,
-            longitude: -122.4303306,
-            createdAt: .now,
-        )
+        let spot = SpotRecord.peacePagoda
         try await db.write { database in
             try spot.insert(database)
         }
@@ -217,13 +174,7 @@ struct RealExperiencesRepositoryTests {
 
     @Test("Create experience creates both experience and rating in transaction")
     func testCreateExperienceCreatesBothInTransaction() async throws {
-        let spot = SpotRecord(
-            id: UUID(),
-            name: "Test Spot",
-            latitude: 37.7849447,
-            longitude: -122.4303306,
-            createdAt: .now,
-        )
+        let spot = SpotRecord.peacePagoda
         try await db.write { database in
             try spot.insert(database)
         }
@@ -259,13 +210,7 @@ struct RealExperiencesRepositoryTests {
     
     @Test("Create experience without rating has nil cached rating fields")
     func testCreateExperienceWithoutRating() async throws {
-        let spot = SpotRecord(
-            id: UUID(),
-            name: "Test Spot",
-            latitude: 37.7849447,
-            longitude: -122.4303306,
-            createdAt: .now,
-        )
+        let spot = SpotRecord.peacePagoda
         try await db.write { database in
             try spot.insert(database)
         }
@@ -281,6 +226,270 @@ struct RealExperiencesRepositoryTests {
         #expect(experience.ratingNote == nil)
     }
 
+    // MARK: - Create Experience Rating Tests
+
+    @Test("Create experience rating successfully")
+    func testCreateExperienceRating() async throws {
+        let spot = SpotRecord.peacePagoda
+        try await db.write { database in
+            try spot.insert(database)
+        }
+
+        let experience = try await repository.createExperience(
+            spotId: spot.id,
+            name: "Test Experience",
+            description: nil,
+            rating: nil,
+        )
+
+        let rating = CreateRating(rating: 5, note: "Great rating!")
+        let ratingRecord = try await repository.createExperienceRating(
+            experienceId: experience.id,
+            rating: rating,
+        )
+
+        #expect(ratingRecord.experienceId == experience.id)
+        #expect(ratingRecord.rating == 5)
+        #expect(ratingRecord.notes == "Great rating!")
+    }
+
+    @Test("Create experience rating without note")
+    func testCreateExperienceRatingWithoutNote() async throws {
+        let spot = SpotRecord.peacePagoda
+        try await db.write { database in
+            try spot.insert(database)
+        }
+
+        let experience = try await repository.createExperience(
+            spotId: spot.id,
+            name: "Test Experience",
+            description: nil,
+            rating: nil,
+        )
+
+        let rating = CreateRating(rating: 4)
+        let ratingRecord = try await repository.createExperienceRating(
+            experienceId: experience.id,
+            rating: rating,
+        )
+
+        #expect(ratingRecord.experienceId == experience.id)
+        #expect(ratingRecord.rating == 4)
+        #expect(ratingRecord.notes == nil)
+    }
+
+    @Test("Create experience rating throws experienceNotFound when experience does not exist")
+    func testCreateExperienceRatingThrowsExperienceNotFound() async throws {
+        let nonExistentExperienceId = UUID()
+        let rating = CreateRating(rating: 5)
+
+        await #expect(throws: ExperiencesRepositoryError.experienceNotFound) {
+            try await repository.createExperienceRating(
+                experienceId: nonExistentExperienceId,
+                rating: rating,
+            )
+        }
+    }
+
+    @Test("Create experience rating generates unique IDs")
+    func testCreateExperienceRatingGeneratesUniqueIDs() async throws {
+        let spot = SpotRecord.peacePagoda
+        try await db.write { database in
+            try spot.insert(database)
+        }
+
+        let experience = try await repository.createExperience(
+            spotId: spot.id,
+            name: "Test Experience",
+            description: nil,
+            rating: nil,
+        )
+
+        let rating1 = CreateRating(rating: 5)
+        let rating2 = CreateRating(rating: 4)
+
+        let ratingRecord1 = try await repository.createExperienceRating(
+            experienceId: experience.id,
+            rating: rating1,
+        )
+        let ratingRecord2 = try await repository.createExperienceRating(
+            experienceId: experience.id,
+            rating: rating2,
+        )
+
+        #expect(ratingRecord1.id != ratingRecord2.id)
+    }
+
+    @Test("Create experience rating sets createdAt timestamp")
+    func testCreateExperienceRatingSetsCreatedAt() async throws {
+        let spot = SpotRecord.peacePagoda
+        try await db.write { database in
+            try spot.insert(database)
+        }
+
+        let experience = try await repository.createExperience(
+            spotId: spot.id,
+            name: "Test Experience",
+            description: nil,
+            rating: nil,
+        )
+
+        let beforeCreation = Date()
+        let rating = CreateRating(rating: 5)
+        let ratingRecord = try await repository.createExperienceRating(
+            experienceId: experience.id,
+            rating: rating,
+        )
+        let afterCreation = Date()
+
+        #expect(ratingRecord.createdAt >= beforeCreation)
+        #expect(ratingRecord.createdAt <= afterCreation)
+    }
+
+    @Test("Create experience rating persists to database")
+    func testCreateExperienceRatingPersistsToDatabase() async throws {
+        let spot = SpotRecord.peacePagoda
+        try await db.write { database in
+            try spot.insert(database)
+        }
+
+        let experience = try await repository.createExperience(
+            spotId: spot.id,
+            name: "Test Experience",
+            description: nil,
+            rating: nil,
+        )
+
+        let rating = CreateRating(rating: 5, note: "Test note")
+        let ratingRecord = try await repository.createExperienceRating(
+            experienceId: experience.id,
+            rating: rating,
+        )
+
+        // Verify rating was persisted in database
+        let fetchedRating = try await db.read { database in
+            try ExperienceRatingRecord.fetchOne(database, key: ratingRecord.id)
+        }
+        let fetched = try #require(fetchedRating)
+        #expect(fetched.id == ratingRecord.id)
+        #expect(fetched.experienceId == experience.id)
+        #expect(fetched.rating == 5)
+        #expect(fetched.notes == "Test note")
+    }
+
+    @Test("Create experience rating allows multiple ratings for same experience")
+    func testCreateExperienceRatingMultipleRatings() async throws {
+        let spot = SpotRecord.peacePagoda
+        try await db.write { database in
+            try spot.insert(database)
+        }
+
+        let experience = try await repository.createExperience(
+            spotId: spot.id,
+            name: "Test Experience",
+            description: nil,
+            rating: nil,
+        )
+
+        let rating1 = CreateRating(rating: 5, note: "First rating")
+        let rating2 = CreateRating(rating: 4, note: "Second rating")
+        let rating3 = CreateRating(rating: 5, note: "Third rating")
+
+        let ratingRecord1 = try await repository.createExperienceRating(
+            experienceId: experience.id,
+            rating: rating1,
+        )
+        let ratingRecord2 = try await repository.createExperienceRating(
+            experienceId: experience.id,
+            rating: rating2,
+        )
+        let ratingRecord3 = try await repository.createExperienceRating(
+            experienceId: experience.id,
+            rating: rating3,
+        )
+
+        // Verify all ratings were created
+        let allRatings = try await db.read { database in
+            try ExperienceRatingRecord.filter(Column("experienceId") == experience.id).fetchAll(database)
+        }
+        #expect(allRatings.count == 3)
+        let ratingIds = Set(allRatings.map(\.id))
+        #expect(ratingIds.contains(ratingRecord1.id))
+        #expect(ratingIds.contains(ratingRecord2.id))
+        #expect(ratingIds.contains(ratingRecord3.id))
+    }
+
+    @Test("Create experience rating updates cached rating fields on experience")
+    func testCreateExperienceRatingUpdatesCachedRatingFields() async throws {
+        let spot = SpotRecord.peacePagoda
+        try await db.write { database in
+            try spot.insert(database)
+        }
+
+        // Create experience with an initial rating
+        let initialRating = CreateRating(rating: 3, note: "Initial rating")
+        let experience = try await repository.createExperience(
+            spotId: spot.id,
+            name: "Test Experience",
+            description: nil,
+            rating: initialRating,
+        )
+
+        // Verify initial cached rating
+        #expect(experience.rating == 3)
+        #expect(experience.ratingNote == "Initial rating")
+
+        // Create a new rating which should update the cached fields
+        let newRating = CreateRating(rating: 5, note: "Updated rating")
+        _ = try await repository.createExperienceRating(
+            experienceId: experience.id,
+            rating: newRating,
+        )
+
+        // Verify cached rating fields were updated
+        let fetchedExperience = try await db.read { database in
+            try ExperienceRecord.fetchOne(database, key: experience.id)
+        }
+        let exp = try #require(fetchedExperience)
+        #expect(exp.rating == 5)
+        #expect(exp.ratingNote == "Updated rating")
+    }
+
+    @Test("Create experience rating updates cached rating when experience had no previous rating")
+    func testCreateExperienceRatingUpdatesCachedRatingFromNil() async throws {
+        let spot = SpotRecord.peacePagoda
+        try await db.write { database in
+            try spot.insert(database)
+        }
+
+        // Create experience without a rating
+        let experience = try await repository.createExperience(
+            spotId: spot.id,
+            name: "Test Experience",
+            description: nil,
+            rating: nil,
+        )
+
+        // Verify initial cached rating is nil
+        #expect(experience.rating == nil)
+        #expect(experience.ratingNote == nil)
+
+        // Create a rating which should set the cached fields
+        let rating = CreateRating(rating: 4, note: "First rating")
+        _ = try await repository.createExperienceRating(
+            experienceId: experience.id,
+            rating: rating,
+        )
+
+        // Verify cached rating fields were set
+        let fetchedExperience = try await db.read { database in
+            try ExperienceRecord.fetchOne(database, key: experience.id)
+        }
+        let exp = try #require(fetchedExperience)
+        #expect(exp.rating == 4)
+        #expect(exp.ratingNote == "First rating")
+    }
+
     // MARK: - Fetch Experiences Tests
 
     @Test("Fetch experiences returns empty array when no experiences exist")
@@ -292,13 +501,7 @@ struct RealExperiencesRepositoryTests {
 
     @Test("Fetch experiences returns single experience with spot")
     func testFetchExperiencesSingle() async throws {
-        let spot = SpotRecord(
-            id: UUID(),
-            name: "Test Spot",
-            latitude: 37.7849447,
-            longitude: -122.4303306,
-            createdAt: .now,
-        )
+        let spot = SpotRecord.peacePagoda
         try await db.write { database in
             try spot.insert(database)
         }
@@ -325,13 +528,7 @@ struct RealExperiencesRepositoryTests {
 
     @Test("Fetch experiences returns multiple experiences from same spot")
     func testFetchExperiencesMultipleFromSameSpot() async throws {
-        let spot = SpotRecord(
-            id: UUID(),
-            name: "Test Spot",
-            latitude: 37.7849447,
-            longitude: -122.4303306,
-            createdAt: .now,
-        )
+        let spot = SpotRecord.peacePagoda
         try await db.write { database in
             try spot.insert(database)
         }
@@ -368,20 +565,8 @@ struct RealExperiencesRepositoryTests {
 
     @Test("Fetch experiences returns multiple experiences from different spots")
     func testFetchExperiencesMultipleFromDifferentSpots() async throws {
-        let spot1 = SpotRecord(
-            id: UUID(),
-            name: "Spot 1",
-            latitude: 37.7849447,
-            longitude: -122.4303306,
-            createdAt: .now,
-        )
-        let spot2 = SpotRecord(
-            id: UUID(),
-            name: "Spot 2",
-            latitude: 37.7849544,
-            longitude: -122.4317274,
-            createdAt: .now,
-        )
+        let spot1 = SpotRecord.peacePagoda
+        let spot2 = SpotRecord.kinokuniya
         try await db.write { database in
             try spot1.insert(database)
             try spot2.insert(database)
@@ -426,13 +611,7 @@ struct RealExperiencesRepositoryTests {
 
     @Test("Fetch experiences with default request parameter")
     func testFetchExperiencesWithDefaultRequest() async throws {
-        let spot = SpotRecord(
-            id: UUID(),
-            name: "Test Spot",
-            latitude: 37.7849447,
-            longitude: -122.4303306,
-            createdAt: .now,
-        )
+        let spot = SpotRecord.peacePagoda
         try await db.write { database in
             try spot.insert(database)
         }
@@ -454,13 +633,7 @@ struct RealExperiencesRepositoryTests {
 
     @Test("Fetch experience by ID successfully")
     func testFetchExperienceByID() async throws {
-        let spot = SpotRecord(
-            id: UUID(),
-            name: "Test Spot",
-            latitude: 37.7849447,
-            longitude: -122.4303306,
-            createdAt: .now,
-        )
+        let spot = SpotRecord.peacePagoda
         try await db.write { database in
             try spot.insert(database)
         }
@@ -499,13 +672,7 @@ struct RealExperiencesRepositoryTests {
 
     @Test("Fetch experience by ID returns empty rating history when no ratings exist")
     func testFetchExperienceByIDWithNoRatingHistory() async throws {
-        let spot = SpotRecord(
-            id: UUID(),
-            name: "Test Spot",
-            latitude: 37.7849447,
-            longitude: -122.4303306,
-            createdAt: .now,
-        )
+        let spot = SpotRecord.peacePagoda
         try await db.write { database in
             try spot.insert(database)
         }
@@ -525,13 +692,7 @@ struct RealExperiencesRepositoryTests {
 
     @Test("Fetch experience by ID returns multiple ratings in history")
     func testFetchExperienceByIDWithMultipleRatings() async throws {
-        let spot = SpotRecord(
-            id: UUID(),
-            name: "Test Spot",
-            latitude: 37.7849447,
-            longitude: -122.4303306,
-            createdAt: .now,
-        )
+        let spot = SpotRecord.peacePagoda
         try await db.write { database in
             try spot.insert(database)
         }
@@ -580,13 +741,7 @@ struct RealExperiencesRepositoryTests {
 
     @Test("Fetch experience by ID includes spot data")
     func testFetchExperienceByIDIncludesSpotData() async throws {
-        let spot = SpotRecord(
-            id: UUID(),
-            name: "Coffee Shop",
-            latitude: 37.7849447,
-            longitude: -122.4303306,
-            createdAt: .now,
-        )
+        let spot = SpotRecord.peacePagoda
         try await db.write { database in
             try spot.insert(database)
         }
@@ -612,13 +767,7 @@ struct RealExperiencesRepositoryTests {
 
     @Test("Observe experience emits initial experience when it exists")
     func testObserveExperienceEmitsInitialExperience() async throws {
-        let spot = SpotRecord(
-            id: UUID(),
-            name: "Test Spot",
-            latitude: 37.7849447,
-            longitude: -122.4303306,
-            createdAt: .now,
-        )
+        let spot = SpotRecord.peacePagoda
         try await db.write { database in
             try spot.insert(database)
         }
@@ -655,13 +804,7 @@ struct RealExperiencesRepositoryTests {
 
     @Test("Observe experience emits updates when experience changes")
     func testObserveExperienceEmitsOnExperienceUpdate() async throws {
-        let spot = SpotRecord(
-            id: UUID(),
-            name: "Test Spot",
-            latitude: 37.7849447,
-            longitude: -122.4303306,
-            createdAt: .now,
-        )
+        let spot = SpotRecord.peacePagoda
         try await db.write { database in
             try spot.insert(database)
         }
@@ -698,13 +841,7 @@ struct RealExperiencesRepositoryTests {
 
     @Test("Observe experience emits updates when rating is added")
     func testObserveExperienceEmitsOnRatingAdded() async throws {
-        let spot = SpotRecord(
-            id: UUID(),
-            name: "Test Spot",
-            latitude: 37.7849447,
-            longitude: -122.4303306,
-            createdAt: .now,
-        )
+        let spot = SpotRecord.peacePagoda
         try await db.write { database in
             try spot.insert(database)
         }
@@ -747,13 +884,7 @@ struct RealExperiencesRepositoryTests {
 
     @Test("Observe experience includes spot data")
     func testObserveExperienceIncludesSpotData() async throws {
-        let spot = SpotRecord(
-            id: UUID(),
-            name: "Coffee Shop",
-            latitude: 37.7849447,
-            longitude: -122.4303306,
-            createdAt: .now,
-        )
+        let spot = SpotRecord.peacePagoda
         try await db.write { database in
             try spot.insert(database)
         }
@@ -780,13 +911,7 @@ struct RealExperiencesRepositoryTests {
 
     @Test("Observe experience returns empty rating history when no ratings exist")
     func testObserveExperienceWithNoRatingHistory() async throws {
-        let spot = SpotRecord(
-            id: UUID(),
-            name: "Test Spot",
-            latitude: 37.7849447,
-            longitude: -122.4303306,
-            createdAt: .now,
-        )
+        let spot = SpotRecord.peacePagoda
         try await db.write { database in
             try spot.insert(database)
         }

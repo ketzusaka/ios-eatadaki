@@ -50,6 +50,7 @@ Please refer to the architecture documentation at `docs/ARCHITECTURE.md` for det
 - **Database Testing**: **Never perform assertions inside database read/write blocks**. Fetch data from the database and perform assertions outside the block. Running test macros (like `#expect` or `#require`) inside database blocks causes the test runner to crash instead of properly reporting failures.
   - ❌ **Incorrect**: `try db.read { database in let entry = try Row.fetchOne(...); #expect(entry != nil) }`
   - ✅ **Correct**: `let entry = try await db.read { database in try Row.fetchOne(...) }; #expect(entry != nil)`
+- **Use Existing Fakes**: When writing tests, prefer using existing fake instances (e.g., `SpotRecord.peacePagoda`, `SpotRecord.kinokuniya`) instead of creating new test data inline. This improves consistency and reduces duplication. Existing fakes are typically defined in `*+Fakes.swift` files (e.g., `Spot+Fakes.swift`).
 
 ## Fake Implementation Guidelines
 
@@ -66,6 +67,8 @@ All `Fake[ProtocolName]` implementations (used for testing and previews) should 
    - Call the stub closure and return its result
 
 5. **DEBUG Only**: All Fake implementations must be wrapped in `#if DEBUG` compiler statements.
+
+6. **AsyncSequence Stubs**: When stubbing methods that return `AsyncSequence`, use `FakeAsyncSequence` instead of creating custom empty sequence types. `FakeAsyncSequence` is available in `EatadakiData/Sources/Experiences/Fakes/FakeAsyncSequence.swift` and can be initialized with an empty array for empty sequences (e.g., `FakeAsyncSequence<[Element], Error>()`).
 
 **Example Pattern:**
 ```swift

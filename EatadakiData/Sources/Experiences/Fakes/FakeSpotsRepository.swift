@@ -58,22 +58,7 @@ public class FakeSpotsRepository: SpotsRepository {
 
     public private(set) var invocationsObserveSpots: [FetchSpotsDataRequest] = []
     public var stubObserveSpots: (FetchSpotsDataRequest) -> any AsyncSequence<[SpotInfoSummary], SpotsRepositoryError> = { _ in
-        struct EmptySpotsSequence: AsyncSequence {
-            typealias Element = [SpotInfoSummary]
-            typealias Failure = SpotsRepositoryError
-            typealias AsyncIterator = Iterator
-
-            struct Iterator: AsyncIteratorProtocol {
-                mutating func next() async throws(SpotsRepositoryError) -> [SpotInfoSummary]? {
-                    nil
-                }
-            }
-
-            func makeAsyncIterator() -> Iterator {
-                Iterator()
-            }
-        }
-        return EmptySpotsSequence()
+        FakeAsyncSequence()
     }
 
     public func observeSpots(request: FetchSpotsDataRequest = .default) async -> any AsyncSequence<[SpotInfoSummary], SpotsRepositoryError> {

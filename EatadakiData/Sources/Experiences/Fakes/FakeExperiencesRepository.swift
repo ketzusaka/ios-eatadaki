@@ -30,6 +30,25 @@ public class FakeExperiencesRepository: ExperiencesRepository {
         return try await stubCreateExperience(spotId, name, description, rating)
     }
 
+    public private(set) var invocationsCreateExperienceRating: [(experienceId: UUID, rating: CreateRating)] = []
+    public var stubCreateExperienceRating: (UUID, CreateRating) async throws(ExperiencesRepositoryError) -> ExperienceRatingRecord = { experienceId, rating in
+        ExperienceRatingRecord(
+            id: UUID(),
+            experienceId: experienceId,
+            rating: rating.rating,
+            notes: rating.note,
+            createdAt: .now,
+        )
+    }
+
+    public func createExperienceRating(
+        experienceId: UUID,
+        rating: CreateRating,
+    ) async throws(ExperiencesRepositoryError) -> ExperienceRatingRecord {
+        invocationsCreateExperienceRating.append((experienceId, rating))
+        return try await stubCreateExperienceRating(experienceId, rating)
+    }
+
     public private(set) var invocationsFetchExperiences: [FetchExperiencesDataRequest] = []
     public var stubFetchExperiences: (FetchExperiencesDataRequest) async throws(ExperiencesRepositoryError) -> [ExperienceInfoSummary] = { _ in
         []
@@ -77,22 +96,7 @@ public class FakeExperiencesRepository: ExperiencesRepository {
 
     public private(set) var invocationsObserveExperiences: [FetchExperiencesDataRequest] = []
     public var stubObserveExperiences: (FetchExperiencesDataRequest) -> any AsyncSequence<[ExperienceInfoSummary], ExperiencesRepositoryError> = { _ in
-        struct EmptyExperiencesSequence: AsyncSequence {
-            typealias Element = [ExperienceInfoSummary]
-            typealias Failure = ExperiencesRepositoryError
-            typealias AsyncIterator = Iterator
-
-            struct Iterator: AsyncIteratorProtocol {
-                mutating func next() async throws(ExperiencesRepositoryError) -> [ExperienceInfoSummary]? {
-                    nil
-                }
-            }
-
-            func makeAsyncIterator() -> Iterator {
-                Iterator()
-            }
-        }
-        return EmptyExperiencesSequence()
+        FakeAsyncSequence()
     }
 
     public func observeExperiences(request: FetchExperiencesDataRequest = .default) async -> any AsyncSequence<[ExperienceInfoSummary], ExperiencesRepositoryError> {

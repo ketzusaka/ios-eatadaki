@@ -17,6 +17,11 @@ public protocol ExperiencesRepository: AnyObject {
         rating: CreateRating?,
     ) async throws(ExperiencesRepositoryError) -> ExperienceRecord
     
+    func createExperienceRating(
+        experienceId: UUID,
+        rating: CreateRating,
+    ) async throws(ExperiencesRepositoryError) -> ExperienceRatingRecord
+    
     func fetchExperiences(request: FetchExperiencesDataRequest) async throws(ExperiencesRepositoryError) -> [ExperienceInfoSummary]
     
     func fetchExperience(withID id: UUID) async throws(ExperiencesRepositoryError) -> ExperienceInfoDetailed
@@ -76,6 +81,39 @@ public actor RealExperiencesRepository: ExperiencesRepository {
                 }
 
                 return experience
+            }
+        } transformError: { error in
+            ExperiencesRepositoryError.databaseError(error.localizedDescription)
+        }
+    }
+
+    public func createExperienceRating(
+        experienceId: UUID,
+        rating: CreateRating,
+    ) async throws(ExperiencesRepositoryError) -> ExperienceRatingRecord {
+        try await perform {
+            try await db.write { db in
+                // Verify experience exists and fetch it
+                guard var experience = try ExperienceRecord.fetchOne(db, key: experienceId) else {
+                    throw ExperiencesRepositoryError.experienceNotFound
+                }
+
+                // Create rating record
+                let experienceRating = ExperienceRatingRecord(
+                    id: UUID(),
+                    experienceId: experienceId,
+                    rating: rating.rating,
+                    notes: rating.note,
+                    createdAt: .now,
+                )
+                try experienceRating.insert(db)
+
+                // Update cached rating fields on experience
+                experience.rating = rating.rating
+                experience.ratingNote = rating.note
+                try experience.update(db)
+
+                return experienceRating
             }
         } transformError: { error in
             ExperiencesRepositoryError.databaseError(error.localizedDescription)
