@@ -34,7 +34,7 @@ public actor AsyncSemaphore {
     /// Otherwise, suspends until `signal()` is called and the count becomes positive.
     /// When the count becomes positive, all waiting tasks are notified at once.
     public func wait() async {
-        if !isEmpty {
+        if count > 0 {
             return
         }
 
@@ -49,7 +49,7 @@ public actor AsyncSemaphore {
     public func signal() {
         count += 1
 
-        if !isEmpty && !waiters.isEmpty {
+        if count > 0 && !waiters.isEmpty {
             let allWaiters = waiters
             waiters.removeAll()
 

@@ -195,6 +195,10 @@ let project = Project(
             sources: ["EatadakiData/Tests/**"],
             dependencies: [
                 .target(name: "EatadakiData"),
+                .target(name: "EatadakiExperiencesKit"),
+                .target(name: "EatadakiLocationKit"),
+                .target(name: "EatadakiSpotsKit"),
+                .target(name: "EatadakiUI"),
                 .package(product: "GRDB")
             ]
         ),

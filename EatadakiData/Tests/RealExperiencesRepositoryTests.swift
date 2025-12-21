@@ -746,8 +746,8 @@ struct RealExperiencesRepositoryTests {
         )
         let observation = await repository.observeExperiences(request: request)
         var iterator = observation.makeAsyncIterator()
-        let experiences = try await iterator.next()
-        let experiences = try #require(experiences)
+        let nextExperiences = try await iterator.next()
+        let experiences = try #require(nextExperiences)
 
         try #require(experiences.count == 3)
         #expect(experiences[0].experience.name == "Apple Experience")
@@ -790,8 +790,8 @@ struct RealExperiencesRepositoryTests {
         )
         let observation = await repository.observeExperiences(request: request)
         var iterator = observation.makeAsyncIterator()
-        let experiences = try await iterator.next()
-        let experiences = try #require(experiences)
+        let nextExperiences = try await iterator.next()
+        let experiences = try #require(nextExperiences)
 
         try #require(experiences.count == 3)
         #expect(experiences[0].experience.name == "Zebra Experience")
