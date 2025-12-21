@@ -60,9 +60,9 @@ public struct SpotDetailView: View {
                         ForEach(spot.experiences) { experience in
                             HStack {
                                 Text(experience.name)
-                                
+
                                 Spacer()
-                                
+
                                 if let rating = experience.rating {
                                     Text(String(Double(rating) / 2))
                                 }
@@ -79,7 +79,7 @@ public struct SpotDetailView: View {
                     Button("Add a new experience") {
                         viewModel.isShowingAddExperienceFlow = true
                     }
-                    
+
                     Spacer(minLength: 16)
                 }
 

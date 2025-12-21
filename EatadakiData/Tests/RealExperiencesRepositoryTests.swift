@@ -207,7 +207,7 @@ struct RealExperiencesRepositoryTests {
         #expect(rat.rating == 5)
         #expect(rat.notes == "Test note")
     }
-    
+
     @Test("Create experience without rating has nil cached rating fields")
     func testCreateExperienceWithoutRating() async throws {
         let spot = SpotRecord.peacePagoda
@@ -554,7 +554,7 @@ struct RealExperiencesRepositoryTests {
         let experienceIds = Set(experiences.map(\.experience.id))
         #expect(experienceIds.contains(experience1.id))
         #expect(experienceIds.contains(experience2.id))
-        
+
         // Verify all experiences have the correct spot relationship
         for experienceInfo in experiences {
             #expect(experienceInfo.experience.spotId == spot.id)
@@ -593,17 +593,17 @@ struct RealExperiencesRepositoryTests {
         let experienceIds = Set(experiences.map(\.experience.id))
         #expect(experienceIds.contains(experience1.id))
         #expect(experienceIds.contains(experience2.id))
-        
+
         // Verify spot relationships are correct
         let experience1Info = experiences.first { $0.experience.id == experience1.id }
         let experience2Info = experiences.first { $0.experience.id == experience2.id }
         let exp1Info = try #require(experience1Info)
         let exp2Info = try #require(experience2Info)
-        
+
         #expect(exp1Info.experience.spotId == spot1.id)
         #expect(exp1Info.spot.id == spot1.id)
         #expect(exp1Info.spot.name == spot1.name)
-        
+
         #expect(exp2Info.experience.spotId == spot2.id)
         #expect(exp2Info.spot.id == spot2.id)
         #expect(exp2Info.spot.name == spot2.name)
@@ -732,7 +732,7 @@ struct RealExperiencesRepositoryTests {
         let ratingIds = Set(fetchedExperience.ratingHistory.map(\.id))
         #expect(ratingIds.contains(rating2.id))
         #expect(ratingIds.contains(rating3.id))
-        
+
         // Verify all ratings belong to this experience
         for ratingRecord in fetchedExperience.ratingHistory {
             #expect(ratingRecord.experienceId == experience.id)

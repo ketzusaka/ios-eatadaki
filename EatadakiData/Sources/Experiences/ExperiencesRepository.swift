@@ -16,18 +16,18 @@ public protocol ExperiencesRepository: AnyObject {
         description: String?,
         rating: CreateRating?,
     ) async throws(ExperiencesRepositoryError) -> ExperienceRecord
-    
+
     func createExperienceRating(
         experienceId: UUID,
         rating: CreateRating,
     ) async throws(ExperiencesRepositoryError) -> ExperienceRatingRecord
-    
+
     func fetchExperiences(request: FetchExperiencesDataRequest) async throws(ExperiencesRepositoryError) -> [ExperienceInfoSummary]
-    
+
     func fetchExperience(withID id: UUID) async throws(ExperiencesRepositoryError) -> ExperienceInfoDetailed
-    
+
     func observeExperience(withID id: UUID) async -> any AsyncSequence<ExperienceInfoDetailed, ExperiencesRepositoryError>
-    
+
     func observeExperiences(request: FetchExperiencesDataRequest) async -> any AsyncSequence<[ExperienceInfoSummary], ExperiencesRepositoryError>
 }
 
@@ -69,7 +69,7 @@ public actor RealExperiencesRepository: ExperiencesRepository {
                 try experience.insert(db)
 
                 // Create rating record
-                if let rating  {
+                if let rating {
                     let experienceRating = ExperienceRatingRecord(
                         id: UUID(),
                         experienceId: experience.id,

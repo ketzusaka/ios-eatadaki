@@ -22,4 +22,3 @@ public struct ExperienceInfoDetailed: FetchableRecord, Decodable, Equatable, Sen
         ratingHistory = row["experiences_ratings"]
     }
 }
-

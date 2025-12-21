@@ -18,4 +18,3 @@ public struct ExperienceInfoSummary: FetchableRecord, Decodable, Sendable {
         spot = row["spot"]
     }
 }
-

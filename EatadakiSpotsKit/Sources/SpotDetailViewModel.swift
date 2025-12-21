@@ -104,7 +104,7 @@ public final class SpotDetailViewModel {
             guard let observation = await self?.dependencies.spotsRepository.observeSpot(withID: spotId) else {
                 return
             }
-            
+
             do {
                 for try await spotInfoDetailed in observation {
                     guard !Task.isCancelled else { return }
