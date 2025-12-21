@@ -19,6 +19,8 @@ public protocol ExperiencesRepository: AnyObject {
     func fetchExperiences(request: FetchExperiencesDataRequest) async throws(ExperiencesRepositoryError) -> [ExperienceInfoSummary]
     
     func fetchExperience(withID id: UUID) async throws(ExperiencesRepositoryError) -> ExperienceInfoDetailed
+    
+    func observeExperience(withID id: UUID) async -> any AsyncSequence<ExperienceInfoDetailed, ExperiencesRepositoryError>
 }
 
 public protocol ExperiencesRepositoryProviding {
@@ -115,5 +117,30 @@ public actor RealExperiencesRepository: ExperiencesRepository {
         } catch {
             throw ExperiencesRepositoryError.databaseError(error.localizedDescription)
         }
+    }
+
+    public func observeExperience(withID id: UUID) async -> any AsyncSequence<ExperienceInfoDetailed, ExperiencesRepositoryError> {
+        let request = ExperienceRecord
+            .including(required: ExperienceRecord.spot)
+            .including(all: ExperienceRecord.ratings)
+            .filter(id: id)
+        let observation = ValueObservation.tracking { db in
+            guard let experience = try ExperienceInfoDetailed.fetchOne(db, request) else {
+                throw ExperiencesRepositoryError.experienceNotFound
+            }
+            return experience
+        }
+        let baseStream = observation.values(in: db)
+
+        return ErrorTransformingSequence<ExperienceInfoDetailed, ExperiencesRepositoryError>(
+            baseStream: baseStream,
+            transformError: { error in
+                if let experiencesError = error as? ExperiencesRepositoryError {
+                    experiencesError
+                } else {
+                    ExperiencesRepositoryError.databaseError(error.localizedDescription)
+                }
+            }
+        )
     }
 }

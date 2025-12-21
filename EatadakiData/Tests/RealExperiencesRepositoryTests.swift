@@ -633,4 +633,202 @@ struct RealExperiencesRepositoryTests {
         #expect(fetchedExperience.spot.longitude == spot.longitude)
         #expect(fetchedExperience.experience.spotId == spot.id)
     }
+
+    // MARK: - Observe Experience Tests
+
+    @Test("Observe experience emits initial experience when it exists")
+    func testObserveExperienceEmitsInitialExperience() async throws {
+        let spot = SpotRecord(
+            id: UUID(),
+            name: "Test Spot",
+            latitude: 37.7849447,
+            longitude: -122.4303306,
+            createdAt: .now,
+        )
+        try await db.write { database in
+            try spot.insert(database)
+        }
+
+        let rating = CreateRating(spotId: spot.id, rating: 5, note: "Great!")
+        let experience = try await repository.createExperience(
+            spotId: spot.id,
+            name: "Test Experience",
+            description: "A test experience",
+            rating: rating,
+        )
+
+        let observation = await repository.observeExperience(withID: experience.id)
+        var iterator = observation.makeAsyncIterator()
+
+        let observedExperience = try await iterator.next()
+        let exp = try #require(observedExperience)
+        #expect(exp.experience.id == experience.id)
+        #expect(exp.experience.name == "Test Experience")
+        #expect(exp.spot.id == spot.id)
+        #expect(exp.ratingHistory.count == 1)
+    }
+
+    @Test("Observe experience throws experienceNotFound when experience does not exist")
+    func testObserveExperienceThrowsNotFound() async throws {
+        let nonExistentID = UUID()
+        let observation = await repository.observeExperience(withID: nonExistentID)
+        var iterator = observation.makeAsyncIterator()
+
+        await #expect(throws: ExperiencesRepositoryError.experienceNotFound) {
+            try await iterator.next()
+        }
+    }
+
+    @Test("Observe experience emits updates when experience changes")
+    func testObserveExperienceEmitsOnExperienceUpdate() async throws {
+        let spot = SpotRecord(
+            id: UUID(),
+            name: "Test Spot",
+            latitude: 37.7849447,
+            longitude: -122.4303306,
+            createdAt: .now,
+        )
+        try await db.write { database in
+            try spot.insert(database)
+        }
+
+        let rating = CreateRating(spotId: spot.id, rating: 5)
+        let experience = try await repository.createExperience(
+            spotId: spot.id,
+            name: "Original Name",
+            description: nil,
+            rating: rating,
+        )
+
+        let observation = await repository.observeExperience(withID: experience.id)
+        var iterator = observation.makeAsyncIterator()
+
+        // Get initial value
+        let initialExperience = try await iterator.next()
+        let initial = try #require(initialExperience)
+        #expect(initial.experience.name == "Original Name")
+
+        // Update the experience name directly in database
+        try await db.write { database in
+            var updatedExperience = experience
+            updatedExperience.name = "Updated Name"
+            try updatedExperience.update(database)
+        }
+
+        // Should emit updated value
+        let updatedExperience = try await iterator.next()
+        let updated = try #require(updatedExperience)
+        #expect(updated.experience.name == "Updated Name")
+        #expect(updated.experience.id == experience.id)
+    }
+
+    @Test("Observe experience emits updates when rating is added")
+    func testObserveExperienceEmitsOnRatingAdded() async throws {
+        let spot = SpotRecord(
+            id: UUID(),
+            name: "Test Spot",
+            latitude: 37.7849447,
+            longitude: -122.4303306,
+            createdAt: .now,
+        )
+        try await db.write { database in
+            try spot.insert(database)
+        }
+
+        let rating1 = CreateRating(spotId: spot.id, rating: 5, note: "First rating")
+        let experience = try await repository.createExperience(
+            spotId: spot.id,
+            name: "Test Experience",
+            description: nil,
+            rating: rating1,
+        )
+
+        let observation = await repository.observeExperience(withID: experience.id)
+        var iterator = observation.makeAsyncIterator()
+
+        // Get initial value with one rating
+        let initialExperience = try await iterator.next()
+        let initial = try #require(initialExperience)
+        #expect(initial.ratingHistory.count == 1)
+
+        // Add another rating
+        let rating2 = ExperienceRatingRecord(
+            id: UUID(),
+            experienceId: experience.id,
+            rating: 4,
+            notes: "Second rating",
+            createdAt: .now,
+        )
+        try await db.write { database in
+            try rating2.insert(database)
+        }
+
+        // Should emit updated value with two ratings
+        let updatedExperience = try await iterator.next()
+        let updated = try #require(updatedExperience)
+        #expect(updated.ratingHistory.count == 2)
+        let ratingIds = Set(updated.ratingHistory.map(\.id))
+        #expect(ratingIds.contains(rating2.id))
+    }
+
+    @Test("Observe experience includes spot data")
+    func testObserveExperienceIncludesSpotData() async throws {
+        let spot = SpotRecord(
+            id: UUID(),
+            name: "Coffee Shop",
+            latitude: 37.7849447,
+            longitude: -122.4303306,
+            createdAt: .now,
+        )
+        try await db.write { database in
+            try spot.insert(database)
+        }
+
+        let rating = CreateRating(spotId: spot.id, rating: 5)
+        let experience = try await repository.createExperience(
+            spotId: spot.id,
+            name: "Test Experience",
+            description: nil,
+            rating: rating,
+        )
+
+        let observation = await repository.observeExperience(withID: experience.id)
+        var iterator = observation.makeAsyncIterator()
+
+        let observedExperience = try await iterator.next()
+        let exp = try #require(observedExperience)
+        #expect(exp.spot.id == spot.id)
+        #expect(exp.spot.name == spot.name)
+        #expect(exp.spot.latitude == spot.latitude)
+        #expect(exp.spot.longitude == spot.longitude)
+        #expect(exp.experience.spotId == spot.id)
+    }
+
+    @Test("Observe experience returns empty rating history when no ratings exist")
+    func testObserveExperienceWithNoRatingHistory() async throws {
+        let spot = SpotRecord(
+            id: UUID(),
+            name: "Test Spot",
+            latitude: 37.7849447,
+            longitude: -122.4303306,
+            createdAt: .now,
+        )
+        try await db.write { database in
+            try spot.insert(database)
+        }
+
+        let experience = try await repository.createExperience(
+            spotId: spot.id,
+            name: "Test Experience",
+            description: nil,
+            rating: nil,
+        )
+
+        let observation = await repository.observeExperience(withID: experience.id)
+        var iterator = observation.makeAsyncIterator()
+
+        let observedExperience = try await iterator.next()
+        let exp = try #require(observedExperience)
+        #expect(exp.ratingHistory.isEmpty == true)
+    }
 }

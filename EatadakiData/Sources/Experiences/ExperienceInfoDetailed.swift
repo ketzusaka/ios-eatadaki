@@ -19,7 +19,7 @@ public struct ExperienceInfoDetailed: FetchableRecord, Decodable, Equatable, Sen
     public init(row: Row) throws {
         experience = try ExperienceRecord(row: row)
         spot = row["spot"]
-        ratingHistory = row["ratings"]
+        ratingHistory = row["experiences_ratings"]
     }
 }
 

@@ -1,7 +1,7 @@
 import Foundation
 import GRDB
 
-public struct ExperienceRatingRecord: Codable {
+public struct ExperienceRatingRecord: Codable, Equatable, Identifiable, Sendable {
     public var id: UUID
     public var experienceId: UUID
     public var rating: Int
