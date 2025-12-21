@@ -74,5 +74,30 @@ public class FakeExperiencesRepository: ExperiencesRepository {
         invocationsObserveExperienceWithID.append(id)
         return stubObserveExperienceWithID(id)
     }
+
+    public private(set) var invocationsObserveExperiences: [FetchExperiencesDataRequest] = []
+    public var stubObserveExperiences: (FetchExperiencesDataRequest) -> any AsyncSequence<[ExperienceInfoSummary], ExperiencesRepositoryError> = { _ in
+        struct EmptyExperiencesSequence: AsyncSequence {
+            typealias Element = [ExperienceInfoSummary]
+            typealias Failure = ExperiencesRepositoryError
+            typealias AsyncIterator = Iterator
+
+            struct Iterator: AsyncIteratorProtocol {
+                mutating func next() async throws(ExperiencesRepositoryError) -> [ExperienceInfoSummary]? {
+                    nil
+                }
+            }
+
+            func makeAsyncIterator() -> Iterator {
+                Iterator()
+            }
+        }
+        return EmptyExperiencesSequence()
+    }
+
+    public func observeExperiences(request: FetchExperiencesDataRequest = .default) async -> any AsyncSequence<[ExperienceInfoSummary], ExperiencesRepositoryError> {
+        invocationsObserveExperiences.append(request)
+        return stubObserveExperiences(request)
+    }
 }
 #endif

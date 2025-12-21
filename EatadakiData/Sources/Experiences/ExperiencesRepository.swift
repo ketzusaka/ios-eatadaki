@@ -1,3 +1,4 @@
+import EatadakiKit
 import Foundation
 import GRDB
 
@@ -21,6 +22,8 @@ public protocol ExperiencesRepository: AnyObject {
     func fetchExperience(withID id: UUID) async throws(ExperiencesRepositoryError) -> ExperienceInfoDetailed
     
     func observeExperience(withID id: UUID) async -> any AsyncSequence<ExperienceInfoDetailed, ExperiencesRepositoryError>
+    
+    func observeExperiences(request: FetchExperiencesDataRequest) async -> any AsyncSequence<[ExperienceInfoSummary], ExperiencesRepositoryError>
 }
 
 public protocol ExperiencesRepositoryProviding {
@@ -45,8 +48,8 @@ public actor RealExperiencesRepository: ExperiencesRepository {
             throw ExperiencesRepositoryError.invalidRating
         }
 
-        do {
-            return try await db.write { db in
+        return try await perform {
+            try await db.write { db in
                 // Verify spot exists
                 guard try SpotRecord.filter(Column("id") == spotId).fetchCount(db) > 0 else {
                     throw ExperiencesRepositoryError.spotNotFound
@@ -79,30 +82,26 @@ public actor RealExperiencesRepository: ExperiencesRepository {
 
                 return experience
             }
-        } catch let error as ExperiencesRepositoryError {
-            throw error
-        } catch {
-            throw ExperiencesRepositoryError.databaseError(error.localizedDescription)
+        } transformError: { error in
+            ExperiencesRepositoryError.databaseError(error.localizedDescription)
         }
     }
 
     public func fetchExperiences(request: FetchExperiencesDataRequest = .default) async throws(ExperiencesRepositoryError) -> [ExperienceInfoSummary] {
-        do {
-            return try await db.read { db in
+        try await perform {
+            try await db.read { db in
                 let query = ExperienceRecord
                     .including(required: ExperienceRecord.spot)
                 return try ExperienceInfoSummary.fetchAll(db, query)
             }
-        } catch let error as ExperiencesRepositoryError {
-            throw error
-        } catch {
-            throw ExperiencesRepositoryError.databaseError(error.localizedDescription)
+        } transformError: { error in
+            ExperiencesRepositoryError.databaseError(error.localizedDescription)
         }
     }
 
     public func fetchExperience(withID id: UUID) async throws(ExperiencesRepositoryError) -> ExperienceInfoDetailed {
-        do {
-            return try await db.read { db in
+        try await perform {
+            try await db.read { db in
                 let request = ExperienceRecord
                     .including(required: ExperienceRecord.spot)
                     .including(all: ExperienceRecord.ratings)
@@ -112,10 +111,8 @@ public actor RealExperiencesRepository: ExperiencesRepository {
                 }
                 return experienceInfo
             }
-        } catch let error as ExperiencesRepositoryError {
-            throw error
-        } catch {
-            throw ExperiencesRepositoryError.databaseError(error.localizedDescription)
+        } transformError: { error in
+            ExperiencesRepositoryError.databaseError(error.localizedDescription)
         }
     }
 
@@ -133,6 +130,26 @@ public actor RealExperiencesRepository: ExperiencesRepository {
         let baseStream = observation.values(in: db)
 
         return ErrorTransformingSequence<ExperienceInfoDetailed, ExperiencesRepositoryError>(
+            baseStream: baseStream,
+            transformError: { error in
+                if let experiencesError = error as? ExperiencesRepositoryError {
+                    experiencesError
+                } else {
+                    ExperiencesRepositoryError.databaseError(error.localizedDescription)
+                }
+            }
+        )
+    }
+
+    public func observeExperiences(request: FetchExperiencesDataRequest = .default) async -> any AsyncSequence<[ExperienceInfoSummary], ExperiencesRepositoryError> {
+        let query = ExperienceRecord
+            .including(required: ExperienceRecord.spot)
+        let observation = ValueObservation.tracking { db in
+            try ExperienceInfoSummary.fetchAll(db, query)
+        }
+        let baseStream = observation.values(in: db)
+
+        return ErrorTransformingSequence<[ExperienceInfoSummary], ExperiencesRepositoryError>(
             baseStream: baseStream,
             transformError: { error in
                 if let experiencesError = error as? ExperiencesRepositoryError {
