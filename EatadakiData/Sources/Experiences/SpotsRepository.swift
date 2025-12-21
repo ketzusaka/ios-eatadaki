@@ -1,4 +1,5 @@
 import CoreLocation
+import EatadakiKit
 import Foundation
 import GRDB
 
@@ -54,8 +55,8 @@ public actor RealSpotsRepository: SpotsRepository {
     }
 
     public func fetchSpot(withID id: UUID) async throws(SpotsRepositoryError) -> SpotInfoDetailed {
-        do {
-            return try await db.read { db in
+        try await perform {
+            try await db.read { db in
                 let request = SpotRecord
                     .including(all: SpotRecord.experiences)
                     .filter(id: id)
@@ -64,10 +65,8 @@ public actor RealSpotsRepository: SpotsRepository {
                 }
                 return spotInfo
             }
-        } catch let error as SpotsRepositoryError {
-            throw error
-        } catch {
-            throw SpotsRepositoryError.databaseError(error.localizedDescription)
+        } transformError: { error in
+            SpotsRepositoryError.databaseError(error.localizedDescription)
         }
     }
 
@@ -76,8 +75,8 @@ public actor RealSpotsRepository: SpotsRepository {
             throw SpotsRepositoryError.noIDsProvided
         }
 
-        do {
-            return try await db.read { db in
+        return try await perform {
+            try await db.read { db in
                 let condition = try ids.condition
 
                 let request = SpotRecord
@@ -88,16 +87,14 @@ public actor RealSpotsRepository: SpotsRepository {
                 }
                 return spotInfo
             }
-        } catch let error as SpotsRepositoryError {
-            throw error
-        } catch {
-            throw SpotsRepositoryError.databaseError(error.localizedDescription)
+        } transformError: { error in
+            SpotsRepositoryError.databaseError(error.localizedDescription)
         }
     }
 
     public func fetchSpots(request: FetchSpotsDataRequest = .default) async throws(SpotsRepositoryError) -> [SpotInfoSummary] {
-        do {
-            return try await db.read { db in
+        try await perform {
+            try await db.read { db in
                 var baseQuery: QueryInterfaceRequest<SpotRecord>
 
                 if let query = request.query, !query.isEmpty {
@@ -147,10 +144,8 @@ public actor RealSpotsRepository: SpotsRepository {
                     return spots.map { SpotInfoSummary(spot: $0) }
                 }
             }
-        } catch let error as SpotsRepositoryError {
-            throw error
-        } catch {
-            throw SpotsRepositoryError.databaseError(error.localizedDescription)
+        } transformError: { error in
+            SpotsRepositoryError.databaseError(error.localizedDescription)
         }
     }
 
@@ -253,31 +248,27 @@ public actor RealSpotsRepository: SpotsRepository {
 
     @discardableResult
     public func create(spot: SpotRecord) async throws(SpotsRepositoryError) -> SpotRecord {
-        do {
-            return try await db.write { [weak self] db in
+        try await perform {
+            try await db.write { [weak self] db in
                 try spot.insert(db)
                 try self?.updateGeospatialIndex(for: spot, in: db)
                 return spot
             }
-        } catch let error as SpotsRepositoryError {
-            throw error
-        } catch {
-            throw SpotsRepositoryError.databaseError(error.localizedDescription)
+        } transformError: { error in
+            SpotsRepositoryError.databaseError(error.localizedDescription)
         }
     }
 
     private func fetchSpotRecord(withID id: UUID) async throws(SpotsRepositoryError) -> SpotRecord {
-        do {
-            return try await db.read { db in
+        try await perform {
+            try await db.read { db in
                 guard let spot = try SpotRecord.fetchOne(db, key: id) else {
                     throw SpotsRepositoryError.spotNotFound
                 }
                 return spot
             }
-        } catch let error as SpotsRepositoryError {
-            throw error
-        } catch {
-            throw SpotsRepositoryError.databaseError(error.localizedDescription)
+        } transformError: { error in
+            SpotsRepositoryError.databaseError(error.localizedDescription)
         }
     }
 
@@ -286,8 +277,8 @@ public actor RealSpotsRepository: SpotsRepository {
             throw SpotsRepositoryError.noIDsProvided
         }
 
-        do {
-            return try await db.read { db in
+        return try await perform {
+            try await db.read { db in
                 let condition = try ids.condition
 
                 let request = SpotRecord.filter(condition)
@@ -296,10 +287,8 @@ public actor RealSpotsRepository: SpotsRepository {
                 }
                 return spot
             }
-        } catch let error as SpotsRepositoryError {
-            throw error
-        } catch {
-            throw SpotsRepositoryError.databaseError(error.localizedDescription)
+        } transformError: { error in
+            SpotsRepositoryError.databaseError(error.localizedDescription)
         }
     }
 
@@ -316,18 +305,18 @@ public actor RealSpotsRepository: SpotsRepository {
             var existingSpot = try await fetchSpotRecord(withIDs: spotIDs)
             existingSpot.update(with: spot)
 
-            return try await db.write { [existingSpot, weak self] db in
-                try existingSpot.update(db)
-                try self?.updateGeospatialIndex(for: existingSpot, in: db)
-                return existingSpot
+            return try await perform {
+                try await db.write { [existingSpot, weak self] db in
+                    try existingSpot.update(db)
+                    try self?.updateGeospatialIndex(for: existingSpot, in: db)
+                    return existingSpot
+                }
+            } transformError: { error in
+                SpotsRepositoryError.databaseError(error.localizedDescription)
             }
         } catch SpotsRepositoryError.spotNotFound {
             // Spot doesn't exist, create it
             return try await create(spot: spot)
-        } catch let error as SpotsRepositoryError {
-            throw error
-        } catch {
-            throw SpotsRepositoryError.databaseError(error.localizedDescription)
         }
     }
 
