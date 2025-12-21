@@ -123,8 +123,12 @@ public actor RealExperiencesRepository: ExperiencesRepository {
     public func fetchExperiences(request: FetchExperiencesDataRequest = .default) async throws(ExperiencesRepositoryError) -> [ExperienceInfoSummary] {
         try await perform {
             try await db.read { db in
+                let ordering = request.sort.direction == .ascending
+                    ? Column("name").asc
+                    : Column("name").desc
                 let query = ExperienceRecord
                     .including(required: ExperienceRecord.spot)
+                    .order(ordering)
                 return try ExperienceInfoSummary.fetchAll(db, query)
             }
         } transformError: { error in
@@ -175,8 +179,12 @@ public actor RealExperiencesRepository: ExperiencesRepository {
     }
 
     public func observeExperiences(request: FetchExperiencesDataRequest = .default) async -> any AsyncSequence<[ExperienceInfoSummary], ExperiencesRepositoryError> {
+        let ordering = request.sort.direction == .ascending
+            ? Column("name").asc
+            : Column("name").desc
         let query = ExperienceRecord
             .including(required: ExperienceRecord.spot)
+            .order(ordering)
         let observation = ValueObservation.tracking { db in
             try ExperienceInfoSummary.fetchAll(db, query)
         }

@@ -629,6 +629,176 @@ struct RealExperiencesRepositoryTests {
         #expect(experiences.count == 1)
     }
 
+    @Test("Fetch experiences sorts by name ascending")
+    func testFetchExperiencesSortByNameAscending() async throws {
+        let spot = SpotRecord.peacePagoda
+        try await db.write { database in
+            try spot.insert(database)
+        }
+
+        let rating = CreateRating(rating: 5)
+        _ = try await repository.createExperience(
+            spotId: spot.id,
+            name: "Zebra Experience",
+            description: nil,
+            rating: rating,
+        )
+        _ = try await repository.createExperience(
+            spotId: spot.id,
+            name: "Apple Experience",
+            description: nil,
+            rating: rating,
+        )
+        _ = try await repository.createExperience(
+            spotId: spot.id,
+            name: "Banana Experience",
+            description: nil,
+            rating: rating,
+        )
+
+        let request = FetchExperiencesDataRequest(
+            sort: FetchExperiencesDataRequest.Sort(
+                field: .name,
+                direction: .ascending,
+            )
+        )
+        let experiences = try await repository.fetchExperiences(request: request)
+
+        try #require(experiences.count == 3)
+        #expect(experiences[0].experience.name == "Apple Experience")
+        #expect(experiences[1].experience.name == "Banana Experience")
+        #expect(experiences[2].experience.name == "Zebra Experience")
+    }
+
+    @Test("Fetch experiences sorts by name descending")
+    func testFetchExperiencesSortByNameDescending() async throws {
+        let spot = SpotRecord.peacePagoda
+        try await db.write { database in
+            try spot.insert(database)
+        }
+
+        let rating = CreateRating(rating: 5)
+        _ = try await repository.createExperience(
+            spotId: spot.id,
+            name: "Apple Experience",
+            description: nil,
+            rating: rating,
+        )
+        _ = try await repository.createExperience(
+            spotId: spot.id,
+            name: "Zebra Experience",
+            description: nil,
+            rating: rating,
+        )
+        _ = try await repository.createExperience(
+            spotId: spot.id,
+            name: "Banana Experience",
+            description: nil,
+            rating: rating,
+        )
+
+        let request = FetchExperiencesDataRequest(
+            sort: FetchExperiencesDataRequest.Sort(
+                field: .name,
+                direction: .descending,
+            )
+        )
+        let experiences = try await repository.fetchExperiences(request: request)
+
+        try #require(experiences.count == 3)
+        #expect(experiences[0].experience.name == "Zebra Experience")
+        #expect(experiences[1].experience.name == "Banana Experience")
+        #expect(experiences[2].experience.name == "Apple Experience")
+    }
+
+    @Test("Observe experiences sorts by name ascending")
+    func testObserveExperiencesSortByNameAscending() async throws {
+        let spot = SpotRecord.peacePagoda
+        try await db.write { database in
+            try spot.insert(database)
+        }
+
+        let rating = CreateRating(rating: 5)
+        _ = try await repository.createExperience(
+            spotId: spot.id,
+            name: "Zebra Experience",
+            description: nil,
+            rating: rating,
+        )
+        _ = try await repository.createExperience(
+            spotId: spot.id,
+            name: "Apple Experience",
+            description: nil,
+            rating: rating,
+        )
+        _ = try await repository.createExperience(
+            spotId: spot.id,
+            name: "Banana Experience",
+            description: nil,
+            rating: rating,
+        )
+
+        let request = FetchExperiencesDataRequest(
+            sort: FetchExperiencesDataRequest.Sort(
+                field: .name,
+                direction: .ascending,
+            )
+        )
+        let observation = await repository.observeExperiences(request: request)
+        var iterator = observation.makeAsyncIterator()
+        let experiences = try await iterator.next()
+        let experiences = try #require(experiences)
+
+        try #require(experiences.count == 3)
+        #expect(experiences[0].experience.name == "Apple Experience")
+        #expect(experiences[1].experience.name == "Banana Experience")
+        #expect(experiences[2].experience.name == "Zebra Experience")
+    }
+
+    @Test("Observe experiences sorts by name descending")
+    func testObserveExperiencesSortByNameDescending() async throws {
+        let spot = SpotRecord.peacePagoda
+        try await db.write { database in
+            try spot.insert(database)
+        }
+
+        let rating = CreateRating(rating: 5)
+        _ = try await repository.createExperience(
+            spotId: spot.id,
+            name: "Apple Experience",
+            description: nil,
+            rating: rating,
+        )
+        _ = try await repository.createExperience(
+            spotId: spot.id,
+            name: "Zebra Experience",
+            description: nil,
+            rating: rating,
+        )
+        _ = try await repository.createExperience(
+            spotId: spot.id,
+            name: "Banana Experience",
+            description: nil,
+            rating: rating,
+        )
+
+        let request = FetchExperiencesDataRequest(
+            sort: FetchExperiencesDataRequest.Sort(
+                field: .name,
+                direction: .descending,
+            )
+        )
+        let observation = await repository.observeExperiences(request: request)
+        var iterator = observation.makeAsyncIterator()
+        let experiences = try await iterator.next()
+        let experiences = try #require(experiences)
+
+        try #require(experiences.count == 3)
+        #expect(experiences[0].experience.name == "Zebra Experience")
+        #expect(experiences[1].experience.name == "Banana Experience")
+        #expect(experiences[2].experience.name == "Apple Experience")
+    }
+
     // MARK: - Fetch Experience By ID Tests
 
     @Test("Fetch experience by ID successfully")
