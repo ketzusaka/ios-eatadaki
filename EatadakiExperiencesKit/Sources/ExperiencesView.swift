@@ -58,7 +58,14 @@ public struct ExperiencesView: View {
     private var experiencesList: some View {
         List {
             ForEach(viewModel.experiences) { experience in
-                ExperienceRowView(experience: experience.backingData)
+                NavigationLink {
+                    ExperienceDetailView(
+                        dependencies: dependencies,
+                        experienceSummary: experience.backingData,
+                    )
+                } label: {
+                    ExperienceRowView(experience: experience.backingData)
+                }
             }
         }
     }

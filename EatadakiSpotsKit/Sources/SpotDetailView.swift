@@ -58,20 +58,14 @@ public struct SpotDetailView: View {
                 } else {
                     VStack(spacing: 8) {
                         ForEach(spot.experiences) { experience in
-                            HStack {
-                                Text(experience.name)
-
-                                Spacer()
-
-                                if let rating = experience.rating {
-                                    Text(String(Double(rating) / 2))
-                                }
+                            NavigationLink {
+                                ExperienceDetailView(
+                                    dependencies: dependencies,
+                                    experienceSummary: ExperienceInfoSummary(spot: spot.backingData.spot, experience: experience),
+                                )
+                            } label: {
+                                experienceRow(for: experience)
                             }
-                            .padding()
-                            .overlay(
-                                RoundedRectangle(cornerRadius: 8)
-                                    .stroke(style: StrokeStyle(lineWidth: 1))
-                            )
                             .padding([.leading, .trailing])
                         }
                     }
@@ -126,6 +120,24 @@ public struct SpotDetailView: View {
                 viewModel.isShowingAddExperienceFlow = true
             }
         }
+    }
+    
+    @ViewBuilder
+    private func experienceRow(for experience: ExperienceRecord) -> some View {
+        HStack {
+            Text(experience.name)
+
+            Spacer()
+
+            if let rating = experience.rating {
+                Text(String(Double(rating) / 2))
+            }
+        }
+        .padding()
+        .overlay(
+            RoundedRectangle(cornerRadius: 8)
+                .stroke(style: StrokeStyle(lineWidth: 1))
+        )
     }
 }
 
