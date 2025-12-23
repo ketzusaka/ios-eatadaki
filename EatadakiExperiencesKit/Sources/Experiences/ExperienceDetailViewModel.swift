@@ -7,8 +7,6 @@ public enum ExperienceDetailViewModelError: Error, Equatable {
     case unableToLoad
 }
 
-
-
 @Observable
 @MainActor
 public final class ExperienceDetailViewModel {
@@ -147,4 +145,3 @@ public struct FakeExperienceDetailViewModelDependencies: ExperiencesRepositoryPr
     }
 }
 #endif
-

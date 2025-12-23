@@ -43,7 +43,6 @@ let project = Project(
                 .target(name: "EatadakiUI"),
                 .target(name: "EatadakiData"),
                 .target(name: "EatadakiKit"),
-                .target(name: "EatadakiSpotsKit"),
                 .target(name: "EatadakiExperiencesKit"),
                 .target(name: "EatadakiUserKit"),
                 .target(name: "EatadakiLocationKit"),
@@ -118,23 +117,6 @@ let project = Project(
         ),
 
         .target(
-            name: "EatadakiSpotsKit",
-            destinations: [.iPhone],
-            product: .framework,
-            bundleId: "com.aethercodelabs.eatadaki.spotskit",
-            deploymentTargets: .iOS("26.0"),
-            infoPlist: .default,
-            sources: ["EatadakiSpotsKit/Sources/**"],
-            dependencies: [
-                .target(name: "EatadakiData"),
-                .target(name: "EatadakiKit"),
-                .target(name: "EatadakiLocationKit"),
-                .target(name: "EatadakiUI"),
-                .target(name: "EatadakiExperiencesKit")
-            ]
-        ),
-
-        .target(
             name: "EatadakiExperiencesKit",
             destinations: [.iPhone],
             product: .framework,
@@ -197,7 +179,6 @@ let project = Project(
                 .target(name: "EatadakiData"),
                 .target(name: "EatadakiExperiencesKit"),
                 .target(name: "EatadakiLocationKit"),
-                .target(name: "EatadakiSpotsKit"),
                 .target(name: "EatadakiUI"),
                 .package(product: "GRDB")
             ]
@@ -223,20 +204,6 @@ let project = Project(
             dependencies: [
                 .target(name: "EatadakiLocationKit"),
                 .target(name: "EatadakiData")
-            ]
-        ),
-
-        .target(
-            name: "EatadakiSpotsKitTests",
-            destinations: [.iPhone],
-            product: .unitTests,
-            bundleId: "com.aethercodelabs.eatadaki.spotskit.tests",
-            deploymentTargets: .iOS("26.0"),
-            sources: ["EatadakiSpotsKit/Tests/**"],
-            dependencies: [
-                .target(name: "EatadakiSpotsKit"),
-                .target(name: "EatadakiData"),
-                .target(name: "EatadakiLocationKit")
             ]
         ),
 
@@ -275,7 +242,6 @@ let project = Project(
                     "EatadakiData",
                     "EatadakiKit",
                     "EatadakiLocationKit",
-                    "EatadakiSpotsKit",
                     "EatadakiExperiencesKit",
                     "EatadakiUserKit"
                 ]
@@ -286,7 +252,6 @@ let project = Project(
                     "EatadakiDataTests",
                     "EatadakiKitTests",
                     "EatadakiLocationKitTests",
-                    "EatadakiSpotsKitTests",
                     "EatadakiExperiencesKitTests",
                     // "EatadakiUserKitTests",
                 ],

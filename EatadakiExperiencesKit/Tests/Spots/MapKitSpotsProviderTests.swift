@@ -1,6 +1,6 @@
 import CoreLocation
 import EatadakiData
-import EatadakiSpotsKit
+import EatadakiExperiencesKit
 import Foundation
 import MapKit
 import Testing

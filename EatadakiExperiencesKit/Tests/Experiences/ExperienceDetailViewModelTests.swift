@@ -225,4 +225,3 @@ struct ExperienceDetailViewModelTests {
         #expect(loadedDetail.spot.id == SpotRecord.peacePagoda.id)
     }
 }
-

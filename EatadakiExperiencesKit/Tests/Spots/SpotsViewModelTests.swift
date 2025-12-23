@@ -1,7 +1,7 @@
 import CoreLocation
 import EatadakiData
+import EatadakiExperiencesKit
 import EatadakiLocationKit
-import EatadakiSpotsKit
 import Foundation
 import Testing
 

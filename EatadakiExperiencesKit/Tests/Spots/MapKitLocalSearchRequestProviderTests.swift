@@ -1,4 +1,4 @@
-import EatadakiSpotsKit
+import EatadakiExperiencesKit
 import MapKit
 import Testing
 

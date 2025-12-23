@@ -1,5 +1,5 @@
 import EatadakiData
-import EatadakiSpotsKit
+import EatadakiExperiencesKit
 import Foundation
 import GRDB
 import Testing

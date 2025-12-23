@@ -8,14 +8,14 @@ public struct ExperienceDetailView: View {
     public protocol SpotCardViewData {
         var spotName: String { get }
     }
-    
+
     public protocol ExperienceCardViewData {
         var experienceName: String { get }
         var experienceDescription: String? { get }
         var rating: Int? { get }
         var ratingNote: String? { get }
     }
-    
+
     @Environment(ThemeManager.self) var themeManager
     @Environment(\.colorScheme) var colorScheme
     @State var viewModel: ExperienceDetailViewModel
@@ -49,11 +49,10 @@ public struct ExperienceDetailView: View {
             case .uninitialized, .initializing:
                 if let preview = viewModel.preview {
                     VStack(alignment: .leading, spacing: 16) {
-
                         experienceSectionView(for: preview)
-                        
+
                         spotSectionView(for: preview)
-                        
+
                         ratingSectionView(for: preview)
 
                         LoadingView()
@@ -65,11 +64,11 @@ public struct ExperienceDetailView: View {
             case .loaded(let experience):
                 VStack(alignment: .leading, spacing: 16) {
                     experienceSectionView(for: experience)
-                    
+
                     spotSectionView(for: experience)
-                    
+
                     ratingSectionView(for: experience)
-                    
+
                     // TODO: Past ratings list
 
                     Spacer(minLength: 16)
@@ -84,99 +83,95 @@ public struct ExperienceDetailView: View {
             await viewModel.initialize()
         }
     }
-    
-    
-    
+
     @ViewBuilder
     private func spotSectionView(for spot: SpotCardViewData) -> some View {
         let theme = themeManager.tokens(for: colorScheme)
-        
+
         VStack(alignment: .leading) {
             Text("Spot")
                 .headlineTextStyling(using: theme)
-            
+
             spotCardView(for: spot)
         }
     }
-    
+
     @ViewBuilder
     private func spotCardView(for spot: SpotCardViewData) -> some View {
         HStack {
             Text(spot.spotName)
 
             Spacer()
-            
+
             // TODO: Add distance from current location here
         }
     }
-    
+
     @ViewBuilder
     private func experienceSectionView(for experience: ExperienceCardViewData) -> some View {
         let theme = themeManager.tokens(for: colorScheme)
-        
+
         VStack(alignment: .leading) {
             Text("Experience")
                 .headlineTextStyling(using: theme)
-            
+
             experienceCardView(for: experience)
         }
     }
-    
+
     @ViewBuilder
     private func experienceCardView(for experience: ExperienceCardViewData) -> some View {
         HStack {
             Text("Name")
 
             Spacer()
-            
+
             Text(experience.experienceName)
         }
-        
+
         // TODO: Category / etc
-        
+
         if let experienceDescription = experience.experienceDescription, !experienceDescription.isEmpty {
             HStack {
                 Text("Description")
 
                 Spacer()
-                
+
                 Text(experienceDescription)
             }
         }
     }
-    
+
     @ViewBuilder
     private func ratingSectionView(for experience: ExperienceCardViewData) -> some View {
         let theme = themeManager.tokens(for: colorScheme)
-        
+
         VStack(alignment: .leading) {
             Text("Rating")
                 .headlineTextStyling(using: theme)
-            
-            
+
             ratingCardView(for: experience)
         }
     }
-    
+
     @ViewBuilder
     private func ratingCardView(for experience: ExperienceCardViewData) -> some View {
         let theme = themeManager.tokens(for: colorScheme)
-        
+
         if let rating = experience.rating {
             VStack(spacing: 8) {
                 RatingStarsView(rating: rating, starSize: 32)
                     .frame(maxWidth: .infinity)
-                
+
                 if let note = experience.ratingNote {
                     Text(note)
                         .captionTextStyling(using: theme)
                 }
-                
+
                 Button("Update rating") {
                     // TODO: Present Edit Rating experience
                 }
             }
-            
         } else {
             VStack {
                 Text("You have not rated this experience yet.")
@@ -271,4 +266,3 @@ public struct ExperienceDetailView: View {
     }
 }
 #endif
-

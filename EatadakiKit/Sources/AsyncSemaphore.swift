@@ -1,5 +1,7 @@
 import Foundation
 
+// swiftlint:disable empty_count
+
 /// An actor-based semaphore-like utility for coordinating async operations in tests.
 ///
 /// Similar to `DispatchSemaphore`, but designed for Swift concurrency. Use this to wait for

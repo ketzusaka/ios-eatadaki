@@ -1,5 +1,4 @@
 import EatadakiData
-import EatadakiExperiencesKit
 import EatadakiLocationKit
 import EatadakiUI
 import MapKit
@@ -121,7 +120,7 @@ public struct SpotDetailView: View {
             }
         }
     }
-    
+
     @ViewBuilder
     private func experienceRow(for experience: ExperienceRecord) -> some View {
         HStack {

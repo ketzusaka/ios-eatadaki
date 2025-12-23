@@ -1,7 +1,6 @@
 import EatadakiData
 import EatadakiExperiencesKit
 import EatadakiKit
-import EatadakiSpotsKit
 import EatadakiUI
 import EatadakiUserKit
 import SwiftUI
