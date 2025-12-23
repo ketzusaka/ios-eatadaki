@@ -100,7 +100,7 @@ public struct FakeExperiencesViewModelDependencies: DeviceConfigurationControlle
 
     public var fakeDeviceConfigurationController = FakeDeviceConfigurationController()
     public var deviceConfigurationController: DeviceConfigurationController { fakeDeviceConfigurationController }
-    
+
     public var fakeSpotsRepository = FakeSpotsRepository()
     public var spotsRepository: any SpotsRepository { fakeSpotsRepository }
 

@@ -6,6 +6,7 @@ public typealias ExperienceDetailViewDependencies = ExperienceDetailViewModelDep
 
 public struct ExperienceDetailView: View {
     public protocol SpotCardViewData {
+        var spotId: UUID { get }
         var spotName: String { get }
     }
 
@@ -98,12 +99,14 @@ public struct ExperienceDetailView: View {
 
     @ViewBuilder
     private func spotCardView(for spot: SpotCardViewData) -> some View {
-        HStack {
-            Text(spot.spotName)
+        NavigationLink(value: ExperiencesScreen.spotDetails(.id(spot.spotId))) {
+            HStack {
+                Text(spot.spotName)
 
-            Spacer()
+                Spacer()
 
-            // TODO: Add distance from current location here
+                // TODO: Add distance from current location here
+            }
         }
     }
 

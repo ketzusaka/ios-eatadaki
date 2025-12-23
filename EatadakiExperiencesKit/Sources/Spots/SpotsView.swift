@@ -11,7 +11,7 @@ public struct SpotsView: View {
     @Environment(ThemeManager.self) var themeManager
     @Environment(\.colorScheme) var colorScheme
     @State var viewModel: SpotsViewModel
-    @State var navPath: [SpotsScreen] = []
+    @State var navPath: [ExperiencesScreen] = []
 
     private let dependencies: SpotsViewDependencies
 
@@ -23,7 +23,7 @@ public struct SpotsView: View {
     public var body: some View {
         NavigationStack(path: $navPath) {
             contentView
-                .navigationDestination(for: SpotsScreen.self) { screen in
+                .navigationDestination(for: ExperiencesScreen.self) { screen in
                     switch screen {
                     case .experienceDetils(let data):
                         switch data {
@@ -111,7 +111,7 @@ public struct SpotsView: View {
 
         List {
             ForEach(viewModel.spots) { spot in
-                NavigationLink(value: SpotsScreen.spotDetails(.summary(spot.backingData))) {
+                NavigationLink(value: ExperiencesScreen.spotDetails(.summary(spot.backingData))) {
                     Text(spot.name)
                         .listMainTextStyling(using: theme)
                 }

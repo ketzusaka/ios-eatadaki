@@ -57,7 +57,7 @@ public struct SpotDetailView: View {
                 } else {
                     VStack(spacing: 8) {
                         ForEach(spot.experiences) { experience in
-                            NavigationLink(value: SpotsScreen.experienceDetils(.summary(ExperienceInfoSummary(spot: spot.backingData.spot, experience: experience)))) {
+                            NavigationLink(value: ExperiencesScreen.experienceDetils(.summary(ExperienceInfoSummary(spot: spot.backingData.spot, experience: experience)))) {
                                 experienceRow(for: experience)
                             }
                             .padding([.leading, .trailing])

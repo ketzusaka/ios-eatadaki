@@ -21,6 +21,7 @@ public final class ExperienceDetailViewModel {
         public var ratingNote: String? { backingData.experience.ratingNote }
         public var spot: SpotRecord { backingData.spot }
         public var ratingHistory: [ExperienceRatingRecord] { backingData.ratingHistory }
+        public var spotId: UUID { backingData.spot.id }
         public var spotName: String { backingData.spot.name }
         public var experienceName: String { backingData.experience.name }
         public var experienceDescription: String? { backingData.experience.description }
@@ -36,6 +37,7 @@ public final class ExperienceDetailViewModel {
         public var experienceName: String
         public var rating: Int?
         public var ratingNote: String?
+        public var spotId: UUID
         public var spotName: String
     }
 
@@ -82,6 +84,7 @@ public final class ExperienceDetailViewModel {
             experienceName: experienceSummary.experience.name,
             rating: experienceSummary.experience.rating,
             ratingNote: experienceSummary.experience.ratingNote,
+            spotId: experienceSummary.spot.id,
             spotName: experienceSummary.spot.name,
         )
     }
