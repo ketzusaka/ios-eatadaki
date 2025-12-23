@@ -91,7 +91,7 @@ public final class ExperiencesViewModel {
 }
 
 #if DEBUG
-public struct FakeExperiencesViewModelDependencies: DeviceConfigurationControllerProviding, ExperiencesRepositoryProviding, LocationServiceProviding {
+public struct FakeExperiencesViewModelDependencies: DeviceConfigurationControllerProviding, ExperiencesRepositoryProviding, SpotsRepositoryProviding, LocationServiceProviding {
     public var fakeExperiencesRepository = FakeExperiencesRepository()
     public var experiencesRepository: any ExperiencesRepository { fakeExperiencesRepository }
 
@@ -100,6 +100,9 @@ public struct FakeExperiencesViewModelDependencies: DeviceConfigurationControlle
 
     public var fakeDeviceConfigurationController = FakeDeviceConfigurationController()
     public var deviceConfigurationController: DeviceConfigurationController { fakeDeviceConfigurationController }
+    
+    public var fakeSpotsRepository = FakeSpotsRepository()
+    public var spotsRepository: any SpotsRepository { fakeSpotsRepository }
 
     public init(_ configure: ((Self) -> Void)? = nil) {
         configure?(self)

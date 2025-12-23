@@ -1,7 +1,7 @@
 import Foundation
 import GRDB
 
-public struct SpotInfoSummary: FetchableRecord, Decodable, Sendable {
+public struct SpotInfoSummary: FetchableRecord, Decodable, Sendable, Hashable {
     public var spot: SpotRecord
 
     public init(

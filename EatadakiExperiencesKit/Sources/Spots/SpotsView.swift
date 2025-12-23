@@ -11,6 +11,7 @@ public struct SpotsView: View {
     @Environment(ThemeManager.self) var themeManager
     @Environment(\.colorScheme) var colorScheme
     @State var viewModel: SpotsViewModel
+    @State var navPath: [SpotsScreen] = []
 
     private let dependencies: SpotsViewDependencies
 
@@ -20,8 +21,26 @@ public struct SpotsView: View {
     }
 
     public var body: some View {
-        NavigationStack {
+        NavigationStack(path: $navPath) {
             contentView
+                .navigationDestination(for: SpotsScreen.self) { screen in
+                    switch screen {
+                    case .experienceDetils(let data):
+                        switch data {
+                        case .id(let id):
+                            ExperienceDetailView(dependencies: dependencies, experienceId: id)
+                        case .summary(let summary):
+                            ExperienceDetailView(dependencies: dependencies, experienceSummary: summary)
+                        }
+                    case .spotDetails(let data):
+                        switch data {
+                        case .id(let id):
+                            SpotDetailView(dependencies: dependencies, spotId: id)
+                        case .summary(let summary):
+                            SpotDetailView(dependencies: dependencies, spotSummary: summary)
+                        }
+                    }
+                }
                 .navigationTitle("Spots")
                 .searchable(text: $viewModel.searchQuery, prompt: "Search spots")
                 .toolbar {
@@ -92,12 +111,7 @@ public struct SpotsView: View {
 
         List {
             ForEach(viewModel.spots) { spot in
-                NavigationLink {
-                    SpotDetailView(
-                        dependencies: dependencies,
-                        spotInfoListing: spot.backingData,
-                    )
-                } label: {
+                NavigationLink(value: SpotsScreen.spotDetails(.summary(spot.backingData))) {
                     Text(spot.name)
                         .listMainTextStyling(using: theme)
                 }

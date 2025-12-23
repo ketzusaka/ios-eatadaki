@@ -67,13 +67,13 @@ public final class SpotDetailViewModel {
 
     public init(
         dependencies: SpotsDetailViewModelDependencies,
-        spotInfoListing: SpotInfoSummary,
+        spotSummary: SpotInfoSummary,
     ) {
         self.dependencies = dependencies
-        self.spotId = spotInfoListing.spot.id
+        self.spotId = spotSummary.spot.id
         self.preview = Preview(
-            name: spotInfoListing.spot.name,
-            coordinates: spotInfoListing.coordinates,
+            name: spotSummary.spot.name,
+            coordinates: spotSummary.coordinates,
         )
     }
 

@@ -2,12 +2,13 @@ import EatadakiData
 import EatadakiUI
 import SwiftUI
 
-public typealias ExperiencesViewDependencies = ExperiencesViewModelDependencies
+public typealias ExperiencesViewDependencies = ExperiencesViewModelDependencies & SpotsRepositoryProviding
 
 public struct ExperiencesView: View {
     @Environment(ThemeManager.self) var themeManager
     @Environment(\.colorScheme) var colorScheme
     @State var viewModel: ExperiencesViewModel
+    @State var navPath: [ExperiencesScreen] = []
 
     private let dependencies: ExperiencesViewDependencies
 
@@ -17,8 +18,26 @@ public struct ExperiencesView: View {
     }
 
     public var body: some View {
-        NavigationStack {
+        NavigationStack(path: $navPath) {
             contentView
+                .navigationDestination(for: ExperiencesScreen.self) { screen in
+                    switch screen {
+                    case .experienceDetils(let data):
+                        switch data {
+                        case .id(let id):
+                            ExperienceDetailView(dependencies: dependencies, experienceId: id)
+                        case .summary(let summary):
+                            ExperienceDetailView(dependencies: dependencies, experienceSummary: summary)
+                        }
+                    case .spotDetails(let data):
+                        switch data {
+                        case .id(let id):
+                            SpotDetailView(dependencies: dependencies, spotId: id)
+                        case .summary(let summary):
+                            SpotDetailView(dependencies: dependencies, spotSummary: summary)
+                        }
+                    }
+                }
                 .navigationTitle("Experiences")
                 .searchable(text: $viewModel.searchQuery, prompt: "Search experiences")
                 .toolbar {
@@ -58,12 +77,7 @@ public struct ExperiencesView: View {
     private var experiencesList: some View {
         List {
             ForEach(viewModel.experiences) { experience in
-                NavigationLink {
-                    ExperienceDetailView(
-                        dependencies: dependencies,
-                        experienceSummary: experience.backingData,
-                    )
-                } label: {
+                NavigationLink(value: ExperiencesScreen.experienceDetils(.summary(experience.backingData))) {
                     ExperienceRowView(experience: experience.backingData)
                 }
             }

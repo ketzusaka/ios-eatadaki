@@ -14,12 +14,12 @@ public struct SpotDetailView: View {
 
     public init(
         dependencies: SpotsDetailViewDependencies,
-        spotInfoListing: SpotInfoSummary,
+        spotSummary: SpotInfoSummary,
     ) {
         self.dependencies = dependencies
         self.viewModel = SpotDetailViewModel(
             dependencies: dependencies,
-            spotInfoListing: spotInfoListing,
+            spotSummary: spotSummary,
         )
     }
 
@@ -57,12 +57,7 @@ public struct SpotDetailView: View {
                 } else {
                     VStack(spacing: 8) {
                         ForEach(spot.experiences) { experience in
-                            NavigationLink {
-                                ExperienceDetailView(
-                                    dependencies: dependencies,
-                                    experienceSummary: ExperienceInfoSummary(spot: spot.backingData.spot, experience: experience),
-                                )
-                            } label: {
+                            NavigationLink(value: SpotsScreen.experienceDetils(.summary(ExperienceInfoSummary(spot: spot.backingData.spot, experience: experience)))) {
                                 experienceRow(for: experience)
                             }
                             .padding([.leading, .trailing])
@@ -168,7 +163,7 @@ public struct SpotDetailView: View {
     NavigationStack {
         SpotDetailView(
             dependencies: dependencies,
-            spotInfoListing: SpotInfoSummary(spot: SpotRecord.peacePagoda),
+            spotSummary: SpotInfoSummary(spot: SpotRecord.peacePagoda),
         )
         .environment(ThemeManager())
     }

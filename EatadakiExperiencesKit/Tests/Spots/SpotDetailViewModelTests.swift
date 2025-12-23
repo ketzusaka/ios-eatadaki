@@ -15,7 +15,7 @@ struct SpotDetailViewModelTests {
         let spotInfoListing = SpotInfoSummary(spot: spot)
         let viewModel = SpotDetailViewModel(
             dependencies: dependencies,
-            spotInfoListing: spotInfoListing,
+            spotSummary: spotInfoListing,
         )
 
         #expect(viewModel.stage == .uninitialized)
@@ -79,7 +79,7 @@ struct SpotDetailViewModelTests {
         let spotInfoListing = SpotInfoSummary(spot: spot)
         let viewModel = SpotDetailViewModel(
             dependencies: dependencies,
-            spotInfoListing: spotInfoListing,
+            spotSummary: spotInfoListing,
         )
 
         #expect(viewModel.navigationTitle == "Preview Name")
